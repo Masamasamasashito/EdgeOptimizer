@@ -19,7 +19,7 @@ git clone https://github.com/Masamasamasashito/EdgeOptimizer.git
 All Docker Compose related files (docker-compose.yml, env.example, caddy/Caddyfile, and service-specific Dockerfiles) are located in the `EO_Infra_Docker` directory.
 
 ```
-cd EO_Infra_Docker
+cd EdgeOptimizer/EO_Infra_Docker
 cp env.example .env
 ```
 
