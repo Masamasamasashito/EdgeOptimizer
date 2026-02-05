@@ -506,8 +506,8 @@ Outputs:
     Export:
       Name: !Sub "${AWS::StackName}-GitHubActionsDeployRoleArn"
 
-   GitHubOIDCProviderArn:
-     Description: "GitHub OIDC Provider ARN"
-     Value: !GetAtt GitHubOIDCProvider.Arn
-     Export:
-       Name: !Sub "${AWS::StackName}-GitHubOIDCProviderArn"
+  GitHubOIDCProviderArn:
+    Description: "GitHub OIDC Provider ARN"
+    Value: !GetAtt GitHubOIDCProvider.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-GitHubOIDCProviderArn"
