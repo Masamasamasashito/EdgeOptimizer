@@ -585,7 +585,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "http://playwright:13000/content",
+        "url": "http://playwright:3000/content",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
