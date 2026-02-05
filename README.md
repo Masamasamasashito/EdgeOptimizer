@@ -11,7 +11,7 @@ mkdir ~/work/docker | cd
 
 ## 1. git clone
 ```
-git clone https://github.com/Masamasamasashito/EdgeOptimizer
+git clone https://github.com/Masamasamasashito/EdgeOptimizer.git
 ```
 
 ## 2. Get Ready .env
