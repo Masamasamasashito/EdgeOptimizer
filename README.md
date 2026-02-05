@@ -14,7 +14,7 @@ mkdir ~/work/docker | cd
 git clone https://github.com/Masamasamasashito/EdgeOptimizer.git
 ```
 
-## 2. Get Ready .env
+## 2. Get Ready EO_Infra_Docker/.env
 
 All Docker Compose related files (docker-compose.yml, env.example, caddy/Caddyfile, and service-specific Dockerfiles) are located in the `EO_Infra_Docker` directory.
 
@@ -23,7 +23,7 @@ cd EO_Infra_Docker
 cp env.example .env
 ```
 
-## 3. Generate security keys on .env (Crucial step!)
+## 3. Generate security keys on EO_Infra_Docker/.env (Crucial step!)
 
 Run the command below for your OS in your terminal to append secrets to `EO_Infra_Docker/.env` (You only need to do this once)
 
@@ -57,9 +57,9 @@ $bytes = New-Object byte[] 32; (New-Object System.Security.Cryptography.RNGCrypt
 
 ### Configuration
 
-#### 1. Set Environment Variable in `.env` File
+#### 1. Set Environment Variable in `EO_Infra_Docker/.env` File
 
-The `N8N_EO_REQUEST_SECRET` value must be set in `EO_Infra_Docker/.env` file. This is automatically generated when you run the commands in **Section 3** above. If you need to set it manually, add the following line to your `.env` file:
+The `N8N_EO_REQUEST_SECRET` value must be set in `EO_Infra_Docker/.env` file. This is automatically generated when you run the commands in **Section 3** above. If you need to set it manually, add the following line to your `EO_Infra_Docker/.env` file:
 
 ```
 N8N_EO_REQUEST_SECRET=your_secret_value_here
@@ -74,7 +74,7 @@ N8N_EO_REQUEST_SECRET: ${N8N_EO_REQUEST_SECRET}
 N8N_BLOCK_ENV_ACCESS_IN_NODE: false
 ```
 
-- **`N8N_EO_REQUEST_SECRET: ${N8N_EO_REQUEST_SECRET}`**: This reads the value from the `.env` file (set in step 1) and passes it to the n8n container as an environment variable. It can then be accessed in workflows using `{{ $env.N8N_EO_REQUEST_SECRET }}`.
+- **`N8N_EO_REQUEST_SECRET: ${N8N_EO_REQUEST_SECRET}`**: This reads the value from the `EO_Infra_Docker/.env` file (set in step 1) and passes it to the n8n container as an environment variable. It can then be accessed in workflows using `{{ $env.N8N_EO_REQUEST_SECRET }}`.
 - **`N8N_BLOCK_ENV_ACCESS_IN_NODE: false`**: This setting allows workflows to access environment variables. Setting it to `true` would block access to all environment variables from expressions and Code nodes.
 
 ### Important Notes
@@ -110,7 +110,7 @@ docker compose up -d
 >
 > **⚠️ CRITICAL: Running Multiple Local Environments**
 > If you want to run multiple environments on the same machine:
-> 1. **Change ALL VOLUME NAMES** in `.env` (e.g., add `_v2` suffix) to prevent data collision
+> 1. **Change ALL VOLUME NAMES** in `EO_Infra_Docker/.env` (e.g., add `_v2` suffix) to prevent data collision
 > 2. **Change `DOCKER_HOST_BIND_ADDR`** to a different IP (e.g., `127.0.0.2`, `127.0.0.3`) to avoid port binding conflicts
 > 3. **Update `N8N_WEBHOOK_URL`** to match the new IP address
 > 
