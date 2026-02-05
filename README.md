@@ -51,7 +51,7 @@ $bytes = New-Object byte[] 32; (New-Object System.Security.Cryptography.RNGCrypt
 $bytes = New-Object byte[] 32; (New-Object System.Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes); $hex = -join ($bytes | ForEach-Object { $_.ToString("x2") }); "SEARXNG_CONTAINER_SECRET=$hex" | Add-Content .env
 ```
 
-## 3.5. Environment Variable Access in n8n Workflows
+## 4. Environment Variable Access in n8n Workflows
 
 **Important**: To use environment variables (e.g., `{{ $env.N8N_EO_REQUEST_SECRET }}`) in n8n workflows, you need to configure environment variable access permissions.
 
@@ -94,7 +94,7 @@ In your n8n workflows (e.g., the "170 n8n RequestSecret Token Generator" node), 
 
 This is required for the Request Engine token generation process.
 
-## 4. Start Containers
+## 5. Start Containers
 
 Navigate to the `EO_Infra_Docker` directory and start the containers:
 
@@ -127,7 +127,7 @@ cd EO_Infra_Docker
 docker compose --profile prod up -d
 ```
 
-## 5. n8n Launch Check(local self-hosted)
+## 6. n8n Launch Check(local self-hosted)
 
 open : [http://localhost:5678](http://localhost:5678)
 
@@ -136,10 +136,15 @@ open : [http://localhost:5678](http://localhost:5678)
 we recommend using the n8n Queue Mode Test as a measure to prevent memory exhaustion in n8n.
 [n8nQueueModeTest](n8nQueueModeTest)
 
-# 6. Setup Request Engine
+# 7. Setup Request Engine
 
 Request Engine is an essential component running on Serverless Computing, designed for purposes such as cache performance verification from edge locations, cache warmup, and security checks.
 
-See detailed setup guide here:
-👉 [RequestEngine/cloudflare_workers/CFWORKER_README.md](RequestEngine/cloudflare_workers/CFWORKER_README.md)
+👉 See detailed setup guide here:
+- RequestEngine\RE_README.md
+- RequestEngine\aws_lambda\apne1\LAMBDA_README.md
+- RequestEngine\azure_functions\jpeast\AZFUNC_README.md
+- RequestEngine\cloudflare_workers\global\CFWORKER_README.md
+- RequestEngine\gcp_cloudrun\ane1\RUN_README.md
+
 
