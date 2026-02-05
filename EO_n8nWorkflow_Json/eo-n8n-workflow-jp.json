@@ -1,0 +1,2430 @@
+{
+  "name": "eo-n8n-workflow-jp",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "# 設定1 XMLサイトマップURL記載\nStart by XML sitemapノードをダブルクリック。鉛筆マークをクリックして、XMLサイトマップURLを以下のJSONで書き換えてください。このリリースでは、XMLサイトマップ1個しか対応していません。\n```\n[\n    {\n        \"Website\" : \"https://sample.com/sitemap.xml\"\n    }\n]\n```\n\n# TXTレコードによるDNS認証\n\n1. DNSレコードの登録\nDNSにて、以下TXTレコードを追加してください。\n・ホスト名　:　_eo-auth.[あなたのドメイン]\n・値 (内容)　:　EX) eo-authorized-2025\n2. 「20 DNS Auth」ノードの「DNSTXT_TOKEN」を「eo-authorized-2025」と編集",
+        "height": 640,
+        "width": 486,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1184,
+        1408
+      ],
+      "typeVersion": 1,
+      "id": "619f22e9-073e-486f-b42a-f342bf471938",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "第2階層XMLサイト\nマップURLを取得",
+        "height": 96,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -80,
+        1904
+      ],
+      "typeVersion": 1,
+      "id": "504c9364-096b-4dec-97c6-f228c8c14022",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "第2階層XMLサイトマップのlocのURL達に直http(s)リクエストを行い、\nWEBサイト配下にある個々のWEBページURL一覧の原型データを取得",
+        "height": 80,
+        "width": 502
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        544,
+        1600
+      ],
+      "typeVersion": 1,
+      "id": "28bc521c-7bf5-4adb-b467-a3fd5addadc1",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "WEBサイト配下の全WEBページURL\nのjsonリストをこのノードで完成。\n\n余分なデータを除去、locだけ取り出し。\nメインドキュメントhtml\nのURLだけjsonを作成",
+        "height": 144,
+        "width": 294
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1248,
+        1536
+      ],
+      "typeVersion": 1,
+      "id": "20f2d098-80fc-47ec-8407-20d5982756fb",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "WEBサイト配下の全WEBページURLs全てに直でhttpリクエスト\nhttpレスポンスを取得し、css,js,画像,フォントなどのサブリンクを含んだデータを取得",
+        "height": 80,
+        "width": 592
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -784,
+        2368
+      ],
+      "typeVersion": 1,
+      "id": "b23f1f8e-d5dc-4b4e-98b8-36297302a89b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# 設定3 WARMUPターゲットURLプレフィックス設定\n①140でURL一覧をメインドキュメント(html)URLと\nアセット(css/js/画像/fonts)URLで構成されるjsonとしてホワイトリストでCleaningしています。\n※GA4ライブラリや外部広告など、WarmupターゲットWebアプリ管轄ではないCDNを除外しています。\n②Start by XML sitemapノードでXMLサイトマップにしたURL https://sample.com　を140に記載してください。Multi CDNなどでCDN Edge PoPにキャッシュする必要がある他のURLプレフィックスもある場合、追記してください。\n③Set(javascript)による重複排除も行っています。\n\nWarmupリクエスト対象URL記載例）\n```\nconst REQUEST_TARGET_URL_PREFIXES = [  \n  'https://sample.com', //Warmup RequestMain Target Url\n  'https://cdn-ileamdm.nitrocdn.com', // CDN Url\n];\n```",
+        "height": 496,
+        "width": 470,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        256,
+        2144
+      ],
+      "typeVersion": 1,
+      "id": "931439c8-c402-4f37-8120-bfca244eb137",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "PageとAssetの区分を無くし、完全にユニークなURLリストのjsonを作る",
+        "height": 128,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        944,
+        2592
+      ],
+      "typeVersion": 1,
+      "id": "f2b83e76-13c6-421c-98a8-44767b8bfa0d",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "アセットURLで\n？と# を含む　バージョンやhtmlアンカーなどのクエリパラメータ除去",
+        "height": 128,
+        "width": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        736,
+        2592
+      ],
+      "typeVersion": 1,
+      "id": "6fcd3ca6-4aba-435b-ac27-dc728c05482b",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "RequestEngineがWarmupリクエストする時に必要なtokenの作成（TargetUrl毎）",
+        "height": 176,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1872,
+        2544
+      ],
+      "typeVersion": 1,
+      "id": "8db9d58d-0910-4170-8ea9-aed3980f71c5",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "# 設定8 RequestEngineのURL設定\n \nRequest EngineにCache Warmup  ( Fetch / GETリクエスト ) 実行命令をn8nからhttpリクエスト\n\n- 280AWSはLambda関数名とクレデンシャル等を設定\n- 280CFは、ParametersのURLにRequest Engine の WorkerのURLを設定\n- User-Agent を 175 Assign UserAgents By UrlTypeで付与しているため Parameters で Send Headers の Header Parameters に User-Agent を JSONで、Expressionとして {{ $json.data.headers[\"User-Agent\"] }} を追加している\n- Accept-Language を 180 Request Engine Settingsノードで付与した場合、Parameters で Send Headers の Header Parameters に Accept-Language を JSONで、Expressionとして {{ $json.data.headers[\"Accept-Language\"] }} を追加する\n- Parameters で Send Body の options の timeoutが短いと途中で止まる場合有り\n- RequestEngineを地域別やクラウド別で増やす場合、280として追加\n\n## クラウド別基盤認証まとめ\n- AWS Lambda\n    - IAMユーザーのアクセスキーによる認証\n- Azure Functions\n    - 関数キーによる x-functions-key ヘッダーの認証\n- Google CloudRun(第3世代)\n    - Oauth2 BearerトークンによるヘッダーのAuthorizationによる認証\n- Clodfare Worker\n    - Cloudflare Access サービストークンによる Header Auth(Custom Auth)認証",
+        "height": 592,
+        "width": 1184,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1664,
+        3600
+      ],
+      "typeVersion": 1,
+      "id": "7c03ef61-84d3-442e-8fee-1bd35da9933d",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "# 設定6 User-Agent付与\n\nWAFを考慮すると、以下の1と2で同じユーザーエージェントを使う方が望ましい（弾かれにくい）\n\n※UA無しを想定してないため、必ず1つ以上UAを設定すること。\n\nURLタイプ別にUser-Agentを付与\n1. asset → アセット用UAリスト\n2. main_document → メイン用UAリスト\n3. exception → 破棄（出力しない）",
+        "height": 512,
+        "width": 224,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2032,
+        2208
+      ],
+      "typeVersion": 1,
+      "id": "d1eabe69-6f90-4e98-a676-9540d7c80266",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "jsonに\nhttpリクエスト\nナンバー追加",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2640,
+        2656
+      ],
+      "typeVersion": 1,
+      "id": "cd855a89-4861-4baf-a7b0-542713e119cf",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "json最上位に\ndata階層追加",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2992,
+        2656
+      ],
+      "typeVersion": 1,
+      "id": "db378c9d-95f4-49eb-836f-1112b5d3ea67",
+      "name": "Sticky Note17"
+    },
+    {
+      "parameters": {
+        "content": "アセット含む\nURL一覧に対し\nループ開始",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -736,
+        3120
+      ],
+      "typeVersion": 1,
+      "id": "e4b3c8bd-fe46-427f-b529-9062792dc930",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "# 設定4 不要URLパターン設定\n/wp-json/ や /xmlrpc.php や\n/feed/ など、Warmup不要URLや例外URLの除去\n\nNitroPackのBlobURLも除外している",
+        "height": 336,
+        "width": 230,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1120,
+        2384
+      ],
+      "typeVersion": 1,
+      "id": "0a767e2e-de5d-4f7c-bece-f515d02a1161",
+      "name": "Sticky Note19"
+    },
+    {
+      "parameters": {
+        "content": "jsonからloc\nだけを取り出し\nurlだけにする",
+        "height": 80,
+        "width": 166
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        320,
+        1600
+      ],
+      "typeVersion": 1,
+      "id": "e47ebd28-48a0-4044-836f-e54bd77c09e8",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# 225 Request Engine Switcher\n\n本ワークフローのインテリジェンス層です。URLの重要度、クラウドのコスト、WAFの回避戦略のすべてをここで統合管理として活かせます。「どのリクエストを」「どこから」「どう送るか」という最終判断をSwitcherに集約できます。各クラウド（AWS, Azure, GCP, Cloudflare）の特性やリージョンに合わせて、URLやUAをリアルタイムに振り分けられます。\n\n- マルチクラウドGEO分散CacheWarmup可能\n- WAFバイパス用のRequestEngine無しで使う場合、280Direct Request だけ利用してください\n\n1. 180のRequest Engine Settingsで　type_area　（クラウド種別とエリア）とaccept_language　を記載/編集\n2. 225でParametersのRouting Rulesにて180のtype_areaを必要に応じて追記する。これにより、クラウド別、エリア別の280系RequestEngineにWarmupリクエストの指示出しでGEO分散となる。\n3. 280系ノードを増やすことでRequestEngineをプラットフォーム別、エリア別で自由に増減可能（GEO分散＆マルチクラウド）。\n\n# 【応用】高度フィルタリング例\n\n- 特定のパス（ディレクトリ）の除外・優先送信\n    - $json.data.url.includes('/lp/') の場合だけ特定のハイスペックなRequest Engine（例：CF Workers）に飛ばす。\n- アセット種別による振り分け\n    - $json.data.urltype == 'asset' かつ拡張子が .js のものだけ、JavaScript処理に強いエンジンに飛ばす、といった最適化。\n- 特定のUser-Agentのみ特定クラウドへ\n    - iOS端末のUA（ios_safari）からのリクエスト時のみ、AppleのCDN Edgeに近いと言われるクラウド（例：Azure）からリクエストを出す、といったUX測定。\n- 時間帯やランダムサンプリングによる間引き\n    - $json.data.httpRequestNumber % 2 == 0（偶数番号のみ実行）などとして、全リクエストの50%だけを検証用に実行する。\n- WAFの特定ルール回避用（特定UAのブロック回避）\n    - 特定のUAが特定のクラウドIP帯域でブロックされていることがわかった場合、その組み合わせだけを「280Direct Request（n8n直）」に逃がす。\n- URL種別×エリア最適化：main_document は全エリアから、asset はコストの安い特定のエリア（例：Cloudflare）からのみリクエストする、といったコスト最適化。\n- サンプリング実行：httpRequestNumber を用いた算術演算（余り計算など）により、膨大なリクエストの「一部（例：1/10）」だけを抜き出してマルチクラウド検証にかける。\n- 「アセットはCloudflareで一括処理し、メインドキュメントだけ各クラウドから多角的に叩く」といった、コストと精度のバランス調整も215で完結します。\n- ターゲット側のWAF特性に合わせて、特定の組み合わせを「間引く」あるいは「Direct（プロキシなし）に逃がす」といった防衛的な運用が、ノーコードで可能です。\n\n## ⚠️ 重要：応用適用時`httpRequestNumber`歯抜け：\n\n- 番号の不連続性：Switchノードでリクエストを間引く場合、最終的な実行結果（RequestResults.csv）において httpRequestNumber は**歯抜け（連番にならない）**状態になります。\n- 仕様：これは185ノードで全組み合わせに対して事前採番を行っているためであり、欠損ではなく「フィルタリングされた結果」です。\n- 注意：urltype: asset は、175ノードで既にUAが1つに絞られている場合、フィルタリング条件を厳しくしすぎてリクエストが0になる可能性",
+        "height": 1264,
+        "width": 720
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1200,
+        3456
+      ],
+      "typeVersion": 1,
+      "id": "44bc6e04-61c7-41a0-86d8-398e77601828",
+      "name": "Sticky Note22"
+    },
+    {
+      "parameters": {
+        "content": "ランダムスリープ\n1000〜3999ms",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        1792
+      ],
+      "typeVersion": 1,
+      "id": "3d078a4a-4d62-4f8d-9ae5-9584d315dff3",
+      "name": "Sticky Note23"
+    },
+    {
+      "parameters": {
+        "content": "CACHE MISS / CACHE HIT 一覧化。csv向けにjsonネストをフラット化。",
+        "height": 112,
+        "width": 176
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1984,
+        3056
+      ],
+      "typeVersion": 1,
+      "id": "4e672e67-24e5-4423-baf4-d37fafbb95b9",
+      "name": "Sticky Note25"
+    },
+    {
+      "parameters": {
+        "content": "アセット／メインドキュメント／例外分類\n\n1. アセットの拡張子(.css/.js/.jpg/.jpeg/.gif/.png/.webp/.avif/各種フォント)がurl末尾に有る場合\n`urltype: asset`\n2. アセット拡張子が URL 末尾に無い、もしくは /(スラッシュ) もしくは .html もしくは .htm である場合\n`urltype: main_document`\n3. アセットの拡張子がurl末尾に無く2でもない例外である場合\n`urltype: exception`",
+        "height": 336,
+        "width": 246
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1376,
+        2384
+      ],
+      "typeVersion": 1,
+      "id": "df56bf7a-5079-406e-924e-a4a4ba0d6ad8",
+      "name": "Sticky Note21"
+    },
+    {
+      "parameters": {
+        "content": "`urltype: exception`\nがtrueの場合（メインドキュメントでもなく、アセットでもなく、Warmupターゲットではない）、一覧化可能。\n\n**通常はfalseでワークフロー続行**",
+        "height": 256,
+        "width": 182
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1648,
+        2464
+      ],
+      "typeVersion": 1,
+      "id": "209e2956-fd63-429b-8b2b-a42b93040548",
+      "name": "Sticky Note27"
+    },
+    {
+      "parameters": {
+        "content": "# Step.1\n\nAsset Merge\n&\nFiltering\n&\nVariant\n\nHigh‑Precision \nTargetURLs \nCreator\n\n100から199ノード",
+        "height": 864,
+        "width": 150,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        2112
+      ],
+      "typeVersion": 1,
+      "id": "d54295f9-c995-4186-9f4f-ed71d3538950",
+      "name": "Sticky Note34"
+    },
+    {
+      "parameters": {
+        "content": "# Step.2\n\nCache Warmup\n\n200から399ノード\n\n※Step.3だけノードナンバーのレンジ広い",
+        "height": 1824,
+        "width": 150,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        3120
+      ],
+      "typeVersion": 1,
+      "id": "b3236e90-9dbd-44c4-bfb0-b65a5bcf1ba0",
+      "name": "Sticky Note35"
+    },
+    {
+      "parameters": {
+        "content": "# ▶ Edge Optimizer\n  \nCreated by にしラボ [https://4649-24.com](https://4649-24.com)\n    \n# 利用手順\n\n## 1. self-hosted n8n 作成\n\n- https://github.com/Masamasamasashito/EdgeOptimizer\n- env.exampleを複製、各種の値を設定。\n- n8n work flow jsonをインポート\n- 桃色スティッキーノートにしたがって各種設定\n\n## 2. 照合用リクエストシークレット設定\n\n## 3. サーバーレスでRequest Engine作成\n\n- クラウド別の認証設定\n    - AWS Lambda、Azure Functions、GCP CloudRun、Cloudflare Workers\n    - 対象WEBサイトのマーケティングペルソナから一番近いCDNのEdgeロケーションの選択が推奨されます\n    - 対象WEBサイトのCDNを問わず使えます。\n    - サーバーレスのリクエストエンジンはプロジェクトによって利用しているクラウドが異なる事を想定し、AWS, Azure, GCP, Cloudflareのいずれかを使えます。\n\n## 3. Github workflowの認証向け Repository secrets 設定\n\n- github > settings > Secret and Variables > action > Repository secrets 作成\n\n## 4. サーバレスで使う照合用シークレットの設定\n\n- シークレットもプロジェクトによって利用しているクラウドが異なる事を想定し、AWS, Azure, GCP, Cloudflareのいずれかを使えます。\n\n\n\n## 2. self-hosted n8n環境の構築と起動\n\n手順は、以下にて。\nhttps://github.com/Masamasamasashito/edge-vero-optimizer\n  \n### 3. self-hosted n8n に signup\n  \nn8nのlicense keyによるアクティベーションを行ってください。無料で出来ます。\n  \n### 4. n8n workflow JSON templateをインポート\n  \nCreate workflow > Import from file >  eo-xmlsitemap-jp.json をインポート\n  \n### 5. 背景ピンクSticky Noteにしたがって必要なパラメータを設定してください\n\n### 6. 「420 JSON to WarmupHistoryCSV」ノードの「Execute Step」を押下してWarmupを開始してください\n\n### 7. Warmup完了後、「420」ノードでdownloadを押下し、RequestResults_YYYYMMDD.csvのファイルをダウンロードしてください\n\n### 8. RequestResults_YYYYMMDD.csvのファイルを開き、最終行の右下でターゲットURL全体に対するCache Hit率などを確認出来ます。\n\n## Warning\n\n1. 最終ノードのExecute Stepを押してWarmupを開始してください\n2. self-hosted n8nでWorkflow実行中、n8nログイン画面内で他のページに移動するとWorkflowは止まります\n3. `.env`の非公開情報が漏洩しないように注意\n   - `.env`は公開リポジトリに push しないでください\n   - docker-compose.yml や各ノードやSticky Noteにシークレットやパスワードを直で書かないでください\n   - .gitignore には .env を必ず記載しておく必要があります\n4. docker image を latest や alpine としています\n   - 必要に応じてバージョンを固定してください\n\n## IMPORTANT\n\nこの n8n workflow JSON template は、キャッシュ最適化と UX 改善を目的としており、WAF やレートリミットなどのセキュリティ対策を回避する用途での利用は禁止します\n\n## Requirements\n\nこのn8n workflow JSON templateは、マルチクラウド Request Engine となるServerless Proxy / Fetcher と、[sitemaps.org](https://www.sitemaps.org/)準拠のXMLサイトマップ（最大 2 階層）を前提としています。",
+        "height": 1232,
+        "width": 1488,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "769a995e-8a9b-4fc4-ad2a-fbae2cba6595",
+      "name": "Sticky Note29"
+    },
+    {
+      "parameters": {
+        "content": "ランダムスリープ\n1000〜3999ms",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        2592
+      ],
+      "typeVersion": 1,
+      "id": "37f23293-5729-4630-a92d-7051facbcc46",
+      "name": "Sticky Note24"
+    },
+    {
+      "parameters": {
+        "content": "ランダムスリープ\n1000〜3999ms",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1968,
+        4288
+      ],
+      "typeVersion": 1,
+      "id": "bb4a0d92-22fe-4077-bfb5-987a0901285c",
+      "name": "Sticky Note30"
+    },
+    {
+      "parameters": {
+        "content": "Step. 2の組み合わせ爆発に注意が必要。大量HTTPリクエストを順次処理する場合、実行時間が数時間に及ぶ、n8n実行タイムアウトやサーバーコスト増、メモリ枯渇に注意。\n\n対策として、キューモードによるn8n親子ワークフローなど。",
+        "height": 176,
+        "width": 352
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -144,
+        2688
+      ],
+      "typeVersion": 1,
+      "id": "6db2343f-2d69-45d3-bbec-fcf0ea77c293",
+      "name": "Sticky Note39"
+    },
+    {
+      "parameters": {
+        "content": "# 設定7 Request Engine種別/エリア/言語の設定\n\n- AWS Lambda/東京リージョン/日本語\n- Cloudflare Workers/global/日本語\n- AWS Lambda/東京リージョン/Nothing\n  \nなど\n\n280系ノードで設定を合わせる必要あり",
+        "height": 384,
+        "width": 358,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2272,
+        2336
+      ],
+      "typeVersion": 1,
+      "id": "85bbc650-ba19-44b0-84bc-5892c43d20e3",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "content": "# Step.0\n\nMainDocument\nTarget\nUrLs\nCreator\n\n1から99ノード",
+        "height": 592,
+        "width": 150,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        1472
+      ],
+      "typeVersion": 1,
+      "id": "8f055662-ff5a-4eb1-9137-bf7f4434583f",
+      "name": "Sticky Note38"
+    },
+    {
+      "parameters": {
+        "content": "# 課題6\n\n特に280系ノードのRequestEngine側で、項目整頓が必要。RequestHistoryのCSVでデータ解析向けに使いやすくする必要有り。n8nノード採番への影響は小さいため、優先順位低",
+        "height": 192,
+        "width": 304,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1520,
+        3376
+      ],
+      "typeVersion": 1,
+      "id": "63e377e1-462d-42ac-92bc-70c35a3a4716",
+      "name": "Sticky Note41"
+    },
+    {
+      "parameters": {
+        "content": "BigQuery / Looker Studio / 生成AI、etc、多様な分析&最適化への活用可能",
+        "height": 112,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2704,
+        3040
+      ],
+      "typeVersion": 1,
+      "id": "b97a1799-41c3-409a-9e27-e37818ced8c9",
+      "name": "Sticky Note26"
+    },
+    {
+      "parameters": {
+        "content": "# 課題4\n\n170 n8n RequestSecret Token Generator でリクエストシークレットを使うトークン照合が機能しているか、検証すべき\n各クラウドの認証機能でn8nのCredentials機能によるRequestEngine接続認証を採用しているため、リクエストエンジンに対する不正接続拒否の担保はあるが、Warmupリクスと実行直前トークン照合も精度を上げておくべき。\n\n## 170 n8n RequestSecret Token Generatorノード\nself hosted 版 n8n リクエストシークレット設定。同ノード ParametersのValueに以下を記載\n\n```\n{{ $json.url }}{{ $env.N8N_EO_REQUEST_SECRET }}\n```\n※EO_Infra_Docker/.env （env.example）　を正しく作成している必要があります",
+        "height": 368,
+        "width": 848,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2320,
+        1904
+      ],
+      "typeVersion": 1,
+      "id": "fe349ff5-12c0-40d6-9b5e-03ed6dc71329",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "210 Step.2 Separete Starter Dummy\n直前のitem数がTotal Warmupリクエスト数",
+        "height": 112
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3168,
+        2608
+      ],
+      "typeVersion": 1,
+      "id": "272c364c-c4a3-4d1a-89ec-71d079806a55",
+      "name": "Sticky Note20"
+    },
+    {
+      "parameters": {
+        "content": "# 設定2\n\n`125-1 HTTP Req to Get All TargetUrls through Playwright Container`\nで Playwrightによるヘッドレスブラウザ（dockerで別コンテナ）を使わない場合\n`125-2 Direct HTTP Req to All Web Page Urls`\nに入れ替え\n\n**Target URLリスト抽出網羅性は下がります**",
+        "height": 528,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1168,
+        2224
+      ],
+      "typeVersion": 1,
+      "id": "c2504584-80a1-4483-8ddc-9142f2f816ad",
+      "name": "Sticky Note32"
+    },
+    {
+      "parameters": {
+        "content": "# 設定9【GCFをRequestEngineで使う場合】\n\n235 Get IDtoken From GCP Service Account Access Token の設定\n\nGCPサービスアカウントのJSON Keyをn8n Credentialsで`Google Service Account API`を使って登録。Authenticationで`Google Service Account API`の該当のCredentialを設定する\n\n## Credentials登録手順\n\nサービスアカウントのJSONキー取得が終わっていること！\n\n1. n8n Credentials の Google Service Account API を使う\n2. Service Account Email に サービスアカウントのメール（JSONキー内のclient_email）を入力\n3. Private Key に private_keyをそのまま入力\n4. Set up for use in HTTP Request node を有効化\n5. Scope(s) に IAMだけをスコープとするためhttps://www.googleapis.com/auth/iamを入力\n5. Save",
+        "height": 544,
+        "width": 672,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -352,
+        4448
+      ],
+      "typeVersion": 1,
+      "id": "ef975fc9-0dd9-4092-a675-d45c04924651",
+      "name": "Sticky Note44"
+    },
+    {
+      "parameters": {
+        "content": "# 115 INPUT json Format Sample For  Step.1\n\nStep.1から開始する場合、\n1. 75と115を分離\n2. 110のコードでターゲットURLを記載し、110後方から115前方に接続\n3. 110だけ実行\n4. 360 JSON to WarmupHistoryCSVを実行\n```\n[\n\t{\n\t\t\"loc\":\"https://sample.com/information/\"\n\t},\n\t{\t\n\t\t\"loc\":\"https://sample.com/お知らせ/site-renewal/\"\n\t},\n\t{\n\t\t\"loc\":\"https://sample.com/\"\n\t},\n\t{\n\t\t\"loc\":\"https://sample.com/category/お知らせ/\"\n\t},\n\t{\n\t\t\"loc\":\"https://sample.com/author/nissy02/\"\n\t}\n]\n```",
+        "height": 560,
+        "width": 736
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2304,
+        1200
+      ],
+      "typeVersion": 1,
+      "id": "24991ff2-aca2-4256-9d9e-f9115c773cfe",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "# 210 INPUT json Format Sample For Step.2\n\n【重要】170 n8n RequestSecret Token Generator を使わないため、Secret Key Token 手動生成が必要でかなり大変。\nそのため、Step.2分離用スタートノード未作成。\n\n```\n[\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/\",\n      \"urltype\": \"main_document\",\n      \"tokenCalculatedByN8n\": \"AAAAAAAAAAAAAAAAAAAAAAA\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"AwsLambda_ap-northeast-1\",\n      \"httpRequestNumber\": 5\n    }\n  },\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/\",\n      \"urltype\": \"main_document\",\n      \"tokenCalculatedByN8n\": \"BBBBBBBBBBBBBBBBBBBBBBBBBBBB\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"AzureFunctions_japaneast\",\n      \"httpRequestNumber\": 6\n    }\n  },\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/\",\n      \"urltype\": \"main_document\",\n      \"tokenCalculatedByN8n\": \"CCCCCCCCCCCCCCCCCCCCCCCCCCCC\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"CloudflareWorker_global\",\n      \"httpRequestNumber\": 7\n    }\n  },\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/\",\n      \"urltype\": \"main_document\",\n      \"tokenCalculatedByN8n\": \"DDDDDDDDDDDDDDDDDDDDDDDDDDDDDD\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"GcpCloudFunctions_asia-northeast1\",\n      \"httpRequestNumber\": 8\n    }\n  },\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/wp-includes/js/jquery/jquery.min.js\",\n      \"urltype\": \"asset\",\n      \"tokenCalculatedByN8n\": \"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"AwsLambda_ap-northeast-1\",\n      \"httpRequestNumber\": 9\n    }\n  },\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/wp-includes/js/jquery/jquery.min.js\",\n      \"urltype\": \"asset\",\n      \"tokenCalculatedByN8n\": \"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"AzureFunctions_japaneast\",\n      \"httpRequestNumber\": 10\n    }\n  },\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/wp-includes/js/jquery/jquery.min.js\",\n      \"urltype\": \"asset\",\n      \"tokenCalculatedByN8n\": \"GGGGGGGGGGGGGGGGGGGGGGGGGG\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"CloudflareWorker_global\",\n      \"httpRequestNumber\": 11\n    }\n  },\n  {\n    \"data\": {\n      \"targetUrl\": \"https://sample.com/wp-includes/js/jquery/jquery.min.js\",\n      \"urltype\": \"asset\",\n      \"tokenCalculatedByN8n\": \"HHHHHHHHHHHHHHHHHHHHHHHHHHHHH\",\n      \"headers\": {\n        \"User-Agent\": \"Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1\",\n        \"Accept-Language\": \"ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7\"\n      },\n      \"userAgentLabel\": \"ios_safari_17\",\n      \"cloud_type_area\": \"GcpCloudFunctions_asia-northeast1\",\n      \"httpRequestNumber\": 12\n    }\n  }\n]\n```",
+        "height": 1312,
+        "width": 1392
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        3216,
+        1536
+      ],
+      "typeVersion": 1,
+      "id": "617e16aa-3b02-42d7-83d0-4750b7af9d25",
+      "name": "Sticky Note46"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -752,
+        2432
+      ],
+      "id": "b218b458-a582-4376-83af-385595cb99dd",
+      "name": "120 Loop Over All Web Page Urls"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://playwright:13000/content",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "url",
+              "value": "={{ $json.loc }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 120000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -576,
+        2560
+      ],
+      "id": "1dcfa815-12eb-4daf-b697-3565b0456125",
+      "name": "125-1 HTTP Req to Get All TargetUrls through Playwright Container",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const delay = Math.floor(Math.random() * 3000) + 1000; // 1000〜3999ms\nawait new Promise(r => setTimeout(r, delay));\nreturn [{ json: { ...$json, waitSeconds: delay / 1000 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        2656
+      ],
+      "id": "d861abfe-d33d-4612-b9b4-0776b7daa36c",
+      "name": "130 Random Sleep (ms)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.loc }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "text",
+              "outputPropertyName": "html"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1088,
+        2512
+      ],
+      "id": "7432106d-093d-4f57-824e-aba83cd30ac2",
+      "name": "125-2 Direct HTTP Req to All Web Page Urls"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -64,
+        2400
+      ],
+      "id": "d8a0bdd4-6e05-445d-a238-82bdcf67d694",
+      "name": "135 Merge Assets to URLs"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\n// -----------------------------------------------------------\n// ユーザー設定エリア\n// -----------------------------------------------------------\n\n// Warmup対象とするURLプレフィックス\nconst REQUEST_TARGET_URL_PREFIXES = [\n  //'https://sample.com'\n  // ↓ ダブルCDN等の場合\n  //'https://cdn-ileamdm.nitrocdn.com',\n];\n\n// 無視するスキーム\nconst IGNORE_SCHEMES = ['javascript:', 'mailto:', 'tel:', 'data:', '#'];\n\n// -----------------------------------------------------------\n// 処理ロジック\n// -----------------------------------------------------------\n\n// 1. item から loc (ページURL) を取り出す\nfunction getLoc(item) {\n  return item.json?.loc || item.loc || null;\n}\n\n// 2. item から HTML本文 を取り出す\nfunction getHtmlDoc(item) {\n  // === 🚀 修正箇所: Playwright APIからのレスポンス構造に対応 ===\n  // 1. Playwright APIのレスポンス (item.json.response.html) からHTMLを取得\n  if (typeof item.json?.response?.html === 'string') return item.json.response.html;\n  // =======================================================\n  \n  if (typeof item.json?.html === 'string') return item.json.html; // 既存の115ノード互換性\n  if (typeof item.json?.data === 'string') return item.json.data;\n  return '';\n}\n\n// 対象URLかどうか判定\nfunction isTargetUrl(url) {\n  if (!url) return false;\n  // スキームチェック\n  if (IGNORE_SCHEMES.some(sch => url.startsWith(sch))) return false;\n  // プレフィックスチェック\n  return REQUEST_TARGET_URL_PREFIXES.some(prefix => url.startsWith(prefix));\n}\n\n// -----------------------------------------------------------\n// 正規表現パターン\n// -----------------------------------------------------------\n\n// A. 【絶対パス用】 http(s)://で始まる文字列を無差別に拾う\n// 注意: PlaywrightがレンダリングしたDOMから、data-srcなどではない最終的なURLを抽出\nconst absoluteUrlPattern = /https?:\\/\\/[^\\s\"'()<>]+/g;\n\n// B. 【相対パス用】 href=\"...\" または src=\"...\" の中身を拾う\nconst relativePathPattern = /(?:href|src)\\\\s*=\\\\s*([\\\"'])(.*?)\\\\1/gi;\n\n\n// -----------------------------------------------------------\n// メインループ\n// -----------------------------------------------------------\n\nfor (const item of items) {\n  const pageUrl = getLoc(item);\n  const html = getHtmlDoc(item); // 修正された関数を使用\n  const assetsSet = new Set(); // 重複排除用Set\n\n  if (pageUrl && html.length > 0) {\n\n    // --- 戦略A: 絶対パスの抽出 ---\n    let match;\n    while ((match = absoluteUrlPattern.exec(html)) !== null) {\n      const rawUrl = match[0];\n      \n      // ここでクエリパラメータ除去は行わない（Node 15の責務）\n      if (isTargetUrl(rawUrl)) {\n        assetsSet.add(rawUrl);\n      }\n    }\n\n    // --- 戦略B: 相対パスの抽出と結合 ---\n    relativePathPattern.lastIndex = 0;\n\n    while ((match = relativePathPattern.exec(html)) !== null) {\n      const rawVal = match[2]; // クォートの中身\n      \n      try {\n        // ベースURL(pageUrl)を使って絶対パスに変換\n        const resolvedUrlObj = new URL(rawVal, pageUrl);\n        const resolvedUrl = resolvedUrlObj.href;\n\n        if (isTargetUrl(resolvedUrl)) {\n          assetsSet.add(resolvedUrl);\n        }\n      } catch (e) {\n        continue;\n      }\n    }\n  }\n\n  out.push({\n    json: {\n      pageUrl: pageUrl,\n      assetUrls: Array.from(assetsSet),\n      count: assetsSet.size\n    },\n  });\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        2752
+      ],
+      "id": "e67b621b-2ff4-4ce4-a68b-3e39d252a121",
+      "name": "140 Extract Warmup Page Assets"
+    },
+    {
+      "parameters": {
+        "jsCode": "// pageUrl / assetUrls のURLからクエリパラメータの文字列 と アンカー を削りベースURLだけにする\n// 構造と順番は維持、重複排除しない\n\n// URL正規化関数（? / # 以降を削る）\nfunction stripQueryAndAnchor(raw) {\n  if (typeof raw !== 'string' || raw.length === 0) return raw;\n\n  try {\n    // 構文解析。正規URLなら origin + pathname だけ残す\n    const parsedUrl = new URL(raw);\n    return parsedUrl.origin + parsedUrl.pathname;\n  } catch {\n    // 解析できないパターンは、? と # を探してそれよりも前だけを返す\n    const queryOrAnchorIndex = raw.search(/[?#]/);\n    if (queryOrAnchorIndex === -1) return raw;\n    return raw.slice(0, queryOrAnchorIndex);\n  }\n}\n\nconst out = [];\n\nfor (const item of items) {\n  const jsonData  = item.json || {};\n\n  //ページURL取得\n  const pageUrl = jsonData .pageUrl;\n  //アセットURL群取得\n  const assetUrlList = Array.isArray(jsonData .assetUrls) ? jsonData .assetUrls : [];\n  //URL正規化\n  const cleanedPageUrl = stripQueryAndAnchor(pageUrl);\n  const cleanedAssetUrls = assetUrlList.map(stripQueryAndAnchor);\n\n  out.push({\n    json: {\n      // 他にフィールドがあれば維持したい場合はスプレッド\n      // ...jsonData ,\n      pageUrl: cleanedPageUrl,\n      assetUrls: cleanedAssetUrls,\n    },\n  });\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        784,
+        2752
+      ],
+      "id": "5f4ea42b-2635-4c32-b832-8e459f2aff99",
+      "name": "145 Query Param and Anchor Filter",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "// URLについて、Pageとアセットの区分を無くし、完全にユニークなURLリストを作成\n\n// Setで重複排除\nconst uniqueUrls = new Set();\n\n// 各アイテムから pageUrl と assetUrls を集める\nfor (const item of items) {\n  const jsonData = item.json || {};\n\n  const pageUrlRaw = jsonData.pageUrl;\n  const assetUrlList = Array.isArray(jsonData.assetUrls) ? jsonData.assetUrls : [];\n\n  // ページURLを追加\n  if (typeof pageUrlRaw === 'string' && pageUrlRaw.length > 0) {\n    uniqueUrls.add(pageUrlRaw);\n  }\n\n  // アセットURL群を追加\n  for (const assetUrlRaw of assetUrlList) {\n    if (typeof assetUrlRaw === 'string' && assetUrlRaw.length > 0) {\n      uniqueUrls.add(assetUrlRaw);\n    }\n  }\n}\n\n// Set → n8n items に変換（重複排除済み）\nreturn Array.from(uniqueUrls).map((url) => ({\n  json: { targetUrl: url },\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        2752
+      ],
+      "id": "6e2d08d1-39a8-4c52-bcb5-7e780978d346",
+      "name": "150 Merge Page and Assets to Unique Urls"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\n// URL文字列をクリーンアップする関数 (オリジナルを完全維持)\nfunction cleanUrlString(inputUrl) {\n  if (typeof inputUrl !== 'string') return inputUrl;\n\n  // HTMLエンティティとエスケープの除去\n  let normalizedUrl = inputUrl\n    .replace(/&quot;/g, '\\\"')\n    .replace(/\\\\\\\"/g, '\\\"')\n    .replace(/\\\\'/g, \"'\");\n\n  // 先頭と末尾の両方からクォートを除去\n  normalizedUrl = normalizedUrl.replace(/^[\\\"']+|[\\\"']+$/g, '');\n\n  return normalizedUrl.trim();\n}\n\n// -------------------------------------------------------------------\n// 【設定箇所 1】除外対象パターン一覧 (オリジナルと完全一致)\n// -------------------------------------------------------------------\nconst EXCLUDED_URL_PATTERNS = [\n  '/wp-json/',\n  '/admin-ajax.php',\n  '/xmlrpc.php',\n  '/feed',\n  'contact',\n  '/search',\n  '/page',\n  '/blog',\n  '。',\n  'beacon.min.js',\n];\n\n// -------------------------------------------------------------------\n// 【設定箇所 2】 完全一致で除外する CDN ルートURL (オリジナルと完全一致)\n// -------------------------------------------------------------------\nconst EXCLUDED_ROOT_URLS = [\n  'https://cdn-ileamdm.nitrocdn.com/',\n  'https://cdn-ileamdm.nitrocdn.com',\n];\n\n/**\n * UUIDの正規表現 (8-4-4-4-12形式)\n * 【修正済】オリジナルと完全に一致させ、劣化を解消\n */\nconst UUID_PATTERN = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;\n\n// URLが除外対象か判定 (オリジナルを維持)\nfunction isExcludedUrl(targetUrl) {\n  return EXCLUDED_URL_PATTERNS.some(pattern => targetUrl.includes(pattern));\n}\n\n// http/https以外は無効 (オリジナルを維持)\nfunction isValidHttpUrl(targetUrl) {\n  if (typeof targetUrl !== 'string') return false;\n  return /^https?:\\/\\//i.test(targetUrl);\n}\n\n// -------------------------------------------------------------------\n// 【追加機能】アセットファイル判定 (救済ロジック用)\n// -------------------------------------------------------------------\nfunction isAssetFile(url) {\n  const assetExtensions = /\\.(js|css|png|jpg|jpeg|gif|svg|webp|woff2?|ttf|otf|ico|bmp)$/i;\n  return assetExtensions.test(url);\n}\n\n// ==========================================\n// メイン処理ループ (旧コードの堅牢性を最優先)\n// ==========================================\nfor (const item of items) {\n  const rawUrl = item.json?.targetUrl;\n  if (typeof rawUrl !== 'string' || rawUrl.length === 0) continue;\n\n  const cleanedUrl = cleanUrlString(rawUrl);\n\n  // 1. 完全一致のルートURLを除外 (オリジナル通り)\n  if (EXCLUDED_ROOT_URLS.includes(cleanedUrl)) continue;\n\n  // 2. UUID形式のパターンを除外 (オリジナル通り / 404対策)\n  // ここで392件のゴミを確実に抹殺します\n  if (UUID_PATTERN.test(cleanedUrl)) continue; \n\n  // 3. 【追加】アセット救済 (contactが含まれていても、js/cssならここで合格させる)\n  if (isAssetFile(cleanedUrl)) {\n    out.push({ json: { targetUrl: cleanedUrl } });\n    continue;\n  }\n\n  // 4. パターンマッチングによる除外 (オリジナル通り / wp-json, feed等)\n  if (isExcludedUrl(cleanedUrl)) continue;\n\n  // 5. http(s)以外はスキップ (オリジナル通り)\n  if (!isValidHttpUrl(cleanedUrl)) continue;\n\n  out.push({ json: { targetUrl: cleanedUrl } });\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        2752
+      ],
+      "id": "7a9054ee-df29-47e7-9443-bb926fa66958",
+      "name": "155 Unwanted URL Ptterns Filter"
+    },
+    {
+      "parameters": {
+        "jsCode": "// items[*].json.url を見て json.urltype を付与\n//\n// ① アセット拡張子 (.css/.js/.jpg/.jpeg/.gif/.png/.webp/.avif/各種フォント) が URL 末尾にある → \"asset\"\n// ② アセット拡張子が URL 末尾に無い、もしくは /(スラッシュ) もしくは .html / .htm → \"main_document\"\n// ③ 上記以外 \"exception\"\n\nconst ASSET_EXTENSIONS = [\n  'css',\n  'js', //テスト時はjsやcssだけにすると削減しやすい\n  'jpg', 'jpeg', 'gif', 'png', 'webp',   'avif', 'svg', 'ico',\n  'woff', 'woff2', 'ttf', 'otf', 'eot',\n];\n\nreturn items.map(item => {\n  if (!item.json || typeof item.json.targetUrl !== 'string') {\n    return item;\n  }\n  //前後の空白を削除してクリーンなURL文字列に\n  const inputUrl = item.json.targetUrl.trim();\n\n  let urlPath = '/';\n\n  // ホストより後ろ（パス部分）を取り出す\n  try {\n    const parsedUrl = new URL(inputUrl);\n    urlPath = parsedUrl.pathname || '/';\n  } catch (error) {\n    // フォールバック: プロトコル＋ホストを削る\n    const match = inputUrl.match(/^[a-zA-Z][a-zA-Z0-9+.-]*:\\/\\/[^/]+(\\/.*)?$/);\n    urlPath = (match && match[1]) ? match[1] : '/';\n  }\n\n\n  // パスの最後の要素（/ だけなら空文字）\n  const pathSegments = urlPath.split('/').filter(Boolean);\n  const lastPathSegment = pathSegments.length ? pathSegments[pathSegments.length - 1] : '';\n\n  // 拡張子を取得（無ければ空文字）\n  let fileExtension = '';\n  const dotIndex = lastPathSegment.lastIndexOf('.');\n  if (dotIndex !== -1 && dotIndex < lastPathSegment.length - 1) {\n    fileExtension = lastPathSegment.slice(dotIndex + 1).toLowerCase();\n  }\n\n  //URLタイプ分類を開始\n  \n  let urlCategory;\n\n  // ① アセット拡張子が URL 末尾にある\n  if (ASSET_EXTENSIONS.includes(fileExtension)) {\n    urlCategory = 'asset';\n\n  // ② アセット拡張子が無い、末尾が /、または .html / .htm\n  } else if (\n    fileExtension === '' ||             // アセット拡張子なし\n    urlPath.endsWith('/') ||            // URL末尾がスラッシュ\n    fileExtension === 'html' ||\n    fileExtension === 'htm'\n  ) {\n    urlCategory = 'main_document';\n\n  // ③ 上記以外は例外\n  } else {\n    urlCategory = 'exception';\n  }\n\n  item.json.urltype = urlCategory;\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        2752
+      ],
+      "id": "140eb5a6-748d-4307-bd4b-7e4ee6a6eabb",
+      "name": "160 Asset / MainDoc / Exception Classification"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2d8adb7d-a3d1-4344-bc18-3767ef6c8d18",
+              "leftValue": "={{ $json.urltype }}",
+              "rightValue": "exception",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1696,
+        2752
+      ],
+      "id": "af98c20c-db63-4ec1-a5c1-b8b58f3e0f32",
+      "name": "165 exception Filter"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// URLタイプごとに適用するユーザーエージェント一覧\nconst mainDocumentUserAgentList = [\n  { label: 'ios_safari_17', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_chrome_pixel', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_chrome_galaxy', ua: 'Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_go', ua: 'Mozilla/5.0 (Linux; Android 12; Android Go) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.60 Mobile Safari/537.36' },\n  //{ label: 'ios_safari_16', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_webview', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/118.0.0.0 Mobile Safari/537.36' },\n];\n\nconst assetUserAgentList = [\n  { label: 'ios_safari_17', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_chrome_pixel', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_chrome_galaxy', ua: 'Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_go', ua: 'Mozilla/5.0 (Linux; Android 12; Android Go) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.60 Mobile Safari/537.36' },\n  //{ label: 'ios_safari_16', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_webview', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/118.0.0.0 Mobile Safari/537.36' },\n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const urlData = item.json ?? item;\n  if (!urlData.targetUrl || !urlData.tokenCalculatedByN8n) continue;\n\n  const urlCategory = urlData.urltype;\n\n  // exception は破棄\n  if (urlCategory === 'exception') {\n    continue;\n  }\n\n  let selectedUserAgents;\n  if (urlCategory === 'asset') {\n    selectedUserAgents = assetUserAgentList;\n  } else if (urlCategory === 'main_document') {\n    selectedUserAgents = mainDocumentUserAgentList;\n  } else {\n    // 指定以外の urltype は出力しない\n    continue;\n  }\n\n  for (const userAgent of selectedUserAgents) {\n    out.push({\n      json: {\n        ...urlData,\n        headers: { 'User-Agent': userAgent.ua },\n        userAgentLabel: userAgent.label,\n      },\n    });\n  }\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2128,
+        2768
+      ],
+      "id": "9b37b20d-2cc3-406b-9d82-229471b1bca5",
+      "name": "175 Assign UserAgents By UrlType"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 入力: [{ json: { targetUrl, tokenCalculatedByN8n, headers, userAgentLabel } }, ...]\nconst items = $input.all();\n\nreturn items.map((item, i) => ({\n  json: {\n    ...item.json,\n    httpRequestNumber: i + 1, // 1始まり\n  },\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        2768
+      ],
+      "id": "0ff5f6e3-122d-40b8-a466-e0682d374903",
+      "name": "185 Add Http Request Number"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\n// EO Request Engine として利用する Serverless Proxy Fetcher と 言語(Accept-Language)の一覧\n// （主にクラウド種別のサーバレスサービスとエリア）\nconst requestEngineList = [\n\n  { \n    type_area: 'AwsLambda_ap-northeast-1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n\n  { \n    type_area: 'AzureFunctions_japan-east',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'CloudflareWorker_global',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'GcpCloudFunctions_asia-northeast1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  // Example\n  // { \n  //   type_area: 'DirectRequest',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AwsLambda_ap-northeast-1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AzureFunctions_japan-east',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'CloudflareWorker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'GcpCloudFunctions_asia-northeast1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n\n  // { \n  //   type_area: 'AkamaiEdgeworker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  \n  // ※ accept_language無しの場合\n  // { \n  //   type_area: 'CloudflareWorker_global' ,\n  //   accept_language: 'nothing',\n  // },  \n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const baseData = item.json ?? item;\n\n  // targetUrl / tokenCalculatedByN8n が無い行はスキップ\n  if (!baseData.targetUrl || !baseData.tokenCalculatedByN8n) continue;\n\n  // 1件の入力に対し、requestEngineList 全エンジンを展開\n  for (const requestEngine of requestEngineList) {\n    // 既存 headers（User-Agent 等）を壊さないようにコピー\n    const headers = { ...(baseData.headers || {}) };\n\n    if (\n      requestEngine.accept_language &&\n      requestEngine.accept_language !== 'nothing'\n    ) {\n      // Accept-Language を付与するパターン\n      headers['Accept-Language'] = requestEngine.accept_language;\n    } else {\n      // “nothing” の場合は Accept-Language ヘッダを付けない（存在していれば削除）\n      delete headers['Accept-Language'];\n    }\n\n    out.push({\n      json: {\n        // 元データ引き継ぎ\n        ...baseData,\n\n        // Request Engine 情報\n        cloud_type_area: requestEngine.type_area,\n\n        // User-Agent など既存ヘッダ + Accept-Language を反映\n        headers,\n      },\n    });\n  }\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        2768
+      ],
+      "id": "0e014e3c-304c-4f55-8705-b24f6dcf1bb7",
+      "name": "180 RequestEngine Settings"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -768,
+        3232
+      ],
+      "id": "b2eedba5-6acb-4f2a-8377-e478fa96fbf3",
+      "name": "220 Loop Over Request Target Urls",
+      "alwaysOutputData": true,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "3bb041ef-26df-488b-9908-7e6b4ea46b25",
+                    "leftValue": "={{ $json.data.cloud_type_area }}",
+                    "rightValue": "DirectRequest",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.data.cloud_type_area }}",
+                    "rightValue": "AwsLambda_ap-northeast-1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "52c785e4-442b-4698-85c4-58a597b93600"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5b6b6497-ea80-41e3-8a11-7cf871ea2062",
+                    "leftValue": "={{ $json.data.cloud_type_area }}",
+                    "rightValue": "AzureFunctions_japan-east",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e2d8e0ee-e416-4b84-9532-1ea1f78ac3c5",
+                    "leftValue": "={{ $json.data.cloud_type_area }}",
+                    "rightValue": "CloudflareWorker_global",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "040783cf-d13f-477c-8c36-757efb935816",
+                    "leftValue": "={{ $json.data.cloud_type_area }}",
+                    "rightValue": "GcpCloudFunctions_asia-northeast1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -464,
+        3392
+      ],
+      "id": "86be1903-1c77-4cdb-9452-13690bc806f4",
+      "name": "225 Request Engine Switcher"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://iaeodentials.googleapis.com/v1/projects/-/serviceAccounts/<Oauth2_Invokerサービスカウントeメール>",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"audience\": \"https://eo-re-d01-cloudrun-ane1-4yharzvoqq-an.a.run.app\",\n  \"includeEmail\": true\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -272,
+        4064
+      ],
+      "id": "16c67107-ba21-4e83-97c3-ca7942e3dba3",
+      "name": "235 Get IDtoken From GCP Service Account Access Token",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "iuOzBoOIfsCT41rU",
+          "name": "Dummy GCP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "769698a5-49d2-423c-bc69-86015cdb5a25",
+              "name": "gcf.idToken",
+              "value": "={{ $json.token }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -32,
+        4064
+      ],
+      "id": "81410cad-cd67-46fd-af19-1a402bcfb502",
+      "name": "240 IDtoken to json"
+    },
+    {
+      "parameters": {
+        "jsCode": "// すべての input items を取得\nconst items = $input.all();\nconst out = [];\n\nfor (const item of items) {\n  const j = item.json || {};\n\n  // data を削除した新しい JSON を作る\n  const cleaned = {\n    headers: j.headers ?? {},\n    statusCode: j.statusCode ?? null,\n    statusMessage: j.statusMessage ?? null,\n  };\n\n  out.push({ json: cleaned });\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        3344
+      ],
+      "id": "352cb76c-8b0d-4a07-862d-61d0258e27b4",
+      "name": "285 JSON data REMOVER"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Lambdaノードの出力: { json: { result: { ...本体... } } }\n// Workerノードの出力:  { json: { ...本体... } }\n//\n// 両方に対応できるように、result があれば中身だけを json に移し替える。\n\nconst items = $input.all();\n\nfor (const item of items) {\n  const j = item.json;\n  if (\n    j &&\n    typeof j === 'object' &&\n    !Array.isArray(j) &&\n    j.result &&\n    typeof j.result === 'object' &&\n    !Array.isArray(j.result)\n  ) {\n    // result配下がフラットEOログ本体なので、そこに差し替える\n    item.json = j.result;\n  }\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        3536
+      ],
+      "id": "9bf63728-a593-4781-843f-99cec337e9ef",
+      "name": "295 JSON result REMOVER"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -160,
+        3856
+      ],
+      "id": "522f1f20-ddbb-42d7-ad6f-7201337ef17d",
+      "name": "230 data Keeper for GCP"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  // 元の headers を退避しておく\n  const originalHeaders = item.json.headers;\n\n  // レスポンス body があれば、json のルートに引き上げ (既存処理)\n  if (item.json.body) {\n    item.json = item.json.body;\n  }\n\n  // 退避しておいた headers があれば、キー名に \"headers.\" を付けて追加 (新規処理)\n  if (originalHeaders) {\n    Object.keys(originalHeaders).forEach(key => {\n      item.json[`headers.${key}`] = originalHeaders[key];\n    });\n  }\n\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        848,
+        4160
+      ],
+      "id": "c3be235e-c187-4f86-bae5-02f2d7946ba8",
+      "name": "305 GCP Arranger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const delay = Math.floor(Math.random() * 3000) + 1000; // 1000〜3999ms\nawait new Promise(r => setTimeout(r, delay));\nreturn [{ json: { ...$json, waitSeconds: delay / 1000 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        4208
+      ],
+      "id": "e77f082a-742b-4a0d-bb8a-9e4dd5a81449",
+      "name": "340 Random Sleep (ms)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// 全アイテムを取得\nconst inputItems = $input.all();\n\n/**\n * ネストされたオブジェクトを \"a.b.c\" 形式でフラット化する再帰関数\n */\nfunction flattenNestedObject(targetObject, parentKey = '', flattenedResult = {}) {\n  for (const [currentKey, currentValue] of Object.entries(targetObject)) {\n    const combinedKey = parentKey ? `${parentKey}.${currentKey}` : currentKey;\n\n    if (\n      currentValue !== null &&\n      typeof currentValue === 'object' &&\n      !Array.isArray(currentValue)\n    ) {\n      // 再帰処理でさらに深い階層を展開\n      flattenNestedObject(currentValue, combinedKey, flattenedResult);\n    } else {\n      // 値をセット（null や undefined は空文字に変換）\n      flattenedResult[combinedKey] = currentValue === undefined ? '' : currentValue;\n    }\n  }\n  return flattenedResult;\n}\n\nconst flattenedOutputItems = [];\n\nfor (const item of inputItems) {\n  const originalJson = item.json || {};\n  // item.json をフラット化\n  const flattenedJson = flattenNestedObject(originalJson);\n  flattenedOutputItems.push({ json: flattenedJson });\n}\n\n// フラット化された複数アイテムを返す\nreturn flattenedOutputItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        3216
+      ],
+      "id": "ca594d0f-2893-451d-a123-13a08115b352",
+      "name": "350 Json Flattener for Csv"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        1920
+      ],
+      "id": "38bd4c7e-b1eb-4287-9ee5-e39bad0a255c",
+      "name": "115 Step.1 Separate Starter Dummy"
+    },
+    {
+      "parameters": {
+        "jsCode": "// すべてのアイテムに対してループ処理\nreturn items.map(item => {\n  \n  // 1. フラット化されたデータからステータスとAgeを取得\n  // ※Node 350の後なので、ドット区切りのキー名で指定します\n  const status = (item.json['headers.response-headers.cf-cache-status'] || '').toUpperCase();\n  const age = parseInt(item.json['headers.response-headers.age'] || '0', 10);\n\n  let message = \"\";\n\n  // 2. 判定ロジック（短い英語バージョン）\n  if (status === 'MISS' || status === 'EXPIRED') {\n    // キャッシュなし（消失）\n    message = \"⚠️ EVICTED: Cache Lost\";\n    \n  } else if (status === 'HIT' && age < 60) {\n    // 直前に生成された（ギリギリセーフ）\n    message = \"⚠️ FRESH: Just Created\";\n    \n  } else if (status === 'DYNAMIC' || status === 'BYPASS') {\n    // キャッシュ対象外（意図的な設定）\n    message = \"ℹ️ IGNORE: Dynamic/Bypass\";\n    \n  } else if (status === 'HIT') {\n    // 正常なキャッシュ\n    message = \"✅ SAFE: Cache Active\";\n    \n  } else {\n    // Cloudflare以外のレスポンスや不明なステータス\n    message = \"-\";\n  }\n\n  // 3. 新しいカラム「eo.re.eviction-alert」として追加\n  item.json['eo.re.eviction-alert'] = message;\n\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        3216
+      ],
+      "id": "cdb8bc50-90a7-4ced-8cb6-6ec4a17b17f9",
+      "name": "355 Eviction Detector"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        1712
+      ],
+      "id": "a57818bd-ad23-4707-9321-3d43276d91b9",
+      "name": "010 Step.0 Starter by XML sitemap"
+    },
+    {
+      "parameters": {
+        "url": "https://dns.google/resolve",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "name",
+              "value": "={{ \"_eo-auth.\" + $json.Website.match(/^https?:\\/\\/([^\\/?#]+)/i)[1] }}"
+            },
+            {
+              "name": "type",
+              "value": "TXT"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -464,
+        1712
+      ],
+      "id": "bf72dfe7-a7dd-4270-a91d-3b6a987ad79d",
+      "name": "015 DNS Fetch TXT"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 15 DNS Auth Node\nconst items = $input.all();\nconst DNSTXT_TOKEN = \"eo-authorized-sample\"; \n\nfor (const item of items) {\n  // Answer配列の中に、DNSTXT_TOKENを含むデータがあるかチェック\n  const records = item.json.Answer || [];\n  const isOk = records.some(r => r.data && r.data.includes(DNSTXT_TOKEN));\n\n  if (!isOk) {\n    throw new Error(\"【DNS認証拒否】正当な所有権が確認できません。実行を停止します。\");\n  }\n}\n\n// 認証成功なら、「Start by XML sitemap」ノードのWebsite情報を「復元」して次に渡す\nreturn [ { json: $node[\"010 Step.0 Starter by XML sitemap\"].json } ];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        1712
+      ],
+      "id": "39a953cd-8d2b-4017-b835-c055f0fd8e59",
+      "name": "020 DNS Auth"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.Website }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -64,
+        1712
+      ],
+      "id": "948054db-1e80-47ab-8bd1-10a60b242baa",
+      "name": "040 Direct HTTP Req to get Tier2 XML sitemap URLs"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        128,
+        1712
+      ],
+      "id": "7fc98c0e-f744-4149-8c7d-835c7abf0fa3",
+      "name": "045 XML to JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "const sitemapIndex = items[0].json.sitemapindex;\n\n// 存在チェック\nif (!sitemapIndex || !Array.isArray(sitemapIndex.sitemap)) {\n  throw new Error('sitemapindex.sitemap が見つかりません');\n}\n\n// sitemap配列から、loc を１件ずつurlに変換。他項目を排除\nconst result = sitemapIndex.sitemap.map((entry) => {\n  return {\n    url: entry.loc,\n  };\n});\n\nreturn result;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        352,
+        1712
+      ],
+      "id": "b914b4e6-86ee-48aa-b598-81b4339b335e",
+      "name": "050 JSON to urls by loc"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        592,
+        1712
+      ],
+      "id": "8e02c057-5f10-449c-8520-e599afc8d83d",
+      "name": "055 Loop Over Tier2 locs"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        768,
+        1792
+      ],
+      "id": "a0cd6d09-4728-41a5-91c2-3b2497042dda",
+      "name": "060 Direct HTTP Req to Tier2 locs"
+    },
+    {
+      "parameters": {
+        "jsCode": "const delay = Math.floor(Math.random() * 3000) + 1000; // 1000〜3999ms\nawait new Promise(r => setTimeout(r, delay));\nreturn [{ json: { ...$json, waitSeconds: delay / 1000 } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        1856
+      ],
+      "id": "0e051006-3342-499f-9e06-52638e32401c",
+      "name": "065 Random Sleep (ms)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        1696
+      ],
+      "id": "8a366b05-9d0c-4c57-b06d-0b87b7d256e4",
+      "name": "070 XML to JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\nfor (const item of items) {\n  const urlset = item.urlset || item.json?.urlset;\n  if (!urlset || !urlset.url) continue;\n\n  const urls = Array.isArray(urlset.url) ? urlset.url : [urlset.url];\n\n  for (const u of urls) {\n    out.push({\n      loc: Array.isArray(u.loc) ? u.loc[0] : u.loc\n    });\n  }\n}\n\nreturn out;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        1696
+      ],
+      "id": "fb55bddd-5ca2-457e-b48c-5c6dba94303d",
+      "name": "075 Clean Page Urls with JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8nの内部メソッドを使用して、マスクされる前の値にアクセスを試みます\nconst items = $input.all();\n\n// 前のノード(HTTP Request)の実行設定から、Credential経由で付与された値を取り出す\n// 注意: Self-hosted版の環境やバージョンにより、直接参照を制限している場合があります\nconst secretHeader = $node[\"025 Credential Fetch Request\"].parameter(\"headerParameters\");\n\n// 抽出処理\nreturn items.map(item => {\n  return {\n    json: {\n      ...item.json,\n\n      // Credentialで設定した「x-eo-request-secret」というキーを探して抽出\n      // 取得できない場合は、フォールバックとして空文字を返します\n\n      extracted_secret: secretHeader?.parameters?.find(p => p.headers === 'x-eo-request-secret')?.value || \"\"\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        1472
+      ],
+      "id": "8c22edfe-1a39-49ca-8701-760badf5b515",
+      "name": "30 Response Secret Catcher"
+    },
+    {
+      "parameters": {
+        "url": "https://httpbin.org/get",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -560,
+        1472
+      ],
+      "id": "80f18e3a-153d-4e65-89e5-a20dd89e19bb",
+      "name": "025 Credential Fetch Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "JzB9PZ51pxKq63hX",
+          "name": "EO_RE_Func_japaneast_AppKey"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 30 Secret Injection (ログ露出対策版)\nconst items = $input.all();\n\nreturn items.map(item => {\n  return {\n    json: {\n      ...item.json,\n      // ★重要：ここを「式（Expression）」として記述します\n      // n8nのGUI上で、この部分を以下の Expression に差し替えてください\n      // {{$getCredentials('headerAuth', 'CacheWarmer_Secret').value}}\n      \n      // 注意：Codeノード内で文字列として書くと動きません。\n      // ノードのパラメータ入力欄、または後続の170番ノードで直接呼び出すのがベストです。\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        1488
+      ],
+      "id": "5fb61db6-5f34-41f7-8ca9-0da71c775674",
+      "name": "30 Secret Injection"
+    },
+    {
+      "parameters": {
+        "content": "# 課題1\nhttps://www.youtube.com/watch?v=QAUOBAJkTkA \n\nを参考に n8nのCredentialsでリクエストを扱えると.envにリクエストシークレットを記載する必要がなくなり、SaaS版n8nも含めて使いやすくなる。ノードを使うと平文でINPUTやOUTPUTの中を駆け巡り、ログに残るため利用不可。",
+        "height": 304,
+        "width": 768,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -656,
+        1312
+      ],
+      "typeVersion": 1,
+      "id": "286c9e9a-49e0-4093-9ad8-f49c338ca470",
+      "name": "Sticky Note37"
+    },
+    {
+      "parameters": {
+        "content": "# 課題5\n\n## 認証の流れ\n\n①DNSのTXTレコード認証\n\n②n8nでリクエストシークレットからトークン生成\n\n③クラウド基盤認証（n8nから各種サーバレスへの接続）\n\n④リクエストエンジン内部でリクエストシークレットによるトークン生成、n8n製トークンと照合\n\n## 要改善箇所\n\nトークン生成が<ターゲットURL><リクエストシークレット>のsha256加工であるため、セキュリティ性の向上が必要",
+        "height": 528,
+        "width": 528,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        4432
+      ],
+      "typeVersion": 1,
+      "id": "10ac53bb-66b7-446b-9200-0a5b7cddde2d",
+      "name": "Sticky Note45"
+    },
+    {
+      "parameters": {
+        "content": "# Step.3\n\nData Analyzer\n\n400~",
+        "height": 1472,
+        "width": 150,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1344,
+        5184
+      ],
+      "typeVersion": 1,
+      "id": "2e4bf855-a461-44de-a931-7f91a4ba4719",
+      "name": "Sticky Note48"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3200,
+        5040
+      ],
+      "id": "96948e39-2025-4a91-8cd6-5265fa4c3c56",
+      "name": "415 Step.3 Separate Starter Dummy"
+    },
+    {
+      "parameters": {
+        "options": {
+          "fileName": "=RequestResults_{{ $now.setZone('Asia/Tokyo').toFormat('yyyy-LL-dd_HH:mm') + '.csv' }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -928,
+        5360
+      ],
+      "id": "8f046a1a-ac9b-496d-b739-7badbb2eb620",
+      "name": "420 JSON to WarmupHistoryCSV"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.data.targetUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "text"
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        3344
+      ],
+      "id": "8c609b92-71a6-4003-b309-242b8e2c4f3b",
+      "name": "280DirectRequest"
+    },
+    {
+      "parameters": {
+        "url": "<CF WorkersリクエストエンジンのカスタムドメインURL>",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "targetUrl",
+              "value": "={{ $json.data.targetUrl }}"
+            },
+            {
+              "name": "tokenCalculatedByN8n",
+              "value": "={{ $json.data.tokenCalculatedByN8n }}"
+            },
+            {
+              "name": "httpRequestNumber",
+              "value": "={{ $json.data.httpRequestNumber }}"
+            },
+            {
+              "name": "httpRequestUUID",
+              "value": "={{ $json.data.httpRequestUUID }}"
+            },
+            {
+              "name": "httpRequestRoundID",
+              "value": "={{ $json.httpRequestRoundID }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        3952
+      ],
+      "id": "f6d6fa0c-06ad-4a77-8e4f-7bf22dad2488",
+      "name": "280CF-global RequestEngine ZeroTrust",
+      "retryOnFail": true,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "PjSzJTmlLNGjN3ow",
+          "name": "Dummy CFWorker"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "<GCP CloudRunリクエストエンジンのサービスURL>/<エンドポイントパス>",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+            },
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $json.gcf.idToken }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n  \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n  \"headers\": \"{{ $json.data.headers }}\",\n  \"httpRequestNumber\": \"{{ $json.data.httpRequestNumber }}\",\n  \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n  \"httpRequestRoundID\": \"{{ $json.data.httpRequestRoundID }}\",\n  \"urltype\": \"{{ $json.data.urltype }}\"\n}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        4160
+      ],
+      "id": "e624eb6b-fc0e-4ac2-84ee-a317f132fadd",
+      "name": "280GCP-asia-northeast1 RequestEngine Oauth2 Bearer"
+    },
+    {
+      "parameters": {
+        "function": "=eo-re-d01-lambda-apne1",
+        "payload": "={{ $json.data }}"
+      },
+      "type": "n8n-nodes-base.awsLambda",
+      "typeVersion": 1,
+      "position": [
+        592,
+        3536
+      ],
+      "id": "183b5be4-2009-4323-a94d-a31b81fb757b",
+      "name": "280AWS-apne1 RequestEngine AccessKey",
+      "credentials": {
+        "aws": {
+          "id": "Wc9FW6idtZk9tShE",
+          "name": "AWS (IAM) account Dummy"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "<Az FunctionsリクエストエンジンのエンドポイントURL>",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"data\": {\n    \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n    \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n    \"headers\": {\n      \"User-Agent\": \"{{ $json.data.headers['User-Agent'] }}\",\n      \"Accept-Language\": \"{{ $json.data.headers['Accept-Language'] }}\"\n    },\n    \"httpRequestNumber\": {{ $json.data.httpRequestNumber }},\n    \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n    \"httpRequestRoundID\": {{ $json.data.httpRequestRoundID }},\n    \"urltype\": \"{{ $json.data.urltype }}\"\n  }\n}",
+        "options": {
+          "redirect": {
+            "redirect": {
+              "maxRedirects": 5
+            }
+          },
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true
+            }
+          },
+          "timeout": 180000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        592,
+        3744
+      ],
+      "id": "2df2bc05-3c11-4802-b722-fadec4cbbb3e",
+      "name": "280AZ-japan-east RequestEngine KeyVault",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "4oorBtBP5SuAimco",
+          "name": "Azure Dummy Hedaer Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 230 JSON data REMOVER の OUTPUT を前提\n// [\n//   {\n//     \"headers\": { ... },\n//     \"statusCode\": 200,\n//     \"statusMessage\": \"OK\"\n//   }\n// ]\n\nconst items = $input.all();\n\nreturn items.map(item => {\n  const j = item.json || {};\n  const h = j.headers || {};\n\n  // statusCode と statusMessage を \"200 OK\" のような形に結合\n  const statusCode = j.statusCode;\n  const statusMessage = j.statusMessage;\n  let combinedStatus = '';\n\n  if (statusCode !== undefined && statusCode !== null) {\n    combinedStatus = String(statusCode);\n  }\n  if (statusMessage) {\n    combinedStatus = combinedStatus\n      ? `${combinedStatus} ${statusMessage}`\n      : String(statusMessage);\n  }\n\n  return {\n    json: {\n      // ■ headers.* → headers.response-headers.*\n      'headers.response-headers.server': h.server ?? '',\n      'headers.response-headers.date': h.date ?? '',\n      'headers.response-headers.content-type': h['content-type'] ?? '',\n      'headers.response-headers.transfer-encoding': h['transfer-encoding'] ?? '',\n      'headers.response-headers.connection': h.connection ?? '',\n      'headers.response-headers.vary': h.vary ?? '',\n      'headers.response-headers.link': h.link ?? '',\n\n      // ■ statusCode + statusMessage → headers.general.status-code\n      'headers.general.status-code': combinedStatus,\n    },\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        3344
+      ],
+      "id": "0d1d7f5b-bead-474e-a30b-6642e1c8ab16",
+      "name": "290 DirectRequest Arranger"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  // 元の headers を退避しておく\n  const originalHeaders = item.json.headers;\n\n  // レスポンス body があれば、json のルートに引き上げ (既存処理)\n  if (item.json.body) {\n    item.json = item.json.body;\n  }\n\n  // 退避しておいた headers があれば、キー名に \"headers.\" を付けて追加 (新規処理)\n  if (originalHeaders) {\n    Object.keys(originalHeaders).forEach(key => {\n      item.json[`headers.${key}`] = originalHeaders[key];\n    });\n  }\n\n  return item;\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        3744
+      ],
+      "id": "d0b2e632-ee8e-402d-8f07-53d201c95c26",
+      "name": "300 AZ Arranger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ▼ Step.1 (HTML解析) から始めたいURLリストをこの中に、URLをダブルクォート囲み、カンマ区切りで記述\nconst targetPages = [\n  \"https://sample.com/\",\n  //\"https://sample.com/services/\",\n];\n\n// -------------------------------------------------------\n// Node 115 以降が期待する「loc」キーを持つJSON形式に変換して出力\n// -------------------------------------------------------\nreturn targetPages.map(url => ({\n  json: {\n    \"loc\":\"https://sample.com/voiceflow/voiceflow-welcome-summary/\"\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        1888
+      ],
+      "id": "73e12f59-95d2-4e1e-88f9-c492e38f6693",
+      "name": "110 Step.1 Starter SimpleUrlList"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Run Once for All Items モードで実行\nconst items = $input.all();\n\nreturn items.map(item => ({\n  json: {\n    data: item.json,  // 元の内容を data 配下に\n  },\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3024,
+        2768
+      ],
+      "id": "518c189b-363a-439b-9396-02766c5ccb41",
+      "name": "195 Wrap Json In Data"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        320,
+        4064
+      ],
+      "id": "15bab6a8-8fde-4faa-b45e-db651da9340a",
+      "name": "245 data and GCP IDtoken Merger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn items.map((item) => {\n  let uuid;\n  try {\n    // 標準モジュールのcrypto.randomUUID()を試す\n    uuid = crypto.randomUUID();\n  } catch (e) {\n    // フォールバック: 手動生成\n    uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n      const r = Math.random() * 16 | 0;\n      const v = c === 'x' ? r : (r & 0x3 | 0x8);\n      return v.toString(16);\n    });\n  }\n  \n  return {\n    json: {\n      ...item.json,\n      httpRequestUUID: uuid,\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2848,
+        2768
+      ],
+      "id": "191ef2f0-19d6-4e46-bc6f-b27aac131686",
+      "name": "190 Add Http Request UUID"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3232,
+        2768
+      ],
+      "id": "4d49003f-3001-4ba9-94f5-2c353c8f9316",
+      "name": "210 Step.2 Separate Starter Dummy"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst roundId = Math.floor(Date.now() / 1000); // ノード実行時点のタイムスタンプ\n\nreturn items.map((item) => ({\n  json: {\n    data: {\n      ...item.json.data,\n      httpRequestRoundID: roundId, // 全アイテム同じ値を設定\n    },\n  },\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1072,
+        3232
+      ],
+      "id": "f82907a2-77c6-48be-bf44-08712484df0e",
+      "name": "215 Add httpRequestRoundID"
+    },
+    {
+      "parameters": {
+        "type": "SHA256",
+        "value": "={{ $json.targetUrl }}{{ $env.N8N_EO_REQUEST_SECRET }}",
+        "dataPropertyName": "tokenCalculatedByN8n"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        2768
+      ],
+      "id": "86914151-6e20-4704-817e-4245aefe934c",
+      "name": "170 n8n RequestSecret Token Generator"
+    }
+  ],
+  "pinData": {
+    "010 Step.0 Starter by XML sitemap": [
+      {
+        "json": {
+          "Website": "https://sample.com/wp-sitemap.xml"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "120 Loop Over All Web Page Urls": {
+      "main": [
+        [
+          {
+            "node": "135 Merge Assets to URLs",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "125-1 HTTP Req to Get All TargetUrls through Playwright Container",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "125-1 HTTP Req to Get All TargetUrls through Playwright Container": {
+      "main": [
+        [
+          {
+            "node": "130 Random Sleep (ms)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "130 Random Sleep (ms)": {
+      "main": [
+        [
+          {
+            "node": "120 Loop Over All Web Page Urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "135 Merge Assets to URLs": {
+      "main": [
+        [
+          {
+            "node": "140 Extract Warmup Page Assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "140 Extract Warmup Page Assets": {
+      "main": [
+        [
+          {
+            "node": "145 Query Param and Anchor Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "145 Query Param and Anchor Filter": {
+      "main": [
+        [
+          {
+            "node": "150 Merge Page and Assets to Unique Urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "150 Merge Page and Assets to Unique Urls": {
+      "main": [
+        [
+          {
+            "node": "155 Unwanted URL Ptterns Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "155 Unwanted URL Ptterns Filter": {
+      "main": [
+        [
+          {
+            "node": "160 Asset / MainDoc / Exception Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "160 Asset / MainDoc / Exception Classification": {
+      "main": [
+        [
+          {
+            "node": "165 exception Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "165 exception Filter": {
+      "main": [
+        [],
+        [
+          {
+            "node": "170 n8n RequestSecret Token Generator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "175 Assign UserAgents By UrlType": {
+      "main": [
+        [
+          {
+            "node": "180 RequestEngine Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "185 Add Http Request Number": {
+      "main": [
+        [
+          {
+            "node": "190 Add Http Request UUID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "180 RequestEngine Settings": {
+      "main": [
+        [
+          {
+            "node": "185 Add Http Request Number",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "220 Loop Over Request Target Urls": {
+      "main": [
+        [
+          {
+            "node": "350 Json Flattener for Csv",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "225 Request Engine Switcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "225 Request Engine Switcher": {
+      "main": [
+        [
+          {
+            "node": "280DirectRequest",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "280AWS-apne1 RequestEngine AccessKey",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "280AZ-japan-east RequestEngine KeyVault",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "280CF-global RequestEngine ZeroTrust",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "235 Get IDtoken From GCP Service Account Access Token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "230 data Keeper for GCP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "235 Get IDtoken From GCP Service Account Access Token": {
+      "main": [
+        [
+          {
+            "node": "240 IDtoken to json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "240 IDtoken to json": {
+      "main": [
+        [
+          {
+            "node": "245 data and GCP IDtoken Merger",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "285 JSON data REMOVER": {
+      "main": [
+        [
+          {
+            "node": "290 DirectRequest Arranger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "295 JSON result REMOVER": {
+      "main": [
+        [
+          {
+            "node": "340 Random Sleep (ms)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "230 data Keeper for GCP": {
+      "main": [
+        [
+          {
+            "node": "245 data and GCP IDtoken Merger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "305 GCP Arranger": {
+      "main": [
+        [
+          {
+            "node": "340 Random Sleep (ms)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "340 Random Sleep (ms)": {
+      "main": [
+        [
+          {
+            "node": "220 Loop Over Request Target Urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "350 Json Flattener for Csv": {
+      "main": [
+        [
+          {
+            "node": "355 Eviction Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "115 Step.1 Separate Starter Dummy": {
+      "main": [
+        [
+          {
+            "node": "135 Merge Assets to URLs",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "120 Loop Over All Web Page Urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "355 Eviction Detector": {
+      "main": [
+        [
+          {
+            "node": "415 Step.3 Separate Starter Dummy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "010 Step.0 Starter by XML sitemap": {
+      "main": [
+        [
+          {
+            "node": "015 DNS Fetch TXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "015 DNS Fetch TXT": {
+      "main": [
+        [
+          {
+            "node": "020 DNS Auth",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "020 DNS Auth": {
+      "main": [
+        [
+          {
+            "node": "040 Direct HTTP Req to get Tier2 XML sitemap URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "040 Direct HTTP Req to get Tier2 XML sitemap URLs": {
+      "main": [
+        [
+          {
+            "node": "045 XML to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "045 XML to JSON": {
+      "main": [
+        [
+          {
+            "node": "050 JSON to urls by loc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "050 JSON to urls by loc": {
+      "main": [
+        [
+          {
+            "node": "055 Loop Over Tier2 locs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "055 Loop Over Tier2 locs": {
+      "main": [
+        [
+          {
+            "node": "070 XML to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "060 Direct HTTP Req to Tier2 locs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "060 Direct HTTP Req to Tier2 locs": {
+      "main": [
+        [
+          {
+            "node": "065 Random Sleep (ms)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "065 Random Sleep (ms)": {
+      "main": [
+        [
+          {
+            "node": "055 Loop Over Tier2 locs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "070 XML to JSON": {
+      "main": [
+        [
+          {
+            "node": "075 Clean Page Urls with JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "075 Clean Page Urls with JSON": {
+      "main": [
+        [
+          {
+            "node": "115 Step.1 Separate Starter Dummy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "025 Credential Fetch Request": {
+      "main": [
+        [
+          {
+            "node": "30 Response Secret Catcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "415 Step.3 Separate Starter Dummy": {
+      "main": [
+        [
+          {
+            "node": "420 JSON to WarmupHistoryCSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "280DirectRequest": {
+      "main": [
+        [
+          {
+            "node": "285 JSON data REMOVER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "280CF-global RequestEngine ZeroTrust": {
+      "main": [
+        [
+          {
+            "node": "340 Random Sleep (ms)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "280GCP-asia-northeast1 RequestEngine Oauth2 Bearer": {
+      "main": [
+        [
+          {
+            "node": "305 GCP Arranger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "280AWS-apne1 RequestEngine AccessKey": {
+      "main": [
+        [
+          {
+            "node": "295 JSON result REMOVER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "280AZ-japan-east RequestEngine KeyVault": {
+      "main": [
+        [
+          {
+            "node": "300 AZ Arranger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "290 DirectRequest Arranger": {
+      "main": [
+        [
+          {
+            "node": "340 Random Sleep (ms)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "300 AZ Arranger": {
+      "main": [
+        [
+          {
+            "node": "340 Random Sleep (ms)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "195 Wrap Json In Data": {
+      "main": [
+        [
+          {
+            "node": "210 Step.2 Separate Starter Dummy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "245 data and GCP IDtoken Merger": {
+      "main": [
+        [
+          {
+            "node": "280GCP-asia-northeast1 RequestEngine Oauth2 Bearer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "190 Add Http Request UUID": {
+      "main": [
+        [
+          {
+            "node": "195 Wrap Json In Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "210 Step.2 Separate Starter Dummy": {
+      "main": [
+        [
+          {
+            "node": "215 Add httpRequestRoundID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "215 Add httpRequestRoundID": {
+      "main": [
+        [
+          {
+            "node": "220 Loop Over Request Target Urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "170 n8n RequestSecret Token Generator": {
+      "main": [
+        [
+          {
+            "node": "175 Assign UserAgents By UrlType",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "110 Step.1 Starter SimpleUrlList": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "7d4cdc43-8203-483e-97ba-ca48e41a44b8",
+  "meta": {
+    "instanceId": "448f766a569d9f99225f92707c70839acb353c0f2aed31023e195f8796fef2cd"
+  },
+  "id": "KDXoO0LbUHerLKP-f1Ono",
+  "tags": []
+}

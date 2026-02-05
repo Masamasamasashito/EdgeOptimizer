@@ -1,0 +1,2056 @@
+# ----------------------------------------------------
+# Edge Optimizer
+# Request Engine for GCP Cloud Run
+# Crafted by Nishi Labo | https://4649-24.com
+# ---------------------------------------------------
+# [DEPLOY TEST 2026-01-22 19:18] EO_GCP_PROJECT_ID 疎通tst
+# 
+# EO Request Engine for GCP Cloud Run ane1 (asia-northeast1) region
+# * Overview:
+# Executes HTTP requests to specified URLs to warm up the GCP Cloud Run cache.
+# Returns results in a flat JSON structure (supporting TTFB/BodySize measurements).
+# 
+# * Input:
+# - JSON Body: { data: { targetUrl, tokenCalculatedByN8n, headers, ... } }
+# - GET Query: ?targetUrl=...&tokenCalculatedByN8n=...
+# 
+# * Dependencies:
+# - GCP Secret Manager (ローカル開発時は環境変数EO_CLOUDRUN_REQUEST_SECRET_LOCAL、Cloud RunではSecret Managerから取得)
+
+"""
+EO Request Engine for GCP Cloud Run (第2世代)
+AWS Lambda / Azure Functions / Cloudflare Workers と同じレスポンス形式で動作
+
+注意: GCP Cloud RunはOAuth2 Bearer認証を使用するため、n8nワークフローでは
+230 data Keeper for GCPノード、235 Get IDtoken From GCP Service Account Access Tokenノード、
+240 IDtoken to jsonノード、245 data and GCP IDtoken Mergerノードを経て
+280GCP-ane1 RequestEngine Oauth2 Bearerノードに至る。
+この認証フローは他のリクエストエンジンとは異なるが、これは意図的な設計である。
+"""
+import os
+import time
+import hashlib
+import json
+import logging
+import re
+import ssl
+from typing import Any, Dict, Optional, Tuple
+from urllib.parse import urlparse, urljoin
+from flask import Flask, request, jsonify
+import requests
+from google.cloud import secretmanager
+
+# ロギング設定
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = Flask(__name__)
+
+# ======================================================================
+# 設定定数
+# ======================================================================
+
+# GCP Secret Manager 設定
+CLOUDRUN_REQUEST_SECRET_NAME = os.environ.get("CLOUDRUN_REQUEST_SECRET_NAME", "eo-re-d01-secretmng")  # GCP Secret Manager シークレット名
+CLOUDRUN_REQUEST_SECRET_KEY_NAME = os.environ.get("CLOUDRUN_REQUEST_SECRET_KEY_NAME", "CLOUDRUN_REQUEST_SECRET")  # シークレット内のキー名（JSON形式の場合）
+
+# EO識別ヘッダー
+# Request Engineの識別用に使用されるカスタムヘッダー
+EO_HEADER_NAME = "x-eo-re"
+EO_HEADER_VALUE = "gcp"
+
+# エンドポイント設定
+# Azure Functionsの「関数名」に相当する、このコンテナの実行パス
+CLOUDRUN_ENDPOINT_PATH = "/requestengine_tail"
+
+# ======================================================================
+# パフォーマンス最適化設定
+# ======================================================================
+HTTP_REQUEST_TIMEOUT = 10  # HTTPリクエストのタイムアウト（秒）
+# Warmup目的なら10秒で十分（従来は30秒だったが、短縮してコスト削減）
+
+MAX_CONTENT_SIZE_FOR_ANALYSIS = 5 * 1024 * 1024  # 5MB
+# このサイズを超えるコンテンツは解析をスキップ（メモリ保護）
+# GCP Cloud Runのメモリ制限を考慮した設定
+
+# ======================================================================
+# リトライ設定
+# ======================================================================
+MAX_RETRY_ATTEMPTS = 2  # 最大リトライ回数（初回含めて合計3回）
+# 例: 初回 + リトライ2回 = 合計3回の試行
+
+RETRY_INITIAL_DELAY = 0.5  # 初回リトライまでの待機時間（秒）
+# 1回目のリトライ: 0.5秒待機
+
+RETRY_BACKOFF_MULTIPLIER = 2.0  # エクスポネンシャルバックオフの倍率
+# リトライ間隔の計算: delay = RETRY_INITIAL_DELAY * (RETRY_BACKOFF_MULTIPLIER ** attempt)
+# 例: 1回目: 0.5秒、2回目: 1.0秒、3回目: 2.0秒
+
+RETRYABLE_STATUS_CODES = {500, 502, 503, 504}  # リトライ対象のHTTPステータスコード
+# 5xxサーバーエラーは一時的な問題である可能性が高いため、リトライ対象
+# 4xxクライアントエラーはリトライ対象外（リトライしても解決しない）
+
+# ======================================================================
+# グローバル変数
+# ======================================================================
+_cached_secretmng_requestsecret_value: Optional[str] = None
+# GCP Secret Managerのシークレット（CLOUDRUN_REQUEST_SECRET）の値をキャッシュ
+# 1回目のリクエストで取得し、以降のリクエストではキャッシュを使用
+# 注意: n8n側のN8N_EO_REQUEST_SECRETとは区別される（値は同じである必要がある）
+
+# ======================================================================
+# GCP Secret Manager から シークレットキーの値を取得（1回だけ取得、以降キャッシュ）
+# ======================================================================
+def _get_secretmng_requestsecret_value() -> str:
+    """
+    GCP Secret Managerからシークレットキー（CLOUDRUN_REQUEST_SECRET）の値を取得
+    
+    1回目の呼び出しでGCP Secret Managerから取得し、以降はキャッシュを使用する。
+    これにより、GCP Secret Managerへのアクセス回数を削減し、パフォーマンスと
+    コストを最適化する。
+    
+    Returns:
+        str: シークレットキーの値（CLOUDRUN_REQUEST_SECRETの値）
+    
+    Raises:
+        RuntimeError: 以下の場合に発生
+            - EO_GCP_PROJECT_ID環境変数が設定されていない
+            - Secret Managerへのアクセスに失敗（権限不足、存在しないシークレットなど）
+            - SecretStringが空
+            - SecretStringが有効なJSONでない
+            - シークレットキーが存在しない
+            - シークレットキーの値が空または文字列でない
+    
+    Note:
+        - シークレットはJSON形式またはプレーンテキスト形式で保存されている必要がある
+        - シークレットキー名: CLOUDRUN_REQUEST_SECRET_KEY_NAME
+        - キャッシュはCloud Runインスタンスが再利用される限り有効
+    """
+    # すでに取得済みなら Secret Manager に問い合わせず、キャッシュされた値を返す
+    # （パフォーマンス最適化とコスト削減）
+    global _cached_secretmng_requestsecret_value
+    if _cached_secretmng_requestsecret_value is not None:
+        return _cached_secretmng_requestsecret_value
+
+    project_id = os.environ.get("EO_GCP_PROJECT_ID")
+    if not project_id:
+        raise RuntimeError(
+            "Environment variable 'EO_GCP_PROJECT_ID' is not set."
+        )
+
+    try:
+        client = secretmanager.SecretManagerServiceClient()
+        secret_path = f"projects/{project_id}/secrets/{CLOUDRUN_REQUEST_SECRET_NAME}/versions/latest"
+        response = client.access_secret_version(request={"name": secret_path})
+        secret_string = response.payload.data.decode("UTF-8")
+    except Exception as e:
+        raise RuntimeError(f"Failed to get secret value: {e}") from e
+
+    if not secret_string:
+        raise RuntimeError(f"SecretString is empty for secret: {CLOUDRUN_REQUEST_SECRET_NAME}")
+
+    # JSON形式の場合はパースして値を取得（AWS Lambdaと同様のロジック）
+    try:
+        secret_json = json.loads(secret_string)
+        if isinstance(secret_json, dict) and CLOUDRUN_REQUEST_SECRET_KEY_NAME in secret_json:
+            secret_string = secret_json[CLOUDRUN_REQUEST_SECRET_KEY_NAME]
+            # 値の型と内容チェック（AWS Lambdaと同様）
+            if not isinstance(secret_string, str) or not secret_string:
+                raise RuntimeError(
+                    f"Secret '{CLOUDRUN_REQUEST_SECRET_NAME}' field '{CLOUDRUN_REQUEST_SECRET_KEY_NAME}' is empty or not a string"
+                )
+    except json.JSONDecodeError:
+        # JSONでない場合はそのまま使用（プレーンテキスト形式）
+        pass
+
+    _cached_secretmng_requestsecret_value = secret_string
+    return secret_string
+
+# ======================================================================
+# token 計算 (SHA-256): SHA-256(url + リクエストシークレット)
+# リクエストシークレットは GCP Secret Manager の CLOUDRUN_REQUEST_SECRET から取得（n8n側では N8N_EO_REQUEST_SECRET を使用）
+# ======================================================================
+def _calc_token(url: str, secret: str) -> str:
+    """
+    リクエストトークンを計算（SHA-256ハッシュ）
+    
+    n8nワークフロー側で生成されたトークンと照合するために使用。
+    計算式: SHA-256(url + リクエストシークレット)
+    
+    Args:
+        url: 対象URL
+        secret: リクエストシークレット（GCP Secret Managerから取得）
+    
+    Returns:
+        str: 64文字の16進数ハッシュ値（小文字）
+    
+    Note:
+        - n8n側では N8N_EO_REQUEST_SECRET を使用
+        - GCP Cloud Run側では CLOUDRUN_REQUEST_SECRET を使用
+        - 両者は同じ値である必要がある
+        - AWS Lambda / Azure Functions / Cloudflare Workers と同一のロジック
+    """
+    return hashlib.sha256(f"{url}{secret}".encode()).hexdigest()
+
+
+# ======================================================================
+# セキュリティヘッダーを解析して指標を返す
+# ======================================================================
+def _analyze_security_headers(res_headers: Dict[str, str], target_url: str) -> Dict[str, Any]:
+    """
+    セキュリティヘッダーを解析して指標を返す
+    Core Web Vitals / PageSpeed Insights / セキュリティ指標に含まれる
+    """
+    security = {}
+    security["is_https"] = target_url.startswith("https://")
+    
+    headers_lower = {k.lower(): v for k, v in res_headers.items()}
+    
+    # セキュリティヘッダー定義（ヘッダー名 -> キー名のマッピング）
+    security_headers = {
+        "strict-transport-security": "hsts",
+        "content-security-policy": "csp",
+        "x-content-type-options": "x_content_type_options",
+        "x-frame-options": "x_frame_options",
+        "x-xss-protection": "x_xss_protection",
+        "referrer-policy": "referrer_policy",
+        "public-key-pins": "hpkp",
+    }
+    
+    # 各セキュリティヘッダーをチェック
+    for header_name, key_prefix in security_headers.items():
+        header_value = headers_lower.get(header_name)
+        security[f"{key_prefix}_present"] = header_value is not None
+        if header_value:
+            security[f"{key_prefix}_value"] = header_value
+    
+    # Permissions-Policy (旧Feature-Policy) - 特殊処理
+    permissions_policy = headers_lower.get("permissions-policy") or headers_lower.get("feature-policy")
+    security["permissions_policy_present"] = permissions_policy is not None
+    if permissions_policy:
+        security["permissions_policy_value"] = permissions_policy
+    
+    return security
+
+
+# ======================================================================
+# HTTPプロトコルバージョン取得
+# ======================================================================
+def _get_http_protocol_version(response: requests.Response) -> Optional[str]:
+    """
+    HTTPプロトコルバージョンを取得（HTTP/1.1, HTTP/2, HTTP/3など）
+    判定が困難な場合は理由を含むエラーメッセージを返す
+    """
+    if not hasattr(response, 'raw') or response.raw is None:
+        return "ERROR: Cannot determine HTTP protocol version. The response object does not have a 'raw' attribute or it is None. The 'raw' attribute is required to access the underlying HTTP version information."
+    
+    try:
+        version = getattr(response.raw, 'version', None)
+        if version is None:
+            version = getattr(response.raw, '_http_version', None)
+        if version:
+            if version == 11:
+                return "HTTP/1.1"
+            elif version == 20:
+                return "HTTP/2"
+            elif version == 30:
+                return "HTTP/3"
+            elif isinstance(version, (int, float)):
+                return f"HTTP/{version/10}"
+            else:
+                return str(version)
+        else:
+            return "ERROR: Cannot determine HTTP protocol version. The response.raw object does not have 'version' or '_http_version' attributes. These attributes are required to determine the HTTP protocol version, but they are not available in this response object."
+    except AttributeError as e:
+        return f"ERROR: Cannot determine HTTP protocol version due to AttributeError. Accessing the HTTP version attribute failed: {str(e)}. The response object structure may not match the expected format."
+    except TypeError as e:
+        return f"ERROR: Cannot determine HTTP protocol version due to TypeError. Type mismatch occurred while accessing the HTTP version: {str(e)}."
+    except Exception as e:
+        return f"ERROR: Cannot determine HTTP protocol version due to unexpected error ({type(e).__name__}): {str(e)}."
+
+
+# ======================================================================
+# TLSバージョン取得
+# ======================================================================
+def _get_tls_version(response: requests.Response, target_url: str) -> Optional[str]:
+    """
+    TLSバージョンを取得
+    失敗時は理由を含む値を返す
+    """
+    if not target_url.startswith("https://"):
+        return "unknown: not_https"
+    if not hasattr(response, 'raw') or response.raw is None:
+        return "unknown: response_raw_not_available"
+    
+    try:
+        connection = getattr(response.raw, '_connection', None)
+        if connection is None:
+            return "unknown: connection_not_found"
+        
+        sock = getattr(connection, 'sock', None)
+        if sock is None:
+            return "unknown: sock_not_found"
+        if not isinstance(sock, ssl.SSLSocket):
+            return f"unknown: sock_not_ssl (type: {type(sock).__name__})"
+        
+        try:
+            ssl_version_str = sock.version()
+            tls_version_map = {
+                'TLSv1': 'TLSv1.0',
+                'TLSv1.1': 'TLSv1.1',
+                'TLSv1.2': 'TLSv1.2',
+                'TLSv1.3': 'TLSv1.3',
+            }
+            for key, value in tls_version_map.items():
+                if key in ssl_version_str:
+                    return value
+            if ssl_version_str:
+                return ssl_version_str
+            return "unknown: version_string_empty"
+        except AttributeError as e:
+            return f"unknown: version_method_failed (AttributeError: {str(e)})"
+        except TypeError as e:
+            return f"unknown: version_method_failed (TypeError: {str(e)})"
+        except Exception as e:
+            return f"unknown: version_method_failed (Exception: {type(e).__name__}: {str(e)})"
+    except AttributeError as e:
+        return f"unknown: connection_access_failed (AttributeError: {str(e)})"
+    except TypeError as e:
+        return f"unknown: connection_access_failed (TypeError: {str(e)})"
+    except Exception as e:
+        return f"unknown: connection_access_failed (Exception: {type(e).__name__}: {str(e)})"
+
+# ======================================================================
+# Core Web Vitals: FCP (First Contentful Paint) 近似値計測
+# ======================================================================
+def _measure_fcp_approximation(
+    response: requests.Response,
+    request_start_time: float,
+) -> Tuple[Dict[str, Any], bytes]:
+    """
+    FCP (First Contentful Paint) の近似値を計測
+    サーバー側では直接計測できないため、以下の指標を計測：
+    - fcp_14kb_ms: 最初の14KB（TCP初期ウィンドウサイズ）の読み込み時間
+    - fcp_50kb_ms: 最初の50KB（一般的なFCP閾値）の読み込み時間
+    
+    Returns:
+        Tuple[Dict[str, Any], bytes]: (FCPメトリクス, 読み込んだ全コンテンツ)
+    """
+    fcp_metrics = {}
+    full_content = b""
+    fcp_14kb_measured = False
+    fcp_50kb_measured = False
+    
+    try:
+        target_size_14kb = 14 * 1024  # 14KB
+        target_size_50kb = 50 * 1024  # 50KB
+        
+        # stream=Trueで段階的に読み込む
+        for chunk in response.iter_content(chunk_size=8192):
+            if chunk:
+                full_content += chunk
+                
+                # 14KBの計測
+                if not fcp_14kb_measured and len(full_content) >= target_size_14kb:
+                    chunk_14kb_end = time.time()
+                    fcp_14kb_ms = (chunk_14kb_end - request_start_time) * 1000
+                    fcp_metrics["fcp_14kb_ms"] = round(fcp_14kb_ms, 2)
+                    fcp_metrics["fcp_14kb_bytes"] = len(full_content)
+                    fcp_14kb_measured = True
+                
+                # 50KBの計測
+                if not fcp_50kb_measured and len(full_content) >= target_size_50kb:
+                    chunk_50kb_end = time.time()
+                    fcp_50kb_ms = (chunk_50kb_end - request_start_time) * 1000
+                    fcp_metrics["fcp_50kb_ms"] = round(fcp_50kb_ms, 2)
+                    fcp_metrics["fcp_50kb_bytes"] = len(full_content)
+                    fcp_50kb_measured = True
+                
+                # 両方計測済みで、十分なデータが読み込まれた場合は早期終了可能
+                # ただし、全コンテンツを読み込む必要があるため、続行
+        
+        # 50KB未満で終了した場合
+        if not fcp_50kb_measured and len(full_content) > 0:
+            chunk_50kb_end = time.time()
+            fcp_50kb_ms = (chunk_50kb_end - request_start_time) * 1000
+            fcp_metrics["fcp_50kb_ms"] = round(fcp_50kb_ms, 2)
+            fcp_metrics["fcp_50kb_bytes"] = len(full_content)
+            fcp_metrics["fcp_50kb_incomplete"] = True
+        
+        # 14KB未満で終了した場合
+        if not fcp_14kb_measured and len(full_content) > 0:
+            chunk_14kb_end = time.time()
+            fcp_14kb_ms = (chunk_14kb_end - request_start_time) * 1000
+            fcp_metrics["fcp_14kb_ms"] = round(fcp_14kb_ms, 2)
+            fcp_metrics["fcp_14kb_bytes"] = len(full_content)
+            fcp_metrics["fcp_14kb_incomplete"] = True
+        
+    except Exception as e:
+        logging.warning(f"FCP approximation measurement error: {str(e)}")
+        fcp_metrics["fcp_measurement_error"] = str(e)
+        # エラーが発生しても、読み込めた部分は返す
+    
+    return fcp_metrics, full_content
+
+
+# ======================================================================
+# URL拡張子の判定
+# ======================================================================
+def _get_url_extension(url: str) -> Optional[str]:
+    """
+    URLから拡張子を取得（クエリパラメータとアンカーを除去）
+    """
+    try:
+        parsed = urlparse(url)
+        path = parsed.path
+        if not path:
+            return None
+        # 拡張子を抽出（最後の.以降）
+        if '.' in path:
+            ext = path.rsplit('.', 1)[-1].lower()
+            # 拡張子が妥当な文字列かチェック（英数字のみ）
+            if ext and ext.isalnum():
+                return ext
+        return None
+    except Exception:
+        return None
+
+
+# ======================================================================
+# URLタイプと拡張子に基づくリソース種別の判定
+# ======================================================================
+def _determine_resource_type(urltype: Optional[str], url: str) -> Dict[str, Any]:
+    """
+    urltypeとURL拡張子からリソース種別を判定
+    
+    n8nワークフロー（160ノード: Asset / MainDoc / Exception Classification）と整合性を保つ
+    
+    アセット拡張子:
+    - 画像: jpg, jpeg, gif, png, webp, avif, svg, ico
+    - CSS: css
+    - JS: js
+    - フォント: woff, woff2, ttf, otf, eot
+    - 動画: mp4, webm, ogg, mov
+    
+    resource_category:
+    - "html", "image", "css", "js", "font", "video", "other"
+    """
+    resource_info = {
+        "urltype": urltype,
+        "url_extension": None,  # 拡張子（例: "woff2", "ttf", "css", "jpg"）
+        "resource_category": None,  # "html", "image", "css", "js", "font", "video", "other"
+        "is_main_document": False,
+        "is_asset": False,
+        "needs_fcp_measurement": False,
+        "needs_lcp_analysis": False,
+        "needs_asset_analysis": False,
+    }
+    
+    # 拡張子を取得
+    ext = _get_url_extension(url)
+    resource_info["url_extension"] = ext
+    
+    # urltypeに基づく判定
+    if urltype == "main_document":
+        resource_info["is_main_document"] = True
+        resource_info["needs_fcp_measurement"] = True
+        resource_info["needs_lcp_analysis"] = True
+        # 拡張子が.html/.htmの場合は確実にHTML
+        if ext in ["html", "htm"]:
+            resource_info["resource_category"] = "html"
+        else:
+            # 拡張子がない場合もHTMLの可能性が高い
+            resource_info["resource_category"] = "html"
+    
+    elif urltype == "asset":
+        resource_info["is_asset"] = True
+        resource_info["needs_asset_analysis"] = True
+        
+        # 拡張子に基づく種別判定
+        image_exts = ["jpg", "jpeg", "gif", "png", "webp", "avif", "svg", "ico"]
+        css_exts = ["css"]
+        js_exts = ["js"]
+        font_exts = ["woff", "woff2", "ttf", "otf", "eot"]
+        video_exts = ["mp4", "webm", "ogg", "mov"]
+        
+        if ext in image_exts:
+            resource_info["resource_category"] = "image"
+        elif ext in css_exts:
+            resource_info["resource_category"] = "css"
+        elif ext in js_exts:
+            resource_info["resource_category"] = "js"
+        elif ext in font_exts:
+            resource_info["resource_category"] = "font"
+        elif ext in video_exts:
+            resource_info["resource_category"] = "video"
+        else:
+            resource_info["resource_category"] = "other"
+    
+    elif urltype == "exception":
+        resource_info["resource_category"] = "exception"
+        # exceptionは計測をスキップ
+    
+    return resource_info
+
+
+# ======================================================================
+# Core Web Vitals: LCP (Largest Contentful Paint) 要素の抽出
+# ======================================================================
+def _extract_lcp_elements(
+    content: bytes,
+    content_type: Optional[str],
+    base_url: str,
+    urltype: Optional[str] = None,
+    url_extension: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    LCP (Largest Contentful Paint) の要素となるリソースを抽出
+    
+    HTMLをパースして、LCP候補となる要素（画像、動画、テキストブロック）を特定する。
+    LCPは、ページ読み込み中に表示される最大のコンテンツ要素を指す。
+    
+    Args:
+        content: HTMLコンテンツ（bytes）
+        content_type: Content-Typeヘッダーの値
+        base_url: ベースURL（相対パス解決用）
+        urltype: URLタイプ（"main_document", "asset", "exception"）
+        url_extension: URL拡張子（"html", "htm"など）
+    
+    Returns:
+        Dict[str, Any]: LCPメトリクス辞書
+            - lcp_image_count: 画像要素の数
+            - lcp_first_image_src: 最初の画像のsrc属性
+            - lcp_video_count: 動画要素の数
+            - lcp_first_video_src: 最初の動画のsrc属性
+            - lcp_bg_image_count: 背景画像の数
+            - lcp_text_block_count: テキストブロックの数
+            - lcp_candidate_count: LCP候補要素の総数
+            - lcp_analysis_skipped: 解析がスキップされた場合True
+            - lcp_skip_reason: スキップ理由
+            - lcp_analysis_error: エラーが発生した場合のエラーメッセージ
+    
+    Note:
+        - main_document以外の場合は解析をスキップ（パフォーマンス最適化）
+        - HTMLでない場合も解析をスキップ
+        - エンコーディング検出に失敗した場合は解析をスキップ
+        - 正規表現ベースの簡易パースを使用（完全なHTMLパーサーではない）
+        - urltypeと拡張子に基づいて、より適切な解析を行う
+    """
+    lcp_metrics = {}
+    
+    # urltypeがmain_documentでない場合は、HTML解析をスキップ
+    if urltype != "main_document":
+        # assetの場合でも、拡張子がhtmlの場合は解析する（例外的なケース）
+        if url_extension not in ["html", "htm"]:
+            lcp_metrics["lcp_analysis_skipped"] = True
+            lcp_metrics["lcp_skip_reason"] = f"urltype_not_main_document (urltype={urltype})"
+            return lcp_metrics
+    
+    # Content-TypeがHTMLでない場合も、urltypeがmain_documentなら解析を試みる
+    # （Content-Typeが正しく設定されていない場合に対応）
+    is_html_by_content_type = content_type and "text/html" in content_type.lower()
+    is_html_by_extension = url_extension in ["html", "htm"]
+    is_html_by_urltype = urltype == "main_document"
+    
+    if not (is_html_by_content_type or is_html_by_extension or is_html_by_urltype):
+        lcp_metrics["lcp_analysis_skipped"] = True
+        lcp_metrics["lcp_skip_reason"] = "not_html"
+        return lcp_metrics
+    
+    try:
+        # HTMLをデコード（エンコーディングを推測）
+        # 日本語サイトでよく使われるエンコーディングを順に試行
+        html_content = None
+        encodings = ['utf-8', 'shift_jis', 'euc-jp', 'iso-2022-jp']
+        
+        for encoding in encodings:
+            try:
+                html_content = content.decode(encoding)
+                lcp_metrics["html_encoding"] = encoding
+                break
+            except UnicodeDecodeError:
+                continue
+        
+        if not html_content:
+            lcp_metrics["lcp_analysis_skipped"] = True
+            lcp_metrics["lcp_skip_reason"] = "encoding_detection_failed"
+            return lcp_metrics
+        
+        # 簡易的なHTMLパース（正規表現を使用）
+        # 注意: 完全なHTMLパーサーではないため、複雑なHTML構造では誤検出の可能性がある
+        
+        # 画像要素の抽出（<img>タグのsrc属性）
+        img_pattern = r'<img[^>]+src=["\']([^"\']+)["\']'
+        images = re.findall(img_pattern, html_content, re.IGNORECASE)
+        lcp_metrics["lcp_image_count"] = len(images)
+        if images:
+            lcp_metrics["lcp_first_image_src"] = images[0]  # 最初の画像をLCP候補として記録
+        
+        # 動画要素の抽出（<video>タグのsrc属性）
+        video_pattern = r'<video[^>]+src=["\']([^"\']+)["\']'
+        videos = re.findall(video_pattern, html_content, re.IGNORECASE)
+        lcp_metrics["lcp_video_count"] = len(videos)
+        if videos:
+            lcp_metrics["lcp_first_video_src"] = videos[0]  # 最初の動画をLCP候補として記録
+        
+        # 背景画像の抽出（CSS内のbackground-image）
+        bg_image_pattern = r'background-image:\s*url\(["\']?([^"\']+)["\']?\)'
+        bg_images = re.findall(bg_image_pattern, html_content, re.IGNORECASE)
+        lcp_metrics["lcp_bg_image_count"] = len(bg_images)
+        
+        # テキストブロックの抽出（h1, h2, h3, p, divタグ）
+        # 注意: この正規表現は、タグ内にネストされた要素がある場合は正しく動作しない
+        # h1, h2, pタグなど、LCP候補となるテキスト要素を抽出
+        text_block_pattern = r'<(h1|h2|h3|p|div)[^>]*>([^<]+)</(h1|h2|h3|p|div)>'
+        text_blocks = re.findall(text_block_pattern, html_content, re.IGNORECASE)
+        lcp_metrics["lcp_text_block_count"] = len(text_blocks)
+        
+        # LCP候補要素の総数（画像、動画、背景画像、テキストブロックの合計）
+        lcp_metrics["lcp_candidate_count"] = (
+            len(images) + len(videos) + len(bg_images) + len(text_blocks)
+        )
+        
+    except Exception as e:
+        # エラーが発生した場合は、エラーメッセージを記録して解析を続行
+        logging.warning(f"LCP element extraction error: {str(e)}")
+        lcp_metrics["lcp_analysis_error"] = str(e)
+    
+    return lcp_metrics
+
+
+# ======================================================================
+# Critical Path（レンダリングブロッキングリソース）の抽出
+# ======================================================================
+def _extract_critical_path(
+    content: bytes,
+    content_type: Optional[str],
+    base_url: str,
+    urltype: Optional[str] = None,
+    url_extension: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Critical Path（レンダリングブロッキングリソース）を抽出
+    
+    HTMLをパースして、ページレンダリングをブロックするリソースを特定する。
+    Critical Pathは、ページが表示されるまでに読み込まれる必要がある
+    重要なリソースのパスを指す。
+    
+    Args:
+        content: HTMLコンテンツ（bytes）
+        content_type: Content-Typeヘッダーの値
+        base_url: ベースURL（相対パス解決用）
+        urltype: URLタイプ（"main_document", "asset", "exception"）
+        url_extension: URL拡張子（"html", "htm"など）
+    
+    Returns:
+        Dict[str, Any]: Critical Pathメトリクス辞書
+            - blocking_css: レンダリングブロッキングCSSのリスト
+            - blocking_js: レンダリングブロッキングJSのリスト
+            - non_blocking_js: 非ブロッキングJSのリスト（defer/async/module）
+            - preload_resources: プリロードリソースのリスト
+            - blocking_css_count: ブロッキングCSSの数
+            - blocking_js_count: ブロッキングJSの数
+            - non_blocking_js_count: 非ブロッキングJSの数
+            - preload_resources_count: プリロードリソースの数
+            - critical_path_analysis_skipped: 解析がスキップされた場合True
+            - critical_path_skip_reason: スキップ理由
+            - critical_path_analysis_error: エラーが発生した場合のエラーメッセージ
+    
+    Note:
+        抽出対象のリソース:
+        - <link rel="stylesheet">: レンダリングブロッキングCSS
+        - <script> (defer/asyncなし): レンダリングブロッキングJS
+        - <script> (defer/async/moduleあり): 非ブロッキングJS
+        - <link rel="preload">: プリロードリソース（最適化のための先行読み込み）
+        
+        相対パスは絶対パスに変換される（base_urlを使用）
+    """
+    critical_path = {
+        "blocking_css": [],
+        "blocking_js": [],
+        "non_blocking_js": [],
+        "preload_resources": [],
+    }
+    
+    # urltypeがmain_documentでない場合は、HTML解析をスキップ
+    if urltype != "main_document":
+        if url_extension not in ["html", "htm"]:
+            critical_path["critical_path_analysis_skipped"] = True
+            critical_path["critical_path_skip_reason"] = f"urltype_not_main_document (urltype={urltype})"
+            return critical_path
+    
+    # Content-TypeがHTMLでない場合も、urltypeがmain_documentなら解析を試みる
+    is_html_by_content_type = content_type and "text/html" in content_type.lower()
+    is_html_by_extension = url_extension in ["html", "htm"]
+    is_html_by_urltype = urltype == "main_document"
+    
+    if not (is_html_by_content_type or is_html_by_extension or is_html_by_urltype):
+        critical_path["critical_path_analysis_skipped"] = True
+        critical_path["critical_path_skip_reason"] = "not_html"
+        return critical_path
+    
+    try:
+        # HTMLをデコード（エンコーディングを推測）
+        html_content = None
+        encodings = ['utf-8', 'shift_jis', 'euc-jp', 'iso-2022-jp']
+        
+        for encoding in encodings:
+            try:
+                html_content = content.decode(encoding)
+                break
+            except UnicodeDecodeError:
+                continue
+        
+        if not html_content:
+            critical_path["critical_path_analysis_skipped"] = True
+            critical_path["critical_path_skip_reason"] = "encoding_detection_failed"
+            return critical_path
+        
+        # 相対パスを絶対パスに変換するヘルパー関数
+        def resolve_url(url: str, base: str) -> str:
+            """
+            相対パスを絶対パスに変換
+            
+            Args:
+                url: 相対パスまたは絶対パス
+                base: ベースURL
+            
+            Returns:
+                str: 絶対パス（変換に失敗した場合は元のURLを返す）
+            """
+            if not url:
+                return url
+            # 既に絶対パスの場合はそのまま返す
+            if url.startswith(('http://', 'https://', '//')):
+                return url
+            try:
+                # urllib.parse.urljoinを使用して相対パスを絶対パスに変換
+                return urljoin(base, url)
+            except Exception:
+                # 変換に失敗した場合は元のURLを返す
+                return url
+        
+        # <link rel="stylesheet">を抽出（レンダリングブロッキングCSS）
+        # これらのCSSは、ページレンダリングをブロックするため、Critical Pathに含まれる
+        css_pattern = r'<link[^>]+rel=["\']stylesheet["\'][^>]+href=["\']([^"\']+)["\']'
+        css_matches = re.finditer(css_pattern, html_content, re.IGNORECASE)
+        for i, match in enumerate(css_matches):
+            css_url = match.group(1)
+            absolute_url = resolve_url(css_url, base_url)
+            critical_path["blocking_css"].append({
+                "url": absolute_url,  # 絶対パス
+                "relative_url": css_url,  # 元の相対パス
+                "order": i  # HTML内での出現順序
+            })
+        
+        # <script>タグを抽出（defer/async属性をチェック）
+        # defer/async/module属性がある場合は非ブロッキング、ない場合はブロッキング
+        script_pattern = r'<script([^>]*)>(.*?)</script>'
+        script_matches = re.finditer(script_pattern, html_content, re.IGNORECASE | re.DOTALL)
+        blocking_js_count = 0
+        non_blocking_js_count = 0
+        
+        for script_match in script_matches:
+            script_attrs = script_match.group(1)  # <script>タグの属性部分
+            script_src_match = re.search(r'src=["\']([^"\']+)["\']', script_attrs, re.IGNORECASE)
+            
+            if script_src_match:
+                script_url = script_src_match.group(1)
+                absolute_url = resolve_url(script_url, base_url)
+                
+                # defer/async属性のチェック
+                has_defer = 'defer' in script_attrs.lower()
+                has_async = 'async' in script_attrs.lower()
+                script_type_match = re.search(r'type=["\']([^"\']+)["\']', script_attrs, re.IGNORECASE)
+                script_type = script_type_match.group(1).lower() if script_type_match else ""
+                
+                # moduleタイプのスクリプトは通常非ブロッキング（ES6 modules）
+                is_module = script_type == "module"
+                
+                if has_defer or has_async or is_module:
+                    # 非ブロッキングJS（defer/async/module属性あり）
+                    critical_path["non_blocking_js"].append({
+                        "url": absolute_url,
+                        "relative_url": script_url,
+                        "defer": has_defer,
+                        "async": has_async,
+                        "type": script_type if script_type else None,
+                        "order": non_blocking_js_count
+                    })
+                    non_blocking_js_count += 1
+                else:
+                    # ブロッキングJS（defer/async/module属性なし）
+                    critical_path["blocking_js"].append({
+                        "url": absolute_url,
+                        "relative_url": script_url,
+                        "order": blocking_js_count
+                    })
+                    blocking_js_count += 1
+        
+        # <link rel="preload">を抽出（プリロードリソース）
+        # プリロードは、Critical Pathの最適化のために使用される
+        preload_pattern = r'<link[^>]+rel=["\']preload["\'][^>]+href=["\']([^"\']+)["\']'
+        preload_matches = re.finditer(preload_pattern, html_content, re.IGNORECASE)
+        for i, match in enumerate(preload_matches):
+            preload_url = match.group(1)
+            absolute_url = resolve_url(preload_url, base_url)
+            
+            # as属性を取得（リソースタイプ: script, style, image, fontなど）
+            as_match = re.search(r'as=["\']([^"\']+)["\']', match.group(0), re.IGNORECASE)
+            as_type = as_match.group(1).lower() if as_match else None
+            
+            critical_path["preload_resources"].append({
+                "url": absolute_url,
+                "relative_url": preload_url,
+                "as": as_type,  # リソースタイプ
+                "order": i
+            })
+        
+        # 統計情報を追加（解析結果の要約）
+        critical_path["blocking_css_count"] = len(critical_path["blocking_css"])
+        critical_path["blocking_js_count"] = len(critical_path["blocking_js"])
+        critical_path["non_blocking_js_count"] = len(critical_path["non_blocking_js"])
+        critical_path["preload_resources_count"] = len(critical_path["preload_resources"])
+        
+    except Exception as e:
+        logging.warning(f"Critical Path extraction error: {str(e)}")
+        critical_path["critical_path_analysis_error"] = str(e)
+    
+    return critical_path
+
+
+# ======================================================================
+# アセットリソースの解析
+# ======================================================================
+def _analyze_asset_resource(
+    content: bytes,
+    content_type: Optional[str],
+    resource_category: Optional[str],
+    url_extension: Optional[str],
+) -> Dict[str, Any]:
+    """
+    アセットリソース（画像、CSS、JS、フォント、動画など）の解析
+    
+    urltypeがassetの場合に実行され、リソース種別に応じた詳細な解析を行う。
+    解析結果は、パフォーマンス最適化やリソース依存関係の把握に使用される。
+    
+    Args:
+        content: アセットコンテンツ（bytes）
+        content_type: Content-Typeヘッダーの値
+        resource_category: リソース種別（"image", "css", "js", "font", "video", "other"）
+        url_extension: URL拡張子（"jpg", "css", "js"など）
+    
+    Returns:
+        Dict[str, Any]: アセットメトリクス辞書
+            - asset_category: リソース種別
+            - asset_extension: URL拡張子
+            - asset_image_size_bytes: 画像サイズ（画像の場合）
+            - asset_image_mime_type: 画像MIMEタイプ（画像の場合）
+            - asset_css_import_count: CSS @importの数（CSSの場合）
+            - asset_css_url_count: CSS url()の数（CSSの場合）
+            - asset_css_size_bytes: CSSサイズ（CSSの場合）
+            - asset_js_import_count: ES6 importの数（JSの場合）
+            - asset_js_require_count: require()の数（JSの場合）
+            - asset_js_size_bytes: JSサイズ（JSの場合）
+            - asset_font_size_bytes: フォントサイズ（フォントの場合）
+            - asset_font_mime_type: フォントMIMEタイプ（フォントの場合）
+            - asset_video_size_bytes: 動画サイズ（動画の場合）
+            - asset_video_mime_type: 動画MIMEタイプ（動画の場合）
+            - asset_other_size_bytes: その他アセットサイズ（その他の場合）
+            - asset_other_mime_type: その他アセットMIMEタイプ（その他の場合）
+            - asset_css_parse_error: CSS解析エラー（エラー発生時）
+            - asset_js_parse_error: JS解析エラー（エラー発生時）
+            - asset_analysis_error: その他の解析エラー（エラー発生時）
+    
+    Note:
+        - 画像: サイズとMIMEタイプのみ記録（解像度などは画像ライブラリが必要）
+        - CSS: @importとurl()を抽出して依存関係を把握
+        - JS: ES6 importとrequire()を抽出して依存関係を把握
+        - フォント/動画: サイズとMIMEタイプのみ記録
+        - 画像の解像度などは、実際の画像ライブラリ（Pillowなど）が必要
+        - ここではサイズのみ記録
+    """
+    asset_metrics = {
+        "asset_category": resource_category,
+        "asset_extension": url_extension,
+    }
+    
+    try:
+        if resource_category == "image":
+            # 画像メタデータの解析（サイズ、フォーマットなど）
+            asset_metrics["asset_image_size_bytes"] = len(content)
+            # Content-Typeから画像フォーマットを取得
+            if content_type:
+                asset_metrics["asset_image_mime_type"] = content_type
+            # 注意: 画像の解像度などは、実際の画像ライブラリ（Pillowなど）が必要
+            # ここではサイズとMIMEタイプのみ記録（AWS Lambda / Azure Functions版と同様）
+        
+        elif resource_category == "css":
+            # CSS解析（@import、url()の抽出）
+            # これらの情報は、CSSの依存関係を把握するために使用される
+            try:
+                css_content = content.decode('utf-8', errors='ignore')
+                
+                # @importの抽出（CSSの外部依存関係）
+                # 例: @import url("style.css");
+                import_pattern = r'@import\s+["\']([^"\']+)["\']'
+                imports = re.findall(import_pattern, css_content, re.IGNORECASE)
+                asset_metrics["asset_css_import_count"] = len(imports)
+                
+                # url()の抽出（画像、フォントなどの参照）
+                # 例: background-image: url("image.jpg");
+                url_pattern = r'url\(["\']?([^"\'()]+)["\']?\)'
+                urls = re.findall(url_pattern, css_content, re.IGNORECASE)
+                asset_metrics["asset_css_url_count"] = len(urls)
+                
+                asset_metrics["asset_css_size_bytes"] = len(content)
+            except Exception as e:
+                asset_metrics["asset_css_parse_error"] = str(e)
+        
+        elif resource_category == "js":
+            # JS解析（import、requireの抽出）
+            # これらの情報は、JSの依存関係を把握するために使用される
+            try:
+                js_content = content.decode('utf-8', errors='ignore')
+                
+                # ES6 importの抽出（ES6 modules）
+                # 例: import { func } from "./module.js";
+                import_pattern = r'import\s+.*?from\s+["\']([^"\']+)["\']'
+                imports = re.findall(import_pattern, js_content, re.IGNORECASE)
+                asset_metrics["asset_js_import_count"] = len(imports)
+                
+                # require()の抽出（CommonJS）
+                # 例: const module = require("./module.js");
+                require_pattern = r'require\(["\']([^"\']+)["\']\)'
+                requires = re.findall(require_pattern, js_content, re.IGNORECASE)
+                asset_metrics["asset_js_require_count"] = len(requires)
+                
+                asset_metrics["asset_js_size_bytes"] = len(content)
+            except Exception as e:
+                asset_metrics["asset_js_parse_error"] = str(e)
+        
+        elif resource_category == "font":
+            # フォント情報（サイズとMIMEタイプのみ）
+            asset_metrics["asset_font_size_bytes"] = len(content)
+            if content_type:
+                asset_metrics["asset_font_mime_type"] = content_type
+        
+        elif resource_category == "video":
+            # 動画情報（サイズとMIMEタイプのみ）
+            asset_metrics["asset_video_size_bytes"] = len(content)
+            if content_type:
+                asset_metrics["asset_video_mime_type"] = content_type
+        
+        else:
+            # その他のアセット（分類不能なリソース）
+            asset_metrics["asset_other_size_bytes"] = len(content)
+            if content_type:
+                asset_metrics["asset_other_mime_type"] = content_type
+        
+    except Exception as e:
+        # 予期しないエラーが発生した場合は、エラーメッセージを記録
+        logging.warning(f"Asset resource analysis error: {str(e)}")
+        asset_metrics["asset_analysis_error"] = str(e)
+    
+    return asset_metrics
+
+
+# ======================================================================
+# パフォーマンス指標データ取得
+# ======================================================================
+def _get_performance_metrics(
+    ttfb_ms: Optional[float],
+    content_length_bytes: Optional[int],
+    res_headers: Dict[str, str],
+    redirect_count: int = 0,
+    fcp_metrics: Optional[Dict[str, Any]] = None,
+    lcp_metrics: Optional[Dict[str, Any]] = None,
+    asset_metrics: Optional[Dict[str, Any]] = None,
+    critical_path_metrics: Optional[Dict[str, Any]] = None,
+    resource_info: Optional[Dict[str, Any]] = None,
+    retry_info: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    パフォーマンス指標データ取得
+    
+    Core Web Vitals / PageSpeed Insights関連のデータを集約する。
+    この関数により、指標の集約ロジックと出力フォーマット構築ロジックを
+    分離し、メンテナンス性を向上させる。
+    
+    Args:
+        ttfb_ms: Time To First Byte（ミリ秒）
+        content_length_bytes: レスポンスボディのサイズ（バイト）
+        res_headers: レスポンスヘッダー
+        redirect_count: リダイレクト回数
+        fcp_metrics: FCPメトリクス（First Contentful Paint）
+        lcp_metrics: LCPメトリクス（Largest Contentful Paint）
+        asset_metrics: アセット解析メトリクス
+        critical_path_metrics: Critical Pathメトリクス
+        resource_info: リソース情報（urltype, resource_categoryなど）
+        retry_info: リトライ情報
+    
+    Returns:
+        Dict[str, Any]: パフォーマンス指標を含む辞書
+            - TTFB、Content-Encoding、Content-Length、Cache-Control、ETag、Last-Modified
+            - CDN検出情報
+            - FCP、LCP、Critical Path、アセット解析結果
+            - リソース情報、リトライ情報
+    
+    Note:
+        - AWS Lambda / Azure Functions版と同じ実装を使用し、両バージョン間の互換性を保つ
+        - メトリクスの集約のみを行い、出力順序の制御は`_build_flat_result()`で行う
+    """
+    metrics = {}
+    
+    # TTFB (既に計測済み)
+    if ttfb_ms is not None:
+        metrics["ttfb_ms"] = ttfb_ms
+    
+    # 圧縮タイプ
+    headers_lower = {k.lower(): v for k, v in res_headers.items()}
+    content_encoding = headers_lower.get("content-encoding", "")
+    if content_encoding:
+        metrics["content_encoding"] = content_encoding
+    
+    # Content-Length ヘッダーの値
+    content_length_header = headers_lower.get("content-length")
+    if content_length_header:
+        metrics["content_length_header"] = content_length_header
+    
+    # 実際のコンテンツサイズ
+    if content_length_bytes is not None:
+        metrics["content_size_bytes"] = content_length_bytes
+    
+    # Cache-Control ヘッダーの値
+    cache_control = headers_lower.get("cache-control")
+    if cache_control:
+        metrics["cache_control"] = cache_control
+    
+    # ETag ヘッダーの値
+    etag = headers_lower.get("etag")
+    if etag:
+        metrics["etag"] = etag
+    
+    # Last-Modified ヘッダーの値
+    last_modified = headers_lower.get("last-modified")
+    if last_modified:
+        metrics["last_modified"] = last_modified
+    
+    # リダイレクト回数
+    metrics["redirect_count"] = redirect_count
+    
+    # CDN検出
+    cdn_headers = [
+        "cf-ray",  # Cloudflare
+        "x-amz-cf-id",  # AWS CloudFront
+        "x-nitro-cache",  # NitroCDN (NitroPack)
+        "x-nitro-cache-from",  # NitroCDN (NitroPack)
+        "x-nitro-rev",  # NitroCDN (NitroPack)
+        "x-rl-cache",  # RabbitLoader
+        "x-rl-mode",  # RabbitLoader
+        "x-rl-modified",  # RabbitLoader
+        "x-rl-rule",  # RabbitLoader
+        "x-azure-ref",  # Azure Front Door
+        "x-azure-fdid",  # Azure Front Door
+        "x-azure-clientip",  # Azure Front Door
+        "x-azure-socketip",  # Azure Front Door
+        "x-azure-requestchain",  # Azure Front Door
+        "x-akamai-request-id",  # Akamai
+        "x-cache-remote",  # Akamai
+        "x-true-cache-key",  # Akamai
+        "x-cache-key",  # Akamai
+        "x-serial",  # Akamai
+        "x-akamai-edgescape",  # Akamai
+        "x-check-cacheable",  # Akamai
+        "x-vercel-cache",  # Vercel
+        "x-vercel-id",  # Vercel
+        "x-cache",  # 一般的なキャッシュヘッダー（Akamaiでも使用される可能性あり）
+        "x-served-by",  # Fastly
+        "x-fastly-request-id",  # Fastly
+    ]
+    for header in cdn_headers:
+        if header in headers_lower:
+            metrics["cdn_header_name"] = header
+            metrics["cdn_header_value"] = headers_lower[header]
+            break
+    
+    # GCP CDN (Cloud CDN / Media CDN) の検出
+    # Server ヘッダーの値が "Google-Edge-Cache" の場合
+    server_header = headers_lower.get("server", "")
+    if "google-edge-cache" in server_header.lower():
+        metrics["cdn_header_name"] = "server"
+        metrics["cdn_header_value"] = server_header
+    
+    # GCP CDN のカスタムヘッダー
+    if "cdn_cache_status" in headers_lower:
+        metrics["cdn_header_name"] = "cdn_cache_status"
+        metrics["cdn_header_value"] = headers_lower["cdn_cache_status"]
+    
+    # Vercel の Server ヘッダー検出
+    if "vercel" in server_header.lower():
+        metrics["cdn_header_name"] = "server"
+        metrics["cdn_header_value"] = server_header
+    
+    # Azure Front Door の Via ヘッダー検出
+    via_header = headers_lower.get("via", "")
+    if "azure" in via_header.lower():
+        metrics["cdn_header_name"] = "via"
+        metrics["cdn_header_value"] = via_header
+    
+    # Core Web Vitals: FCP近似値
+    if fcp_metrics:
+        metrics.update(fcp_metrics)
+    
+    # Core Web Vitals: LCP要素
+    if lcp_metrics:
+        metrics.update(lcp_metrics)
+    
+    # アセット解析結果
+    if asset_metrics:
+        metrics.update(asset_metrics)
+    
+    # Critical Path（レンダリングブロッキングリソース）
+    if critical_path_metrics:
+        metrics.update(critical_path_metrics)
+    
+    # リソース情報
+    if resource_info:
+        metrics["resource_urltype"] = resource_info.get("urltype")
+        metrics["resource_extension"] = resource_info.get("url_extension")
+        metrics["resource_category"] = resource_info.get("resource_category")
+    
+    # リトライ情報
+    if retry_info:
+        metrics["retry_attempts"] = retry_info.get("retry_attempts", 0)
+        if retry_info.get("retry_delays"):
+            metrics["retry_delays_ms"] = [round(d * 1000, 2) for d in retry_info.get("retry_delays", [])]
+        if retry_info.get("last_error"):
+            metrics["retry_last_error"] = retry_info.get("last_error")
+    
+    return metrics
+
+
+# ======================================================================
+# リトライ対象エラーの判定
+# ======================================================================
+def _is_retryable_error(exception: Exception, status_code: Optional[int] = None) -> bool:
+    """
+    リトライ対象のエラーかどうかを判定
+    
+    一時的なエラー（ネットワークエラー、サーバーエラーなど）はリトライ対象とする。
+    永続的なエラー（4xxクライアントエラーなど）はリトライ対象としない。
+    
+    Args:
+        exception: 発生した例外
+        status_code: HTTPステータスコード（例外がHTTPErrorの場合）
+    
+    Returns:
+        bool: リトライ対象の場合True、そうでない場合False
+    
+    Note:
+        リトライ対象のエラー:
+        - ConnectionError: ネットワーク接続エラー（一時的な可能性が高い）
+        - Timeout: タイムアウトエラー（一時的な可能性が高い）
+        - 5xxサーバーエラー: 500, 502, 503, 504（サーバー側の一時的な問題）
+        
+        リトライ対象外のエラー:
+        - 4xxクライアントエラー: リクエストの問題（リトライしても解決しない）
+        - その他のRequestException: 予期しないエラー（リトライしても解決しない可能性が高い）
+    """
+    # ネットワークエラー（ConnectionError, Timeout）
+    # これらは一時的な問題である可能性が高いため、リトライ対象
+    if isinstance(exception, (requests.exceptions.ConnectionError, requests.exceptions.Timeout)):
+        return True
+    
+    # 一時的なサーバーエラー（5xx）
+    # サーバー側の一時的な問題である可能性が高いため、リトライ対象
+    if status_code and status_code in RETRYABLE_STATUS_CODES:
+        return True
+    
+    # HTTPError（一部の例外）
+    # HTTPErrorでも、5xxエラーの場合はリトライ対象
+    if isinstance(exception, requests.exceptions.HTTPError):
+        if status_code and status_code in RETRYABLE_STATUS_CODES:
+            return True
+    
+    # その他のネットワーク関連エラー
+    # Timeout, ConnectionError以外のRequestExceptionはリトライしない
+    # （予期しないエラーや、リトライしても解決しない可能性が高いエラー）
+    if isinstance(exception, requests.exceptions.RequestException):
+        return False
+    
+    return False
+
+
+# ======================================================================
+# HTTPリクエスト実行（リトライ対応）
+# ======================================================================
+def _execute_http_request_with_retry(
+    target_url: str,
+    headers: Dict[str, str],
+) -> Tuple[requests.Response, Dict[str, Any]]:
+    """
+    HTTPリクエストをリトライ付きで実行
+    
+    一時的なエラー（ネットワークエラー、サーバーエラーなど）に対して
+    自動的にリトライを行う。エクスポネンシャルバックオフを使用して
+    リトライ間隔を調整する。
+    
+    Args:
+        target_url: リクエスト先URL
+        headers: HTTPリクエストヘッダー
+    
+    Returns:
+        Tuple[requests.Response, Dict[str, Any]]: 
+            - レスポンスオブジェクト
+            - リトライ情報辞書（retry_attempts, retry_delays, last_error）
+    
+    Raises:
+        requests.exceptions.RequestException: リトライ後も失敗した場合
+        RuntimeError: 最大リトライ回数に達した場合
+    
+    Note:
+        - 最大リトライ回数: MAX_RETRY_ATTEMPTS（初回含めて合計3回）
+        - リトライ間隔: エクスポネンシャルバックオフ（0.5秒、1秒、2秒...）
+        - リトライ対象: ネットワークエラー、タイムアウト、5xxサーバーエラー
+        - stream=Trueでリクエストを実行（メモリ効率のため）
+    """
+    retry_info = {
+        "retry_attempts": 0,  # リトライ回数（初回は0、1回目のリトライで1）
+        "retry_delays": [],  # 各リトライの待機時間（秒）のリスト
+        "last_error": None,  # 最後に発生したエラーメッセージ
+    }
+    
+    last_exception = None
+    last_response = None
+    
+    # 初回 + リトライ回数（合計MAX_RETRY_ATTEMPTS + 1回）
+    for attempt in range(MAX_RETRY_ATTEMPTS + 1):
+        try:
+            # HTTPリクエスト実行
+            response = requests.get(
+                target_url,
+                headers=headers,
+                stream=True,  # ストリーミング読み込み（メモリ効率のため）
+                timeout=HTTP_REQUEST_TIMEOUT,
+                allow_redirects=True,  # リダイレクトを自動的に追跡
+            )
+            
+            # HTTPステータスコードをチェック
+            status_code = response.status_code
+            
+            # リトライ対象のステータスコードの場合（5xxエラー）
+            if status_code in RETRYABLE_STATUS_CODES and attempt < MAX_RETRY_ATTEMPTS:
+                last_response = response
+                response.close()  # レスポンスを閉じる（リソース解放）
+                
+                # エクスポネンシャルバックオフで待機
+                # 例: 1回目: 0.5秒、2回目: 1.0秒、3回目: 2.0秒
+                delay = RETRY_INITIAL_DELAY * (RETRY_BACKOFF_MULTIPLIER ** attempt)
+                retry_info["retry_delays"].append(delay)
+                time.sleep(delay)
+                retry_info["retry_attempts"] += 1
+                logging.warning(f"Retry attempt {retry_info['retry_attempts']} for status {status_code} after {delay}s delay")
+                continue
+            
+            # 成功した場合（正常なステータスコード、またはリトライ対象外のエラー）
+            retry_info["retry_attempts"] = attempt
+            return response, retry_info
+            
+        except requests.exceptions.RequestException as e:
+            last_exception = e
+            retry_info["last_error"] = str(e)
+            
+            # リトライ対象のエラーかどうかを判定
+            if _is_retryable_error(e) and attempt < MAX_RETRY_ATTEMPTS:
+                # エクスポネンシャルバックオフで待機
+                delay = RETRY_INITIAL_DELAY * (RETRY_BACKOFF_MULTIPLIER ** attempt)
+                retry_info["retry_delays"].append(delay)
+                time.sleep(delay)
+                retry_info["retry_attempts"] += 1
+                logging.warning(f"Retry attempt {retry_info['retry_attempts']} for error {type(e).__name__} after {delay}s delay")
+                continue
+            else:
+                # リトライ対象でない、または最大リトライ回数に達した場合
+                # 例外を再発生させて、呼び出し元でエラーハンドリングを行う
+                raise
+    
+    # 最大リトライ回数に達した場合（通常は到達しない）
+    if last_response:
+        last_response.close()
+    if last_exception:
+        raise last_exception
+    raise RuntimeError("Maximum retry attempts reached without successful response")
+
+
+# ======================================================================
+# GCPリージョン名をメタデータサーバーから取得
+# ======================================================================
+def _get_gcp_region() -> str:
+    """
+    GCPリージョン名をメタデータサーバーから取得
+    
+    GCPのメタデータサーバーからリージョン名を取得する。
+    旧バージョンのロジックを参考に、確実にリージョン名を取得する。
+    
+    Returns:
+        str: GCPリージョン名（例: "asia-northeast1"、APIでは ane1 にマッピング）
+            取得できない場合は "gcp-unknown" を返す
+    
+    Note:
+        - メタデータサーバーへのアクセスは、Compute Engine / Cloud Run から可能
+        - メタデータサーバーへのアクセスに失敗した場合は、環境変数 GCP_REGION を使用
+        - 環境変数も設定されていない場合は "gcp-unknown" を返す
+    """
+    region = None
+    try:
+        headers = {"Metadata-Flavor": "Google"}
+        # Compute Engine / Cloud Run からアクセス可能
+        url = "http://metadata.google.internal/computeMetadata/v1/instance/region"
+        resp = requests.get(url, headers=headers, timeout=1)
+        if resp.status_code == 200:
+            # projects/12345/regions/asia-northeast1 の形式から、リージョン名のみを抽出
+            region = resp.text.split('/')[-1]
+    except Exception:
+        pass
+
+    # 最終的なフォールバック
+    if not region:
+        region = os.environ.get("GCP_REGION") or "gcp-unknown"
+
+    return region
+
+# ======================================================================
+# フラットな結果を構築
+# ======================================================================
+def _build_flat_result(
+    *,
+    status_code: int,
+    status_message: str,
+    duration_ms: float,
+    ttfb_ms: Optional[float] = None,
+    content_length_bytes: Optional[int] = None,
+    target_url: str,
+    http_request_number: Optional[Any] = None,
+    http_request_uuid: Optional[str] = None,
+    http_request_round_id: Optional[int] = None,
+    req_headers: Dict[str, str],
+    res_headers: Dict[str, str],
+    tls_version: Optional[str] = None,
+    http_protocol_version: Optional[str] = None,
+    request_start_timestamp: Optional[float] = None,
+    request_end_timestamp: Optional[float] = None,
+    execution_id: Optional[str] = None,
+    area: Optional[str] = None,
+    redirect_count: int = 0,
+    fcp_metrics: Optional[Dict[str, Any]] = None,
+    lcp_metrics: Optional[Dict[str, Any]] = None,
+    asset_metrics: Optional[Dict[str, Any]] = None,
+    critical_path_metrics: Optional[Dict[str, Any]] = None,
+    resource_info: Optional[Dict[str, Any]] = None,
+    retry_info: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    レスポンスをフラットJSON構造で構築
+    
+    AWS Lambda / Azure Functions版と同様のレスポンス構造を使用し、すべての情報を
+    フラットなキー・バリューペアとして返す。これにより、BigQueryなどの
+    データウェアハウスへの投入が容易になる。
+    
+    Args:
+        status_code: HTTPステータスコード
+        status_message: HTTPステータスメッセージ
+        duration_ms: リクエスト全体の実行時間（ミリ秒）
+        ttfb_ms: Time To First Byte（ミリ秒）
+        content_length_bytes: レスポンスボディのサイズ（バイト）
+        target_url: リクエスト先URL
+        http_request_number: リクエスト番号（n8nワークフローから）
+        http_request_uuid: リクエストUUID（n8nワークフローから）
+        http_request_round_id: リクエストラウンドID（n8nワークフローから）
+        req_headers: リクエストヘッダー
+        res_headers: レスポンスヘッダー
+        tls_version: TLSバージョン（HTTPSの場合）
+        http_protocol_version: HTTPプロトコルバージョン
+        request_start_timestamp: リクエスト開始時刻（UNIXタイムスタンプ）
+        request_end_timestamp: リクエスト終了時刻（UNIXタイムスタンプ）
+        execution_id: Cloud Run実行ID
+        area: GCPリージョン
+        redirect_count: リダイレクト回数
+        fcp_metrics: FCPメトリクス（First Contentful Paint）
+        lcp_metrics: LCPメトリクス（Largest Contentful Paint）
+        asset_metrics: アセット解析メトリクス
+        critical_path_metrics: Critical Pathメトリクス
+        resource_info: リソース情報（urltype, resource_categoryなど）
+        retry_info: リトライ情報
+    
+    Returns:
+        Dict[str, Any]: フラットJSON構造のレスポンス
+            - headers.general.*: 基本HTTP情報
+            - eo.meta.*: メタデータ（実行環境、識別情報など）
+            - eo.measure.*: 測定値（duration, ttfb, content_length）
+            - eo.performance.*: パフォーマンス指標（FCP, LCP, Critical Pathなど）
+            - headers.request-headers.*: リクエストヘッダー
+            - headers.response-headers.*: レスポンスヘッダー
+    
+    Note:
+        - すべてのキーは小文字に正規化される
+        - ヘッダーはソートされて出力される（一貫性のため）
+        - メトリクスは存在する場合のみ含まれる
+    """
+    # GCPリージョンの取得（areaパラメータまたは環境変数から）
+    gcp_region = area or _get_gcp_region()
+    if not gcp_region:
+        gcp_region = "gcp-unknown"
+    # リージョン表記を短縮形に統一（asia-northeast1 → ane1）
+    _REGION_TO_SHORT = {"asia-northeast1": "ane1"}
+    gcp_region_display = _REGION_TO_SHORT.get(gcp_region, gcp_region)
+    
+    # HTTPプロトコルバージョンとTLSバージョンのデフォルト値
+    # 取得できない場合は"unknown"を設定
+    protocol_value = http_protocol_version or "unknown"
+    tls_version_value = tls_version or "unknown"
+    
+    # レスポンスを論理的な順序で構築
+    # セクションごとにグループ化して、可読性と一貫性を保つ
+    ordered_result = {}
+    
+    # ==================================================================
+    # 1. 基本HTTP情報
+    # ==================================================================
+    ordered_result["headers.general.status-code"] = status_code
+    ordered_result["headers.general.status-message"] = status_message
+    ordered_result["headers.general.request-url"] = target_url
+    ordered_result["headers.general.http-request-method"] = "GET"
+    
+    # ==================================================================
+    # 2. リクエスト識別情報
+    # ==================================================================
+    # n8nワークフローから渡される識別情報
+    if http_request_number is not None:
+        ordered_result["eo.meta.http-request-number"] = http_request_number
+    if http_request_uuid is not None:
+        ordered_result["eo.meta.http-request-uuid"] = http_request_uuid
+    if http_request_round_id is not None:
+        ordered_result["eo.meta.http-request-round-id"] = http_request_round_id
+    
+    # ==================================================================
+    # 3. 実行環境・タイムスタンプ情報
+    # ==================================================================
+    ordered_result["eo.meta.area"] = gcp_region_display
+    if execution_id is not None:
+        ordered_result["eo.meta.execution-id"] = execution_id
+    if request_start_timestamp is not None:
+        ordered_result["eo.meta.request-start-timestamp"] = request_start_timestamp
+    if request_end_timestamp is not None:
+        ordered_result["eo.meta.request-end-timestamp"] = request_end_timestamp
+    
+    # ==================================================================
+    # 4. プロトコル情報
+    # ==================================================================
+    ordered_result["eo.meta.http-protocol-version"] = protocol_value
+    ordered_result["eo.meta.tls-version"] = tls_version_value
+    
+    # ==================================================================
+    # 5. 基本測定値
+    # ==================================================================
+    ordered_result["eo.measure.duration-ms"] = round(duration_ms, 2)
+    if ttfb_ms is not None:
+        ordered_result["eo.measure.ttfb-ms"] = round(ttfb_ms, 2)
+    if content_length_bytes is not None:
+        ordered_result["eo.measure.actual-content-length"] = content_length_bytes
+    
+    # ==================================================================
+    # 6. リソース情報（リクエスト対象リソースの種別・拡張子）
+    # ==================================================================
+    # パフォーマンス指標を先に取得（resource_infoが含まれるため）
+    performance_metrics = _get_performance_metrics(
+        ttfb_ms=ttfb_ms,
+        content_length_bytes=content_length_bytes,
+        res_headers=res_headers,
+        redirect_count=redirect_count,
+        fcp_metrics=fcp_metrics,
+        lcp_metrics=lcp_metrics,
+        asset_metrics=asset_metrics if "asset_metrics" in locals() else None,
+        critical_path_metrics=critical_path_metrics,
+        resource_info=resource_info if "resource_info" in locals() else None,
+        retry_info=retry_info if "retry_info" in locals() else None,
+    )
+    
+    # リソース情報を先に追加（resource_urltype, resource_extension, resource_category）
+    if "resource_urltype" in performance_metrics:
+        ordered_result["eo.performance.resource_urltype"] = performance_metrics.pop("resource_urltype")
+    if "resource_extension" in performance_metrics:
+        ordered_result["eo.performance.resource_extension"] = performance_metrics.pop("resource_extension")
+    if "resource_category" in performance_metrics:
+        ordered_result["eo.performance.resource_category"] = performance_metrics.pop("resource_category")
+    
+    # ==================================================================
+    # 7. パフォーマンス指標（Core Web Vitals、Critical Path、キャッシュなど）
+    # ==================================================================
+    # TTFB関連（基本測定値の近くに配置）
+    # 注意: TTFBは既にeo.measure.ttfb-msとして出力済みだが、
+    # Azure Functions版と同様に、eo.performance.ttfb_msとしても出力する
+    if "ttfb_ms" in performance_metrics:
+        ordered_result["eo.performance.ttfb_ms"] = performance_metrics.pop("ttfb_ms")
+    
+    # リダイレクト情報
+    if "redirect_count" in performance_metrics:
+        ordered_result["eo.performance.redirect_count"] = performance_metrics.pop("redirect_count")
+    
+    # FCP関連（First Contentful Paint）
+    fcp_keys = [k for k in performance_metrics.keys() if k.startswith("fcp_")]
+    for key in sorted(fcp_keys):
+        ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    # LCP関連（Largest Contentful Paint）
+    lcp_keys = [k for k in performance_metrics.keys() if k.startswith("lcp_")]
+    for key in sorted(lcp_keys):
+        ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    # Critical Path関連（レンダリングブロッキングリソース）
+    critical_path_keys = [k for k in performance_metrics.keys() if k.startswith(("blocking_", "non_blocking_", "preload_", "critical_path_"))]
+    for key in sorted(critical_path_keys):
+        ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    # アセット解析結果
+    asset_keys = [k for k in performance_metrics.keys() if k.startswith("asset_")]
+    for key in sorted(asset_keys):
+        ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    # コンテンツ情報（サイズ、エンコーディング、キャッシュ）
+    content_keys = ["content_size_bytes", "content_length_header", "content_encoding", "html_encoding"]
+    for key in content_keys:
+        if key in performance_metrics:
+            ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    cache_keys = [k for k in performance_metrics.keys() if k in ("cache_control", "etag", "last_modified")]
+    for key in sorted(cache_keys):
+        ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    # CDN情報
+    cdn_keys = [k for k in performance_metrics.keys() if k.startswith("cdn_")]
+    for key in sorted(cdn_keys):
+        ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    # リトライ情報（エラーハンドリング関連）
+    retry_keys = [k for k in performance_metrics.keys() if k.startswith("retry_")]
+    for key in sorted(retry_keys):
+        ordered_result[f"eo.performance.{key}"] = performance_metrics.pop(key)
+    
+    # その他のパフォーマンス指標（残りをアルファベット順で追加）
+    remaining_perf_keys = sorted(performance_metrics.keys())
+    for key in remaining_perf_keys:
+        ordered_result[f"eo.performance.{key}"] = performance_metrics[key]
+    
+    # ==================================================================
+    # 8. セキュリティ情報（セキュリティヘッダー関連）
+    # ==================================================================
+    # セキュリティヘッダー（HSTS、CSP、X-Frame-Optionsなど）の解析結果
+    security_metrics = _analyze_security_headers(res_headers, target_url)
+    for key in sorted(security_metrics.keys()):
+        ordered_result[f"eo.security.{key}"] = security_metrics[key]
+    
+    # ==================================================================
+    # 9. リクエストヘッダー
+    # ==================================================================
+    # ソートして出力（一貫性のため）
+    for key in sorted(req_headers.keys()):
+        ordered_result[f"headers.request-headers.{key.lower()}"] = req_headers[key]
+    
+    # ==================================================================
+    # 10. レスポンスヘッダー
+    # ==================================================================
+    # ソートして出力（一貫性のため）
+    for key in sorted(res_headers.keys()):
+        ordered_result[f"headers.response-headers.{key.lower()}"] = res_headers[key]
+    
+    # ==================================================================
+    # 11. content-lengthヘッダーの補完
+    # ==================================================================
+    # Content-Lengthヘッダーが存在しない場合、実際のサイズを補完
+    if content_length_bytes is not None:
+        cl_key = "headers.response-headers.content-length"
+        if cl_key not in ordered_result or not ordered_result[cl_key]:
+            ordered_result[cl_key] = str(content_length_bytes)
+    
+    return ordered_result
+
+# ======================================================================
+# メイン関数
+# ======================================================================
+@app.route(CLOUDRUN_ENDPOINT_PATH, methods=["POST"])
+def requestengine_tail():
+    """
+    GCP Cloud Run メインハンドラー
+    
+    n8nワークフローから送信されたHTTPリクエストを処理し、
+    対象URLに対してHTTPリクエストを実行して、パフォーマンスメトリクスを
+    計測・解析した結果をフラットJSON構造で返す。
+    
+    Args:
+        request: Flask request オブジェクト
+            - JSON Body: {"data": {...}} または直接リクエストデータ
+            - data.url: 対象URL（必須）
+            - data.token: 認証トークン（必須、SHA-256(url + secret)）
+            - data.headers: リクエストヘッダー（オプション）
+            - data.httpRequestNumber: リクエスト番号（オプション）
+            - data.httpRequestUUID: リクエストUUID（オプション）
+            - data.httpRequestRoundID: リクエストラウンドID（オプション）
+            - data.urltype: URLタイプ（オプション、"main_document", "asset", "exception"）
+    
+    Returns:
+        Tuple[Response, int]: Flask Response と HTTPステータスコード
+            - 成功時: HTTPステータスコード200、パフォーマンスメトリクスを含む
+            - エラー時: 適切なHTTPステータスコード、エラーメッセージを含む
+    
+    Note:
+        - 認証: tokenパラメータとGCP Secret Managerのシークレットを照合
+        - リトライ: 一時的なエラーに対して自動的にリトライ（最大3回）
+        - メトリクス: FCP、LCP、Critical Path、アセット解析を実行
+        - メモリ保護: 5MBを超えるコンテンツは解析をスキップ
+        - GCP Cloud RunはOAuth2 Bearer認証を使用するため、n8nワークフローでは
+          認証トークンがヘッダーに含まれる。この関数内では、リクエストボディ内の
+          tokenフィールドで検証を行う。
+    """
+    start_time = time.time()
+    
+    try:
+        # ==================================================================
+        # n8nのHttpRequestノード(リクエストエンジンノード)からリクエスト受信
+        # (Receive from n8n HttpRequest node (Request Engine node))
+        # ==================================================================
+        # JSON パースとデータ抽出
+        try:
+            body_json = request.get_json() or {}
+        except Exception:
+            body_json = {}
+        
+        # ==================================================================
+        # デバッグ用: イベントをログ出力
+        # ==================================================================
+        # 開発・デバッグ時にイベント内容を確認するために使用
+        logger.info("### RAW EVENT START ###")
+        try:
+            logger.info(json.dumps(body_json, ensure_ascii=False))
+        except Exception:
+            logger.info(str(body_json))
+        logger.info("### RAW EVENT END ###")
+        
+        # ==================================================================
+        # イベント形式の正規化
+        # ==================================================================
+        # body_json が配列形式の場合、先頭要素を取り出す
+        # （一部の統合では配列形式で送信される）
+        if isinstance(body_json, list):
+            if len(body_json) == 0:
+                # 空の配列の場合はエラーを返す
+                end_time = time.time()
+                duration_ms = (end_time - start_time) * 1000
+                result = _build_flat_result(
+                    status_code=400,
+                    status_message="EMPTY_EVENT_LIST",
+                    duration_ms=duration_ms,
+                    target_url="",
+                    http_request_number=None,
+                    req_headers={},
+                    res_headers={},
+                    request_start_timestamp=start_time,
+                    request_end_timestamp=end_time,
+                )
+                return jsonify(result), 400
+            body_json = body_json[0]  # 先頭要素を使用
+        
+        # イベントが辞書形式でない場合はエラーを返す
+        if not isinstance(body_json, dict):
+            end_time = time.time()
+            duration_ms = (end_time - start_time) * 1000
+            result = _build_flat_result(
+                status_code=400,
+                status_message="INVALID_EVENT_TYPE",
+                duration_ms=duration_ms,
+                target_url="",
+                http_request_number=None,
+                req_headers={},
+                res_headers={},
+                request_start_timestamp=start_time,
+                request_end_timestamp=end_time,
+            )
+            return jsonify(result), 400
+        
+        # ==================================================================
+        # データ構造の正規化（AWS Lambda / Azure Functions版と同様）
+        # ==================================================================
+        # body_json.dataが存在する場合はそれを使用、ない場合はbody_json自体を使用
+        # これにより、異なるイベント形式に対応できる
+        data = body_json.get("data") if isinstance(body_json, dict) else None
+        if not isinstance(data, dict) or not data:
+            data = body_json
+        
+        # ==================================================================
+        # リクエストデータの抽出
+        # ==================================================================
+        target_url = data.get("targetUrl") or ""
+        n8n_requestsecret_token = data.get("tokenCalculatedByN8n")
+        http_request_number = data.get("httpRequestNumber")
+        http_request_uuid = data.get("httpRequestUUID")
+        http_request_round_id = data.get("httpRequestRoundID")
+        urltype = data.get("urltype")
+        input_headers = data.get("headers") if isinstance(data.get("headers"), dict) else {}
+        
+        # User-Agentヘッダーの取得
+        # リクエストボディのdata.headersのみを使用（フォールバックなし）
+        ua_from_request_headers = input_headers.get("User-Agent") or ""
+        
+        # ==================================================================
+        # URLタイプと拡張子に基づくリソース種別の判定
+        # ==================================================================
+        resource_info = _determine_resource_type(urltype, target_url)
+        
+        # ==================================================================
+        # URL 検証
+        # ==================================================================
+        if not target_url:
+            end_time = time.time()
+            duration_ms = (end_time - start_time) * 1000
+            error_resource_info = _determine_resource_type(urltype, "")
+            result = _build_flat_result(
+                status_code=400,
+                status_message="MISSING_URL",
+                duration_ms=duration_ms,
+                target_url="",
+                http_request_number=http_request_number,
+                http_request_uuid=http_request_uuid,
+                http_request_round_id=http_request_round_id,
+                req_headers={},
+                res_headers={},
+                request_start_timestamp=start_time,
+                request_end_timestamp=end_time,
+                resource_info=error_resource_info,
+            )
+            return jsonify(result), 400
+        
+        # ==================================================================
+        # n8n生成トークンとGCP Secret Managerのシークレットキーから生成したトークンの照合
+        # ==================================================================
+        # GCP Secret Managerからシークレットを取得
+        # 注意: シークレットは1回だけ取得され、以降はキャッシュされる
+        try:
+            secretmng_requestsecret_value = _get_secretmng_requestsecret_value()
+            tokenCalculatedByCloudSecret = _calc_token(target_url, secretmng_requestsecret_value)  # SHA-256(url + リクエストシークレット)
+            if n8n_requestsecret_token == tokenCalculatedByCloudSecret:
+                # トークン検証成功: 処理を続行
+                pass
+            else:
+                end_time = time.time()
+                duration_ms = (end_time - start_time) * 1000
+                result = _build_flat_result(
+                    status_code=401,
+                    status_message="INVALID_TOKEN",
+                    duration_ms=duration_ms,
+                    target_url=target_url,
+                    http_request_number=http_request_number,
+                    http_request_uuid=http_request_uuid,
+                    http_request_round_id=http_request_round_id,
+                    req_headers={},
+                    res_headers={},
+                    request_start_timestamp=start_time,
+                    request_end_timestamp=end_time,
+                    resource_info=resource_info,
+                )
+                return jsonify(result), 401
+        except Exception as e:
+            logging.error(f"Request Secret validation failed: {str(e)}")
+            end_time = time.time()
+            duration_ms = (end_time - start_time) * 1000
+            result = _build_flat_result(
+                status_code=500,
+                status_message="SECRET_FETCH_FAILED",
+                duration_ms=duration_ms,
+                target_url=target_url,
+                http_request_number=http_request_number,
+                http_request_uuid=http_request_uuid,
+                http_request_round_id=http_request_round_id,
+                req_headers={},
+                res_headers={},
+                request_start_timestamp=start_time,
+                request_end_timestamp=end_time,
+                resource_info=resource_info,
+            )
+            return jsonify(result), 500
+        
+        # ==================================================================
+        # リクエストヘッダー準備
+        # ==================================================================
+        req_headers: Dict[str, str] = dict(input_headers)
+        # User-Agentが指定されている場合は設定（n8nワークフロー175番ノードで必ず付与される）
+        if ua_from_request_headers:
+            req_headers.setdefault("User-Agent", ua_from_request_headers)
+        # EO識別ヘッダーを追加（Request Engineの識別用）
+        req_headers[EO_HEADER_NAME] = EO_HEADER_VALUE
+        
+        # ==================================================================
+        # HTTP リクエスト実行（リトライ対応）
+        # ==================================================================
+        # TTFB (Time To First Byte) 計測
+        # 定義: HTTPリクエストを送信してから、サーバーから最初のバイト（レスポンスヘッダー）を受信するまでの時間
+        # 含まれる要素: DNSルックアップ、TCP接続確立、TLSハンドシェイク（HTTPSの場合）、サーバー内部処理、ネットワーク遅延
+        # 計測方法: リクエスト送信直前の時刻を記録し、withブロックに入った時点（レスポンスヘッダー受信完了時 = 最初のバイト受信時）で計測
+        http_request_start_time = time.time()
+        try:
+            # ==================================================================
+            # WarmupターゲットURLにHTTPリクエスト送信
+            # (Send to Request for Warmup Target URL)
+            # ==================================================================
+            # リトライ対応のHTTPリクエスト実行
+            response, retry_info = _execute_http_request_with_retry(
+                target_url,
+                req_headers,
+            )
+            
+            with response:
+                # ==================================================================
+                # WarmupResultData受信
+                # (Recieve WarmupResultData from Target URL)
+                # ==================================================================
+                # ==================================================================
+                # TTFB計測: withブロックに入った時点 = レスポンスヘッダー受信完了時点（最初のバイト受信時）
+                # ==================================================================
+                ttfb_end = time.time()
+                ttfb_ms = (ttfb_end - http_request_start_time) * 1000
+                
+                # ==================================================================
+                # HTTPプロトコルバージョン取得
+                # ==================================================================
+                http_protocol_version = _get_http_protocol_version(response)
+                
+                # ==================================================================
+                # TLSバージョン取得
+                # ==================================================================
+                tls_version = _get_tls_version(response, target_url)
+                
+                # ==================================================================
+                # レスポンスヘッダー取得
+                # ==================================================================
+                res_headers = dict(response.headers)
+                
+                # ==================================================================
+                # リダイレクト回数の取得
+                # ==================================================================
+                redirect_count = len(response.history) if hasattr(response, 'history') else 0
+                
+                # ==================================================================
+                # Core Web Vitals: FCP近似値の計測（main_documentの場合のみ重点的に計測）
+                # ==================================================================
+                # パフォーマンス最適化: 必要最小限のコンテンツのみ読み込む
+                fcp_metrics = {}
+                full_content = b""
+                
+                if resource_info.get("needs_fcp_measurement", False):
+                    # main_documentの場合はFCP計測を実行（全コンテンツを読み込む）
+                    fcp_metrics, full_content = _measure_fcp_approximation(response, http_request_start_time)
+                    # メモリ保護: 5MBを超える場合は解析をスキップ
+                    if len(full_content) > MAX_CONTENT_SIZE_FOR_ANALYSIS:
+                        logging.warning(f"Content size exceeds {MAX_CONTENT_SIZE_FOR_ANALYSIS} bytes, truncating for analysis")
+                        full_content = full_content[:MAX_CONTENT_SIZE_FOR_ANALYSIS]
+                else:
+                    # assetの場合は必要最小限のみ読み込む
+                    if resource_info.get("needs_asset_analysis", False):
+                        # アセット解析が必要な場合（CSS/JS解析など）
+                        full_content = response.content
+                        # メモリ保護: 5MBを超える場合は解析をスキップ
+                        if len(full_content) > MAX_CONTENT_SIZE_FOR_ANALYSIS:
+                            logging.warning(f"Asset content size exceeds {MAX_CONTENT_SIZE_FOR_ANALYSIS} bytes, truncating for analysis")
+                            full_content = full_content[:MAX_CONTENT_SIZE_FOR_ANALYSIS]
+                    else:
+                        # アセット解析が不要な場合（画像など）、サイズ計測のみ
+                        # Warmup目的ならボディを読み込まない（Content-Lengthヘッダーからサイズを取得）
+                        full_content = b""  # ボディを読み込まない（Warmup目的）
+                
+                # ==================================================================
+                # ボディサイズ取得
+                # ==================================================================
+                if full_content:
+                    content_length = len(full_content)
+                else:
+                    # full_contentが空の場合は、Content-Lengthヘッダーから取得
+                    content_length_header = res_headers.get("Content-Length") or res_headers.get("content-length")
+                    if content_length_header:
+                        try:
+                            content_length = int(content_length_header)
+                        except (ValueError, TypeError):
+                            content_length = 0
+                    else:
+                        # Content-Lengthヘッダーがない場合は実際に読み込む必要がある
+                        # ただし、Warmup目的なら最小限（ヘッダーだけ）で十分
+                        content_length = 0
+                
+                # ==================================================================
+                # Core Web Vitals: LCP要素の抽出（main_documentの場合のみ）
+                # ==================================================================
+                content_type = res_headers.get("Content-Type", res_headers.get("content-type", ""))
+                lcp_metrics = _extract_lcp_elements(
+                    full_content,
+                    content_type,
+                    target_url,
+                    urltype=urltype,
+                    url_extension=resource_info.get("url_extension"),
+                )
+                
+                # ==================================================================
+                # Critical Path（レンダリングブロッキングリソース）の抽出（main_documentの場合のみ）
+                # ==================================================================
+                critical_path_metrics = _extract_critical_path(
+                    full_content,
+                    content_type,
+                    target_url,
+                    urltype=urltype,
+                    url_extension=resource_info.get("url_extension"),
+                )
+                
+                # ==================================================================
+                # アセット解析（assetの場合、コンテンツが読み込まれている場合のみ）
+                # ==================================================================
+                asset_metrics = {}
+                if resource_info.get("needs_asset_analysis", False) and full_content:
+                    asset_metrics = _analyze_asset_resource(
+                        full_content,
+                        content_type,
+                        resource_info.get("resource_category"),
+                        resource_info.get("url_extension"),
+                    )
+                elif resource_info.get("needs_asset_analysis", False) and not full_content:
+                    # コンテンツが読み込まれていない場合は解析をスキップ（Warmup目的）
+                    asset_metrics["asset_analysis_skipped"] = True
+                    asset_metrics["asset_skip_reason"] = "content_not_loaded_for_warmup"
+                
+                # ==================================================================
+                # 結果構築
+                # ==================================================================
+                end_time = time.time()
+                duration_ms = (end_time - start_time) * 1000
+                
+                # 結果をフラットJSON構造で構築
+                result = _build_flat_result(
+                    status_code=response.status_code,
+                    status_message=response.reason or "OK",
+                    duration_ms=duration_ms,
+                    ttfb_ms=ttfb_ms,
+                    content_length_bytes=content_length,
+                    target_url=target_url,
+                    http_request_number=http_request_number,
+                    http_request_uuid=http_request_uuid,
+                    http_request_round_id=http_request_round_id,
+                    req_headers=req_headers,
+                    res_headers=res_headers,
+                    tls_version=tls_version,
+                    http_protocol_version=http_protocol_version,
+                    request_start_timestamp=http_request_start_time,
+                    request_end_timestamp=end_time,
+                    redirect_count=redirect_count,
+                    fcp_metrics=fcp_metrics,
+                    lcp_metrics=lcp_metrics,
+                    asset_metrics=asset_metrics,
+                    critical_path_metrics=critical_path_metrics,
+                    resource_info=resource_info,
+                    retry_info=retry_info,
+                )
+                # ==================================================================
+                # n8nのHttpRequestノード(リクエストエンジンノード)にWarmup結果データを返す
+                # (Reply to n8n HttpRequest node (Request Engine node) with WarmupResultData)
+                # ==================================================================
+                return jsonify(result), response.status_code
+        
+        # ==================================================================
+        # エラーハンドリング
+        # ==================================================================
+        except requests.exceptions.RequestException as e:
+            end_time = time.time()
+            duration_ms = (end_time - start_time) * 1000
+            # エラー時もresource_infoを取得（可能な場合）
+            error_resource_info = resource_info if "resource_info" in locals() else _determine_resource_type(urltype if "urltype" in locals() else None, target_url)
+            result = _build_flat_result(
+                status_code=500,
+                status_message=f"Request failed: {str(e)}",
+                duration_ms=duration_ms,
+                target_url=target_url,
+                http_request_number=http_request_number if "http_request_number" in locals() else None,
+                http_request_uuid=http_request_uuid if "http_request_uuid" in locals() else None,
+                http_request_round_id=http_request_round_id if "http_request_round_id" in locals() else None,
+                req_headers=req_headers if "req_headers" in locals() else {},
+                res_headers={},
+                request_start_timestamp=http_request_start_time if "http_request_start_time" in locals() else None,
+                request_end_timestamp=end_time,
+                redirect_count=0,
+                critical_path_metrics=None,
+                resource_info=error_resource_info,
+                retry_info=retry_info if "retry_info" in locals() else None,
+            )
+            return jsonify(result), 500
+        
+        except Exception as e:
+            logging.error(f"Unexpected error: {str(e)}")
+            end_time = time.time()
+            duration_ms = (end_time - start_time) * 1000
+            # エラー時もresource_infoを取得（可能な場合）
+            error_target_url = target_url if "target_url" in locals() else ""
+            error_urltype = urltype if "urltype" in locals() else None
+            error_resource_info = _determine_resource_type(error_urltype, error_target_url) if error_target_url else None
+            result = _build_flat_result(
+                status_code=500,
+                status_message=f"Internal error: {str(e)}",
+                duration_ms=duration_ms,
+                target_url=error_target_url,
+                http_request_number=http_request_number if "http_request_number" in locals() else None,
+                http_request_uuid=http_request_uuid if "http_request_uuid" in locals() else None,
+                http_request_round_id=http_request_round_id if "http_request_round_id" in locals() else None,
+                req_headers=input_headers if "input_headers" in locals() else {},
+                res_headers={},
+                request_start_timestamp=start_time if "start_time" in locals() else None,
+                request_end_timestamp=end_time,
+                redirect_count=0,
+                critical_path_metrics=None,
+                resource_info=error_resource_info,
+                retry_info=None,  # 予期しないエラーの場合はリトライ情報なし
+            )
+            return jsonify(result), 500
+    
+    except Exception as e:
+        logging.error(f"Unexpected error in requestengine_tail: {str(e)}")
+        end_time = time.time()
+        duration_ms = (end_time - start_time) * 1000
+        result = _build_flat_result(
+            status_code=500,
+            status_message=f"Internal error: {str(e)}",
+            duration_ms=duration_ms,
+            target_url="",
+            http_request_number=None,
+            req_headers={},
+            res_headers={},
+            request_start_timestamp=start_time,
+            request_end_timestamp=end_time,
+            redirect_count=0,
+            critical_path_metrics=None,
+            resource_info=None,
+            retry_info=None,
+        )
+        return jsonify(result), 500
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    """ヘルスチェックエンドポイント"""
+    return jsonify({"status": "healthy"}), 200
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port, debug=False)
+
+# ======================================================================
+# 以下旧バージョン（参考用）
+# ======================================================================
+# 旧バージョンでは以下の特徴があった：
+# - stream=True でTTFBを正確に計測（このロジックは新バージョンでも採用）
+# - メタデータサーバーからリージョン名を取得（このロジックは新バージョンでも採用）
+
+

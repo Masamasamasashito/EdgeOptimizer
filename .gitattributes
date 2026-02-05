@@ -1,0 +1,88 @@
+# ==========================================
+# Line Ending Configuration (LF統一)
+# ==========================================
+# すべてのテキストファイルをLFに統一（クロスプラットフォーム対応）
+* text=auto eol=lf
+
+# ==========================================
+# バイナリファイル（変換しない）
+# ==========================================
+*.zip binary
+*.zip -text
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+
+# ==========================================
+# テキストファイル（明示的にLF指定）
+# ==========================================
+# コードファイル
+*.py text eol=lf
+*.ts text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.tsx text eol=lf
+*.jsx text eol=lf
+
+# 設定ファイル
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.tf text eol=lf
+*.tfvars text eol=lf
+*.tfstate text eol=lf
+*.tfstate.backup text eol=lf
+
+# ドキュメント
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+
+# シェルスクリプト
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+
+# PowerShellスクリプト（LFでも動作する）
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+
+# Docker関連
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+*.dockerfile text eol=lf
+
+# その他
+*.env.example text eol=lf
+*.example text eol=lf
+*.config text eol=lf
+*.conf text eol=lf
+*.ini text eol=lf
+*.xml text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+*.sql text eol=lf
+*.csv text eol=lf
+*.log text eol=lf
+*.lock text eol=lf
+
+# Git関連
+.gitignore text eol=lf
+.gitattributes text eol=lf
+.gitmodules text eol=lf
+
+# CI/CD
+.github/**/*.yml text eol=lf
+.github/**/*.yaml text eol=lf

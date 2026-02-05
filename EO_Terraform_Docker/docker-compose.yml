@@ -1,0 +1,41 @@
+# ------------------------------------------------------------------------------
+# EO Terraform Docker - Terraform 実行用 Compose
+# ------------------------------------------------------------------------------
+# 使い方: EO_Terraform_Docker をカレントにし、
+#   docker compose run --rm terraform init
+#   docker compose run --rm terraform plan
+#   docker compose run --rm terraform apply
+# など。Terraform コードはリポジトリルートの terraform/ をマウントする想定。
+# ------------------------------------------------------------------------------
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  # --------------------------------------------------------------------------
+  # terraform: Terraform CLI 実行用（one-shot）
+  # --------------------------------------------------------------------------
+  terraform:
+    build:
+      context: ./terraform
+      args:
+        EO_DOCKER_TERRAFORM_IMAGE: ${COMMON_EO_DOCKER_TERRAFORM_IMAGE:-hashicorp/terraform}
+        EO_DOCKER_TERRAFORM_IMAGE_TAG: ${COMMON_EO_DOCKER_TERRAFORM_IMAGE_TAG:-latest}
+    image: ${COMMON_EO_DOCKER_TERRAFORM_IMAGE:-hashicorp/terraform}-eo:${COMMON_EO_DOCKER_TERRAFORM_IMAGE_TAG:-latest}
+    logging: *default-logging
+    working_dir: /workspace
+    environment:
+      # クラウド認証はマウントしたディレクトリ内の設定を参照
+      TZ: ${COMMON_TIMEZONE:-Asia/Tokyo}
+      # Terraform 変数（機密は .env で渡し、terraform.tfvars に書かない）
+      TF_VAR_req_secret: ${EO_TF_VAR_req_secret:-}
+    volumes:
+      # リポジトリの terraform/ をワークスペースとしてマウント（相対パスは compose ファイル基準）
+      - ${EO_TERRAFORM_WORKSPACE:-../terraform}:/workspace
+      # クラウド認証: .env で TF_*_CREDENTIALS_PATH を設定するか、docker-compose.override.yml で追加
+      # 例: - ${TF_AWS_CREDENTIALS_PATH}:/root/.aws:ro
+    # デフォルトは terraform --help。run 時にコマンドを上書き: docker compose run --rm terraform plan
+    command: ["--help"]

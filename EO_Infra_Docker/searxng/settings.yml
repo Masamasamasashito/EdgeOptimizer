@@ -1,0 +1,26 @@
+# searxng/settings.yml
+
+# ★ CRITICAL: Setting this to true inherits the default settings from the container image.
+# This ensures your instance automatically adapts to future SearXNG updates (e.g., engine URL changes) without manual intervention.
+use_default_settings: true
+
+server:
+  # Required for n8n integration (disables rate limiting to prevent being blocked as a bot)
+  limiter: false
+
+  # Loads the value from the environment variable defined in docker-compose.yml
+  secret_key: "%(SEARXNG_CONTAINER_SECRET)s"
+  # Recommended when retrieving/displaying image results (protects privacy & prevents broken links/hotlinking)
+  image_proxy: true
+
+# Required since n8n expects search results in JSON format
+search:
+  formats:
+    - html
+    - json
+
+# Configuration for Redis (Explicitly required here as the default settings do not enable Redis)
+# Note: The redis.url is overwritten by ${SEARXNG_REDIS_URL} environment variable in docker-compose.yml
+# This allows dynamic configuration of Redis connection details (host, port, password)
+redis:
+  url: false  # Will be overwritten by SEARXNG_REDIS_URL environment variable

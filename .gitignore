@@ -1,0 +1,75 @@
+# ==========================================
+# 🛑 Secrets & Local Configuration (Critical)
+# ==========================================
+# Environment variable files (Contains API keys/passwords - NEVER commit)
+.env
+
+# Local Docker Compose override file (For local development settings)
+docker-compose.override.yml
+
+# ==========================================
+# 🤖 n8n Service
+# ==========================================
+# Workflow definitions, Credentials, and Execution logs
+# (Ignored to prevent accidental commits of local backups even if using Docker Volumes)
+n8n_data/
+
+# Custom installed nodes directory
+n8n_nodes/
+
+# ==========================================
+# 💾 Database & Storage (PostgreSQL / Redis)
+# ==========================================
+# PostgreSQL: Main data directory (Defensive ignore for local bind mounts)
+postgres_data/
+
+# PostgreSQL: User home data
+postgres_userhome/
+
+# Redis: Main data directory
+redis_data/
+
+# Manual SQL dump/backup files
+*.sql
+
+# ==========================================
+# 🎭 Playwright (Browser Automation)
+# ==========================================
+# Dependencies (inside Playwright directory)
+playwright/node_modules/
+
+# Generated screenshots, reports, and test results
+playwright/test-results/
+playwright/playwright-report/
+playwright/npm-debug.log
+
+# User data (Browser profiles, persistent context)
+playwright_data/
+
+# ==========================================
+# 🔒 Caddy (Reverse Proxy)
+# ==========================================
+# SSL Certificates (Private Keys) and configuration data
+# (Prevents leakage if volumes are mapped locally)
+caddy_data/
+caddy_config/
+
+# ==========================================
+# ⚙️ System, Logs & General
+# ==========================================
+# General log files
+*.log
+npm-debug.log
+
+# macOS metadata
+.DS_Store
+
+# drawio
+*.drawio.bkp
+.$*.drawio.bkp
+
+# Window System Setting
+desktop.ini
+
+# node_modules in root
+node_modules/

@@ -1,0 +1,37 @@
+﻿#---------------------------------------------------------------------------
+# Global Logging Configuration (Log Rotation)
+#---------------------------------------------------------------------------
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+#---------------------------------------------------------------------------
+# services
+#---------------------------------------------------------------------------
+services:
+  #--------------------------------------------------------------------------
+  # Cloudflare Workers npm installer service
+  #---------------------------------------------------------------------------
+  cfworker_npm_installer:
+    build:
+      context: .
+      args:
+        CF_WORKER_DOCKER_IMAGE: ${COMMON_CF_WORKER_DOCKER_IMAGE:-node}
+        CF_WORKER_DOCKER_IMAGE_TAG: ${COMMON_CF_WORKER_DOCKER_IMAGE_TAG:-slim}
+    # Docker Image Name (Images一覧に表示される名前)
+    image: ${COMMON_CF_WORKER_DOCKER_IMAGE:-node}-cfworker_npm_installer:${COMMON_CF_WORKER_DOCKER_IMAGE_TAG:-slim}
+    # container_name: cfworker_npm_installer-container
+    logging: *default-logging
+    volumes:
+      # ローカルディレクトリをnpm-installerコンテナの/appにマウント（編集可能）
+      - ./funcfiles:/app
+    # 実行するコマンド
+    command: npm install
+#---------------------------------------------------------------------------
+# volumes
+#---------------------------------------------------------------------------
+# ローカルディレクトリをnpm-installerコンテナの/appに直接マウントするため、名前付きボリュームは不要
+# volumes:
+#   cf_worker_data_docker_volume:
+#     # name: "${CF_WORKER_VOLUME_NAME:-eoCfWorkerDataVolume}"

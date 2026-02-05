@@ -1,0 +1,122 @@
+{
+  "name": "Queue Mode / Webhook Processing - Concurrency Testing2",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "i",
+        "options": {}
+      },
+      "id": "dfa2d97b-8a7f-4003-bc21-cd0d2e025fc0",
+      "name": "Split Out",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        160,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "path": "1d645586-8a24-4196-969f-1631d46c58a6",
+        "options": {}
+      },
+      "id": "9f1574d8-8d8e-4f19-80d6-ec170db93923",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        48
+      ],
+      "webhookId": "1d645586-8a24-4196-969f-1631d46c58a6"
+    },
+    {
+      "parameters": {
+        "content": "## Runs a Sub-Workflow 50 Times via Webhook Trigger Call\n* Note: Each \"child\" workflow will be queued and run ASAP on an available worker instance.\n* Before Testing1 Execute , Publish this (Testing2)",
+        "height": 331,
+        "width": 914
+      },
+      "id": "b865e033-1667-4243-996e-01d873955722",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "url": "http://n8n:5678/webhook/f5382c13-2941-47f7-872b-6fda6f1d26d9",
+        "options": {}
+      },
+      "id": "f96ab3a6-d359-4570-af93-7fbc378ce0ff",
+      "name": "Trigger Workflow via HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const n = 50;\nreturn Array.from({ length: n }, (_, i) => ({\"i\": i }) );\n"
+      },
+      "id": "f08dfea4-a122-45b5-9e33-19f10fd55b2f",
+      "name": "Code - Generate 50 \"Items\"",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        48
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Trigger Workflow via HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code - Generate 50 \"Items\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code - Generate 50 \"Items\"": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3c4f1d09-557d-46b9-8879-144a328eb4e5",
+  "meta": {
+    "instanceId": "a89294f8ba3a3890db4bc7a1851952b9ac4326fec52688630ab4ab1b01c4a482"
+  },
+  "id": "3DVBS86cn6s70DZS",
+  "tags": []
+}

@@ -1,0 +1,17 @@
+# ------------------------------------------------------------------------------
+# 認証ディレクトリをコンテナに渡すための override 例
+# ------------------------------------------------------------------------------
+# 使い方:
+#   1. このファイルを docker-compose.override.yml にコピー
+#   2. .env に TF_AWS_CREDENTIALS_PATH 等を設定（使用するクラウドのみ）
+#   3. 使用しないクラウドの volume は削除またはコメントアウト
+# ------------------------------------------------------------------------------
+
+services:
+  terraform:
+    volumes:
+      - ${TERRAFORM_WORKSPACE:-../terraform}:/workspace
+      # 使用するクラウドの認証パスのみ有効にし、.env でパスを設定
+      - ${TF_AWS_CREDENTIALS_PATH}:/root/.aws:ro
+      # - ${TF_AZURE_CREDENTIALS_PATH}:/root/.azure:ro
+      # - ${TF_GCP_CREDENTIALS_PATH}:/root/.config/gcloud:ro

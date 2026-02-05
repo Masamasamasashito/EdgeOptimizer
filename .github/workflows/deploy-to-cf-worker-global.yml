@@ -1,0 +1,81 @@
+﻿name: Deploy CloudFlare Worker Global
+
+on:
+#   push:
+#     paths:
+#       - 'RequestEngine/cloudflare_workers/global/funcfiles/src/**'
+#       - 'RequestEngine/cloudflare_workers/global/funcfiles/wrangler.toml'
+#       - 'RequestEngine/cloudflare_workers/global/funcfiles/package.json'
+#       - 'RequestEngine/cloudflare_workers/global/funcfiles/package-lock.json'
+#       - 'RequestEngine/cloudflare_workers/global/funcfiles/tsconfig.json'
+#       - 'RequestEngine/cloudflare_workers/global/funcfiles/build.mjs'
+#       # if you want to trigger workflow when you change deploy-to-cf-worker-global.yml
+#       # - '.github/workflows/deploy-to-cf-worker-global.yml'
+
+  workflow_dispatch:
+
+jobs:
+  prod_deploy: # ジョブ名（任意）。実行単位の論理名
+    # GitHub-hosted Runner(JOB実行するマシン(コンテナ))の実行環境が割り当てられる(送信元IPアドレス固定できない)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10 # ジョブ全体の実行上限時間。ハング防止
+    permissions: # 最小権限の原則。GITHUB_TOKEN のスコープを制限
+      contents: read # リポジトリの「読み取りのみ」許可（push/Release作成等は不可）
+    concurrency: # 二重実行の制御（最新コミットだけをデプロイしたい時に有効）
+      # 同じ group 名のジョブは同時実行しない。workflow名＋ブランチ/タグでグループ化
+      group: deploy-worker-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true # 新しい実行が来たら古い実行を自動キャンセル
+    steps:
+      # Checkout the latest code,Get Repository on Runner.以降のステップがソースにアクセス可能になる
+      - uses: actions/checkout@v5
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: ./RequestEngine/cloudflare_workers/global/funcfiles
+        run: npm install
+
+      - name: Build worker (strip comments only, no minify)
+        working-directory: ./RequestEngine/cloudflare_workers/global/funcfiles
+        run: npm run build
+
+      - name: Generate wrangler.toml
+        working-directory: ./RequestEngine/cloudflare_workers/global/funcfiles
+        run: |
+          cat <<EOF > wrangler.toml
+          name = "eo-re-d01-cfworker-global"
+          main = "src/worker.ts"
+          compatibility_date = "2026-01-13"
+
+          # シークレットから取得したドメインを設定
+          workers_dev = false
+          routes = [
+            { pattern = "${{ secrets.EO_CLOUDFLARE_WORKER_DOMAIN }}", zone_confirm = true }
+          ]
+
+          [observability]
+          enabled = false
+          head_sampling_rate = 1
+
+          [observability.logs]
+          enabled = true
+          head_sampling_rate = 1
+          persist = true
+          invocation_logs = true
+
+          [observability.traces]
+          enabled = false
+          persist = true
+          head_sampling_rate = 1
+          EOF
+
+      - name: Deploy to Cloudflare Worker Global
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.EO_CLOUDFLARE_WORKER_USER_API_TOKEN_FOR_GITHUB }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: ./RequestEngine/cloudflare_workers/global/funcfiles
+          command: deploy

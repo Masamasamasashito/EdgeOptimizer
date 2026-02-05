@@ -1,0 +1,40 @@
+﻿#---------------------------------------------------------------------------
+# Global Logging Configuration (Log Rotation)
+#---------------------------------------------------------------------------
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+#---------------------------------------------------------------------------
+# services
+#---------------------------------------------------------------------------
+services:
+  #---------------------------------------------------------------------------
+  # Azure Functions Python service
+  #---------------------------------------------------------------------------
+  azfunc_builder:
+    build:
+      context: .
+      args:
+        AZFUNC_DOCKER_IMAGE: ${COMMON_AZFUNC_DOCKER_IMAGE:-python}
+        AZFUNC_DOCKER_IMAGE_TAG: ${COMMON_AZFUNC_DOCKER_IMAGE_TAG:-slim-bookworm}
+        AZFUNC_CORE_TOOLS_VERSION: ${COMMON_AZFUNC_CORE_TOOLS_VERSION:-4}
+    image: ${COMMON_AZFUNC_DOCKER_IMAGE:-python}-azfunc_builder:${COMMON_AZFUNC_DOCKER_IMAGE_TAG:-slim-bookworm}
+    # container_name: azfunc_builder_py_container
+    logging: *default-logging
+    working_dir: /container_workspace
+    volumes:
+      # ローカルディレクトリをazfunc_builderコンテナの/container_workspaceにマウント（編集可能）
+      - ./funcfiles:/container_workspace
+    ports:
+      - "${DOCKER_HOST_BIND_ADDR:-127.0.0.1}:${DOCKER_HOST_PORT_AZFUNC_CONTAINER:-7071}:${AZFUNC_CONTAINER_LISTEN_PORT:-7071}"
+    tty: true
+    stdin_open: true
+#---------------------------------------------------------------------------
+# volumes
+#---------------------------------------------------------------------------
+# ローカルディレクトリをazfunc_builderコンテナの/workspaceに直接マウントするため、名前付きボリュームは不要
+# volumes:
+#   azfunc_builder_data_docker_volume:
+#     # name: "${AZFUNC_VOLUME_NAME:-eoAzfuncDataVolume}"

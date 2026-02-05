@@ -1,0 +1,44 @@
+﻿#---------------------------------------------------------------------------
+# Global Logging Configuration (Log Rotation)
+#---------------------------------------------------------------------------
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+#---------------------------------------------------------------------------
+# services
+#---------------------------------------------------------------------------
+services:
+  #---------------------------------------------------------------------------
+  # GCP Cloud Run builder service
+  #---------------------------------------------------------------------------
+  gcloudrun_builder:
+    build:
+      context: .
+      args:
+        GCP_CLOUDRUN_DOCKER_IMAGE: ${COMMON_GCP_CLOUDRUN_DOCKER_IMAGE:-python}
+        GCP_CLOUDRUN_DOCKER_IMAGE_TAG: ${COMMON_GCP_CLOUDRUN_DOCKER_IMAGE_TAG:-slim}
+    # Docker Image Name (Images一覧に表示される名前)
+    image: ${COMMON_GCP_CLOUDRUN_DOCKER_IMAGE:-python}-gcloudrun_builder:${COMMON_GCP_CLOUDRUN_DOCKER_IMAGE_TAG:-slim}
+    # container_name: gcloudrun_builder-container
+    logging: *default-logging
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - EO_CLOUDRUN_REQUEST_SECRET_LOCAL=${EO_CLOUDRUN_REQUEST_SECRET_LOCAL:-your-secret-here}
+      - EO_GCP_PROJECT_ID=${EO_GCP_PROJECT_ID:-}
+      - CLOUDRUN_REQUEST_SECRET_NAME=${CLOUDRUN_REQUEST_SECRET_NAME:-eo-re-dev01-secretmng}
+    volumes:
+      # ローカルディレクトリをgcloudrun_builderコンテナの/appにマウント（編集可能）
+      - ./funcfiles:/app
+    # 実行するコマンド
+    command: python main.py
+#---------------------------------------------------------------------------
+# volumes
+#---------------------------------------------------------------------------
+# ローカルディレクトリをgcloudrun_builderコンテナの/appに直接マウントするため、名前付きボリュームは不要
+# volumes:
+#   gcp_cloudrun_data_docker_volume:
+#     # name: "${GCP_CLOUDRUN_VOLUME_NAME:-eoGcpCloudrunDataVolume}"

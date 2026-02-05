@@ -1,0 +1,42 @@
+﻿#---------------------------------------------------------------------------
+# Global Logging Configuration (Log Rotation)
+#---------------------------------------------------------------------------
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "3"
+#---------------------------------------------------------------------------
+# services
+#---------------------------------------------------------------------------
+services:
+  #---------------------------------------------------------------------------
+  # AWS Lambda Layer Builder service
+  #---------------------------------------------------------------------------
+  lambda_layer_builder:
+    build:
+      context: .
+      args:
+        LAMBDA_LAYER_DOCKER_IMAGE: ${COMMON_LAMBDA_LAYER_DOCKER_IMAGE:-python}
+        LAMBDA_LAYER_DOCKER_IMAGE_TAG: ${COMMON_LAMBDA_LAYER_DOCKER_IMAGE_TAG:-slim}
+    image: ${COMMON_LAMBDA_LAYER_DOCKER_IMAGE:-python}-lambda_layer_builder:${COMMON_LAMBDA_LAYER_DOCKER_IMAGE_TAG:-slim}  # ここで指定した名前がImagesに表示されます
+    # container_name: lambda-layer-container
+    logging: *default-logging
+    volumes:
+      - .:/lambda-layer
+    # 実行時に実行される処理
+    command: >
+      /bin/bash -c "
+        mkdir -p /opt/python &&
+        pip install --no-cache-dir -t /opt/python requests &&
+        mkdir -p /lambda-layer/funcfiles &&
+        cd /opt &&
+        zip -r /lambda-layer/funcfiles/requests-py314-slim-layer.zip .
+      "
+#---------------------------------------------------------------------------
+# volumes
+#---------------------------------------------------------------------------
+# ローカルディレクトリをbuilderコンテナの/lambda-layerに直接マウントするため、名前付きボリュームは不要
+# volumes:
+#   lambda_layer_data_docker_volume:
+#     # name: "${LAMBDA_LAYER_VOLUME_NAME:-eoLambdaLayerDataVolume}"
