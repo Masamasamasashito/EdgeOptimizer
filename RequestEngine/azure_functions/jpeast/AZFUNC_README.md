@@ -14,32 +14,36 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 ## 管理グループ作成
 
 1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > 「+ 作成」 > 管理グループの作成
-2. 命名(ID) `MG-eo-re-d01`
+2. 命名(ID) `eo-re-d01-azure-mgmt-group`
+3. 作成後、反映するまで少し待つ（遅い）。
 
 ## サブスクリプション を管理グループに紐付け
 
 既存もしくは、新規作成したサブスクリプションを管理グループに紐付ける。
 今後、この管理グループでサブスクリプションの権限を制限する。
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d01-azure-mgmt-group`
+2. 「+ サブスクリプションの追加」
+3. 紐付けたいサブスクリプションを選択 > 保存
 
 ## ホワイトリスト作成
 
-※このホワイトリスト作成は、まだ、作成中であるため、直下の「管理グループで(サブスクリプションIDを)ポリシー制限」を行ってください。
+まだ、作成中であるため、直下の「管理グループで(サブスクリプションIDを)ポリシー制限」を行ってください。
 
 1. Azure > ポリシー > (左サイドバー)作成 > 定義 > 「+ ポリシー定義」
-2. スコープ > `MG-eo-re-d01` を選択
+2. スコープ > `eo-re-d01-azure-mgmt-group` を選択
 3. 定義の種類 > ポリシー
 4. ポリシーの種類
 
    - 名前: `eo-re-d01-allowed-locations`
-   - 説明: `Allow only specific locations for resources in MG-eo-re-d01`
+   - 説明: `Allow only specific locations for resources in eo-re-d01-azure-mgmt-group`
    - カテゴリ: `EdgeOptimizer`
 
 ## 管理グループで(サブスクリプションIDを)ポリシー制限
 
-1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `MG-eo-re-d01`
-2. (左サイドバー)ガバナンス > ポリシー > ポリシーの割り当て
-3. スコープ > `MG-eo-re-d01` を選択
-4. (タブ)基本情報 > 基本情報 > ポリシー定義 > `Allowed resource types` を選択 
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d01-azure-mgmt-group`
+2. (左サイドバー)ガバナンス > ポリシー > 「ポリシーの割り当て」をクリック
+3. (タブ)基本情報 > スコープ > `eo-re-d01-azure-mgmt-group` を選択
+4. 基本情報 > ポリシー定義 > `Allowed resource types` を選択 > 追加
 5. 次へ(パラメーター)
 6. リソースの種類 > 以下を選択（検索機能が非常に非力。sitesなどの最後尾の名称で検索する）
     - 関数アプリ
@@ -65,8 +69,8 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
     - `[Azure Policy制限] プロジェクト管理ルールにより、許可されたリソースタイプ以外はデプロイできません。追加が必要な場合、該当管理グループのポリシー設定を確認してください。`
 11. レビューと作成 > 作成
 
-【参考】
-- スコープ `MG-eo-re-d01`
+【参考】割り当て名：使用できるリソースの種類
+- スコープ `eo-re-d01-azure-mgmt-group`
 - 定義の種類 `ポリシー`
 - パラメーターID `listOfResourceTypesAllowed`
 - パラメーター名 `Allowed resource types`
@@ -76,10 +80,10 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 
 リソースの作成先リージョンを Japan East のみに制限し、意図しないリージョンへのデプロイを防止する。
 
-1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `MG-eo-re-d01`
-2. (左サイドバー)ガバナンス > ポリシー > ポリシーの割り当て
-3. スコープ > `MG-eo-re-d01` を選択
-4. (タブ)基本情報 > 基本情報 > ポリシー定義 > `Allowed locations` を選択
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d01-azure-mgmt-group`
+2. (左サイドバー)ガバナンス > ポリシー > 「ポリシーの割り当て」をクリック
+3. (タブ)基本情報 > スコープ > `eo-re-d01-azure-mgmt-group` を選択
+4. 基本情報 > ポリシー定義 > `Allowed locations` を選択 > 追加
 5. 次へ(パラメーター)
 6. 許可されている場所 > 以下を選択
     - `Japan East`
@@ -89,10 +93,10 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 9. 次へ(コンプライアンス非対応のメッセージ)
 10. コンプライアンス非対応のメッセージ　に以下を入力
     - `[Azure Policy制限] プロジェクト管理ルールにより、Japan East 以外のリージョンへのデプロイは許可されていません。追加が必要な場合、該当管理グループのポリシー設定を確認してください。`
-11. レビューと作成 > 作成
+11. 次へ > 作成
 
-【参考】
-- スコープ `MG-eo-re-d01`
+【参考】割り当て名：許可されている場所
+- スコープ `eo-re-d01-azure-mgmt-group`
 - 定義の種類 `ポリシー`
 - パラメーターID `listOfAllowedLocations`
 - パラメーター名 `Allowed locations`
