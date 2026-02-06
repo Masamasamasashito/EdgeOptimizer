@@ -1,6 +1,6 @@
 # 【事前準備】Azure管理グループ作成
 
-Azureの「グローバル管理者権限」ユー~あはデフォルトでは、管理グループの閲覧すらできないので、「管理グループ」操作権の付与から。
+Azureの「グローバル管理者権限」ユーザーはデフォルトでは、管理グループの閲覧すらできないので、「管理グループ」操作権の付与から。
 
 ## 「管理グループ」操作権の付与
 
@@ -11,12 +11,10 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 
 ※「グローバル管理者権限」のユーザーに「ユーザー アクセス管理者 (User Access Administrator)」が付与され「全管理グループの支配権」へと昇華されます。
 
-`mg-eo`
-
 ## 管理グループ作成
 
 1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > 「+ 作成」 > 管理グループの作成
-2. 命名(ID) `MG-eo-d01`
+2. 命名(ID) `MG-eo-re-d01`
 
 ## サブスクリプション を管理グループに紐付け
 
@@ -26,20 +24,20 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 ## ホワイトリスト作成
 
 1. Azure > ポリシー > (左サイドバー)作成 > 定義 > 「+ ポリシー定義」
-2. スコープ > `mg-eo-d01` を選択
+2. スコープ > `MG-eo-re-d01` を選択
 3. 定義の種類 > ポリシー
 4. ポリシーの種類
 
    - 名前: `eo-allowed-locations`
-   - 説明: `Allow only specific locations for resources in mg-eo-d01`
+   - 説明: `Allow only specific locations for resources in MG-eo-re-d01`
    - カテゴリ: `EdgeOptimizer`
 
 
 ## 管理グループで(サブスクリプションIDを)ポリシー制限
 
-1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `mg-eo-d01`
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `MG-eo-re-d01`
 2. (左サイドバー)ガバナンス > ポリシー > ポリシーの割り当て
-3. スコープ > `mg-eo-d01` を選択
+3. スコープ > `MG-eo-re-d01` を選択
 4. (タブ)基本情報 > 基本情報 > ポリシー定義 > `Allowed resource types` を選択 
 5. 次へ(パラメーター)
 6. リソースの種類 > 以下を選択（検索機能が非常に非力。sitesなどの最後尾の名称で検索する）
@@ -67,7 +65,7 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 11. レビューと作成 > 作成
 
 【参考】
-- スコープ `MG-eo-d01`
+- スコープ `MG-eo-re-d01`
 - 定義の種類 `ポリシー`
 - パラメーターID `listOfResourceTypesAllowed`
 - パラメーター名 `Allowed resource types`
@@ -77,9 +75,9 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 
 リソースの作成先リージョンを Japan East のみに制限し、意図しないリージョンへのデプロイを防止する。
 
-1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `mg-eo-d01`
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `MG-eo-re-d01`
 2. (左サイドバー)ガバナンス > ポリシー > ポリシーの割り当て
-3. スコープ > `mg-eo-d01` を選択
+3. スコープ > `MG-eo-re-d01` を選択
 4. (タブ)基本情報 > 基本情報 > ポリシー定義 > `Allowed locations` を選択
 5. 次へ(パラメーター)
 6. 許可されている場所 > 以下を選択
@@ -93,7 +91,7 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 11. レビューと作成 > 作成
 
 【参考】
-- スコープ `MG-eo-d01`
+- スコープ `MG-eo-re-d01`
 - 定義の種類 `ポリシー`
 - パラメーターID `listOfAllowedLocations`
 - パラメーター名 `Allowed locations`
