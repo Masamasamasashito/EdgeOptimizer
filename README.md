@@ -143,7 +143,7 @@ Request Engine is an essential component running on Serverless Computing, design
 👉 See detailed setup guide here:
 - RequestEngine\RE_README.md
 - RequestEngine\aws_lambda\apne1\LAMBDA_README.md
-- RequestEngine\aws_lambda\CFn\LAMBDA_CFN_README.md
+- RequestEngine\aws_lambda\CFn\LAMBDA_CFN_README.md :point_left: Recommend!!
 - RequestEngine\azure_functions\jpeast\AZFUNC_README.md
 - RequestEngine\cloudflare_workers\global\CFWORKER_README.md
 - RequestEngine\gcp_cloudrun\ane1\RUN_README.md
