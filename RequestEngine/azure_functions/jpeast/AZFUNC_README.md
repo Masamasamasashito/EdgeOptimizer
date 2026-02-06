@@ -1,3 +1,104 @@
+# 【事前準備】Azure管理グループ作成
+
+Azureの「グローバル管理者権限」ユー~あはデフォルトでは、管理グループの閲覧すらできないので、「管理グループ」操作権の付与から。
+
+## 「管理グループ」操作権の付与
+
+Entra ID「グローバル管理者」ロールのユーザーで行う必要がある。
+
+1. Azure にサインイン > Entra ID > プロパティ > 画面を一番下までスクロール「Azure リソースのアクセス管理」
+2. [はい] に切り替えて、[保存] をクリック
+
+※「グローバル管理者権限」のユーザーに「ユーザー アクセス管理者 (User Access Administrator)」が付与され「全管理グループの支配権」へと昇華されます。
+
+`mg-eo`
+
+## 管理グループ作成
+
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > 「+ 作成」 > 管理グループの作成
+2. 命名(ID) `MG-eo-d01`
+
+## サブスクリプション を管理グループに紐付け
+
+既存もしくは、新規作成したサブスクリプションを管理グループに紐付ける。
+今後、この管理グループでサブスクリプションの権限を制限する。
+
+## ホワイトリスト作成
+
+1. Azure > ポリシー > (左サイドバー)作成 > 定義 > 「+ ポリシー定義」
+2. スコープ > `mg-eo-d01` を選択
+3. 定義の種類 > ポリシー
+4. ポリシーの種類
+
+   - 名前: `eo-allowed-locations`
+   - 説明: `Allow only specific locations for resources in mg-eo-d01`
+   - カテゴリ: `EdgeOptimizer`
+
+
+## 管理グループで(サブスクリプションIDを)ポリシー制限
+
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `mg-eo-d01`
+2. (左サイドバー)ガバナンス > ポリシー > ポリシーの割り当て
+3. スコープ > `mg-eo-d01` を選択
+4. (タブ)基本情報 > 基本情報 > ポリシー定義 > `Allowed resource types` を選択 
+5. 次へ(パラメーター)
+6. リソースの種類 > 以下を選択（検索機能が非常に非力。sitesなどの最後尾の名称で検索する）
+    - 関数アプリ
+        - Microsoft.Web　の sites
+        - Functionsの本体
+    - App Service プラン
+        - Microsoft.Web の serverfarms
+        - Functionsを実行するサーバー代わりの土台
+    - キー コンテナー
+        - Microsoft.KeyVault の vaults
+        - パスワードや機密情報を守る金庫です。
+    - ストレージ アカウント
+        - Microsoft.Storage の storageAccounts
+        - Functionsのコード保存や実行ログの記録に必須です。
+    - 画像外: 監視用（必要なら）
+        - Microsoft.Insights/components	Application Insights
+        - エラー検知やログ収集に必要です。
+7. 次へ(修復)
+8. 次へ(マネージドID) > チェックを入れない
+    - 【参考】ポリシー自体が「リソースをいじる」場合、ポリシーに「操作権限」を与える必要があり、その「身分証」としてマネージドIDが使われる
+9. 次へ(コンプライアンス非対応のメッセージ)
+10. コンプライアンス非対応のメッセージ　に以下を入力
+    - `[Azure Policy制限] プロジェクト管理ルールにより、許可されたリソースタイプ以外はデプロイできません。追加が必要な場合、該当管理グループのポリシー設定を確認してください。`
+11. レビューと作成 > 作成
+
+【参考】
+- スコープ `MG-eo-d01`
+- 定義の種類 `ポリシー`
+- パラメーターID `listOfResourceTypesAllowed`
+- パラメーター名 `Allowed resource types`
+- パラメーター値 `["Microsoft.Web/sites","Microsoft.Web/serverFarms","Microsoft.KeyVault/vaults","Microsoft.Storage/storageAccounts"]`
+
+## 管理グループで(リージョン)ポリシー制限
+
+リソースの作成先リージョンを Japan East のみに制限し、意図しないリージョンへのデプロイを防止する。
+
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `mg-eo-d01`
+2. (左サイドバー)ガバナンス > ポリシー > ポリシーの割り当て
+3. スコープ > `mg-eo-d01` を選択
+4. (タブ)基本情報 > 基本情報 > ポリシー定義 > `Allowed locations` を選択
+5. 次へ(パラメーター)
+6. 許可されている場所 > 以下を選択
+    - `Japan East`
+    - （必要に応じて `Japan West` も追加）
+7. 次へ(修復)
+8. 次へ(マネージドID) > チェックを入れない
+9. 次へ(コンプライアンス非対応のメッセージ)
+10. コンプライアンス非対応のメッセージ　に以下を入力
+    - `[Azure Policy制限] プロジェクト管理ルールにより、Japan East 以外のリージョンへのデプロイは許可されていません。`
+11. レビューと作成 > 作成
+
+【参考】
+- スコープ `MG-eo-d01`
+- 定義の種類 `ポリシー`
+- パラメーターID `listOfAllowedLocations`
+- パラメーター名 `Allowed locations`
+- パラメーター値 `["japaneast"]`
+
 # Step.1 Azureリソースグループ作成
 
 `eo-re-d01-resource-group-jpeast`
@@ -473,7 +574,7 @@ GitHub ActionsからAzure Functionsにデプロイするため、Azure ADアプ�
 5. 登録をクリック
 6. アプリケーション（クライアント）ID をコピーして控える（GitHub Secretsの`EO_AZ_FUNC_JPEAST_DEPLOY_ENTRA_APP_ID_FOR_GITHUB`に使用）
 7. ディレクトリ（テナント）ID をコピーして控える（GitHub Secretsの`EO_AZ_TENANT_ID`に使用）
-8. サブスクリプションID をコピーして控える（GitHub Secretsの`AZURE_SUBSCRIPTION_ID`に使用）
+8. サブスクリプションID をコピーして控える（GitHub Secretsの`EO_AZURE_SUBSCRIPTION_ID`に使用）
 
 ### 既存のアプリケーションの設定を変更する場合（「個人用Microsoftアカウントのみ」から変更）
 
@@ -569,7 +670,7 @@ GitHub ActionsからOIDC認証でログインするため、サービスプリ�
 |--------------|-----|------|
 | `EO_AZ_FUNC_JPEAST_DEPLOY_ENTRA_APP_ID_FOR_GITHUB` | 上記で取得したアプリケーション（クライアント）ID | Azure ADアプリケーションのClient ID |
 | `EO_AZ_TENANT_ID` | 上記で取得したディレクトリ（テナント）ID | Azure ADテナントID |
-| `AZURE_SUBSCRIPTION_ID` | AzureサブスクリプションID | デプロイ先のサブスクリプションID |
+| `EO_AZURE_SUBSCRIPTION_ID` | AzureサブスクリプションID | デプロイ先のサブスクリプションID |
 | `EO_AZ_RE_KEYVAULT_URL` | Key VaultのURI（語尾のスラッシュ不要。例: `https://eo-re-d01-kv-jpeast.vault.azure.net`） | Key VaultのURI（デプロイ時に`local.settings.json`に含まれ、アプリケーション設定として自動設定されます） |
 
 ## 手順 5: ワークフローファイルの確認
