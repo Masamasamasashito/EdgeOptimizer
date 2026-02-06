@@ -13,7 +13,8 @@
 - [STEP 2: Bicep テンプレートのデプロイ](#step-2-bicep-テンプレートのデプロイ)
 - [STEP 3: デプロイ後の設定](#step-3-デプロイ後の設定)
 - [STEP 4: GitHub Actions OIDC 設定](#step-4-github-actions-oidc-設定)
-- [STEP 5: n8n Credentials 設定](#step-5-n8n-credentials-設定)
+- [STEP 5: GitHub Actions で Function App をデプロイ](#step-5-github-actions-で-function-app-をデプロイ)
+- [STEP 6: n8n Credentials 設定](#step-6-n8n-credentials-設定)
 - [パラメータ一覧](#パラメータ一覧)
 - [トラブルシューティング](#トラブルシューティング)
 
@@ -416,9 +417,22 @@ az bicep build --file eo-re-d01-azure-funcapp.bicep
 
 ## STEP 3: デプロイ後の設定
 
-### 3-1. Key Vault シークレット値の更新
+### 3-1. 【重要】Key Vault アクセス権を人間に付与
 
-Bicep で作成されたシークレットにはプレースホルダー値が入っています。
+- Bicep で Function App のマネージド ID にのみ Key Vault アクセス権を付与、Key Vault と シークレットを作成  
+- GUIで人間がシークレット値を更新する場合、権限付与が必要
+
+Azure Portal で自分に権限を付与します。
+
+1. Key Vault > eo-re-d01-kv-jpeast > アクセス制御 (IAM)
+2. 「+ 追加」> 「ロールの割り当ての追加」
+3. ロール: `キー コンテナー シークレット責任者`（Key Vault Secrets Officer）
+    - `シークレットの読み取り・書き込み・削除（管理者用）`
+4. メンバー: 自分のアカウント を選択
+5. Description: `Key Vault で シークレットを閲覧、作成、更新など権限を人間に付与 `
+5. 「レビューと割り当て」
+
+### 3-2. Key Vault シークレットの更新
 
 1. Azure Portal > Key Vault > `eo-re-d01-kv-jpeast`
 2. オブジェクト > シークレット > `AZFUNC-REQUEST-SECRET`
@@ -438,16 +452,6 @@ az keyvault secret set \
 ```powershell
 az keyvault secret set --vault-name eo-re-d01-kv-jpeast --name AZFUNC-REQUEST-SECRET --value '<N8N_EO_REQUEST_SECRET の値>'
 ```
-
-### 3-2. Key Vault シークレット管理者の権限付与（必要な場合）
-
-シークレットを編集する作業者に「キー コンテナー シークレット責任者」ロールを付与:
-
-1. Key Vault > アクセス制御 (IAM) > 「+ 追加」> 「ロールの割り当ての追加」
-2. ロール: `キー コンテナー シークレット責任者`
-3. メンバー: シークレットを管理する作業者を選択
-4. 「レビューと割り当て」
-
 ---
 
 ## STEP 4: GitHub Actions OIDC 設定
@@ -470,8 +474,9 @@ az keyvault secret set --vault-name eo-re-d01-kv-jpeast --name AZFUNC-REQUEST-SE
 1. Azure Portal > リソースグループ > `eo-re-d01-resource-group-jpeast` > アクセス制御 (IAM)
 2. 「+ 追加」> 「ロールの割り当ての追加」
 3. ロール: `Web サイト共同作成者`
-4. メンバー: `eo-ghactions-deploy-entra-app-azfunc-jpeast` を検索して選択
-5. 「レビューと割り当て」
+4. アクセスの割り当て先: **ユーザー、グループ、またはサービス プリンシパル**
+5. メンバー: `eo-ghactions-deploy-entra-app-azfunc-jpeast` のApplicationを検索して選択
+6. 「レビューと割り当て」
 
 ### 4-3. GitHub Secrets の設定
 
@@ -504,16 +509,37 @@ az deployment group show --name eo-azure-funcapp-deployment --resource-group eo-
 
 ---
 
-## STEP 5: n8n Credentials 設定
+## STEP 5: GitHub Actions で Function App をデプロイ
 
-### 5-1. Function App Key の取得
+Bicep で作成した Function App にはまだ関数コードがありません。GitHub Actions でデプロイします。
+
+### 5-1. GitHub Actions ワークフローの実行
+
+1. GitHub リポジトリ > **Actions** タブ
+2. 左サイドバー > **Deploy Azure Functions jpeast**
+3. 「Run workflow」> ブランチ `main` を選択 > 「Run workflow」
+4. ワークフローが完了するまで待機（約2-3分）
+
+### 5-2. デプロイ結果の確認
 
 1. Azure Portal > Function App > `eo-re-d01-funcapp-jpeast`
-2. 関数 > `requestengine_func`（GitHub Actions デプロイ後に表示）
+2. 左サイドバー > **関数** をクリック
+3. `requestengine_func` が表示されていれば成功
+
+**表示されない場合**: GitHub Actions のログを確認し、エラーがないかチェックしてください。
+
+---
+
+## STEP 6: n8n Credentials 設定
+
+### 6-1. Function App Key の取得
+
+1. Azure Portal > Function App > `eo-re-d01-funcapp-jpeast`
+2. 関数 > `requestengine_func`
 3. 「関数の URL の取得」> `default` (ファンクション キー) を選択
 4. URL をコピー（`?code=...` まで含む）
 
-### 5-2. n8n Credential の作成
+### 6-2. n8n Credential の作成
 
 1. n8n > Personal > Credentials > Create Credential
 2. Credential Type: `Header Auth`
@@ -523,7 +549,7 @@ az deployment group show --name eo-azure-funcapp-deployment --resource-group eo-
    - Header Value: Function Key の値（URL の `?code=` 以降の部分）
 4. 「Save」
 
-### 5-3. n8n ワークフローノードの設定
+### 6-3. n8n ワークフローノードの設定
 
 1. `280AZ-japan-east RequestEngine KeyVault` ノードを開く
 2. URL: Function App の URL（`?code=...` 付き、または `x-functions-key` ヘッダーで認証）
