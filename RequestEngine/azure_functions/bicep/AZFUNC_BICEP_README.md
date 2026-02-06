@@ -555,6 +555,23 @@ Bicep で作成した Function App にはまだ関数コードがありません
 2. URL: Function App の URL（`?code=...` 付き、または `x-functions-key` ヘッダーで認証）
 3. 「Save」
 
+### 6-4. 280AZ...ノード Parameters URL設定
+
+1. n8n > `280AZ-japan-east RequestEngine KeyVault` ノードを開く
+2. **Parameters** > **URL** に Function App の URL を設定:
+   ```
+   https://eo-re-d01-funcapp-jpeast.azurewebsites.net/api/requestengine_func
+   ```
+3. 「Save」
+
+**URL の確認方法**:
+- Azure Portal > 関数アプリ > `eo-re-d01-funcapp-jpeast` > 関数 > `requestengine_func`
+- 「関数の URL の取得」> `default` (ファンクション キー) の URL から `?code=...` を除いた部分
+
+**認証の補足**:
+- URL に `?code=...` を含める方法と、Header Auth で `x-functions-key` を設定する方法の2通りがある
+- 6-2 で Header Auth を設定済みの場合、URL には `?code=...` 不要
+
 ---
 
 ## パラメータ一覧
