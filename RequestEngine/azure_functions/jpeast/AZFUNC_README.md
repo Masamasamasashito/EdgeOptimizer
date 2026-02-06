@@ -23,15 +23,16 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 
 ## ホワイトリスト作成
 
+※このホワイトリスト作成は、まだ、作成中であるため、直下の「管理グループで(サブスクリプションIDを)ポリシー制限」を行ってください。
+
 1. Azure > ポリシー > (左サイドバー)作成 > 定義 > 「+ ポリシー定義」
 2. スコープ > `MG-eo-re-d01` を選択
 3. 定義の種類 > ポリシー
 4. ポリシーの種類
 
-   - 名前: `eo-allowed-locations`
+   - 名前: `eo-re-d01-allowed-locations`
    - 説明: `Allow only specific locations for resources in MG-eo-re-d01`
    - カテゴリ: `EdgeOptimizer`
-
 
 ## 管理グループで(サブスクリプションIDを)ポリシー制限
 
