@@ -73,3 +73,6 @@ desktop.ini
 
 # node_modules in root
 node_modules/
+
+# test
+test/
