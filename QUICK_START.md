@@ -84,16 +84,27 @@ n8nのダッシュボードが表示されたら、Edge Optimizerのワークフ
 
 ---
 
-**🎉 セットアップ完了！**
+## ⏩ 次のステップ：Request Engine をセットアップ
 
-これで Edge Optimizer の基本環境が動作しています。
+ここまでで n8n + Docker の基本環境が動作しています。**次に Request Engine を1つセットアップすれば、Edge Optimizer が利用可能になります。**
 
----
+### 🥇 推奨：AWS Lambda（CloudFormation 版）
 
-## 🎯 次のステップ
+CloudFormation テンプレートで Lambda + IAM + Secrets Manager を**ワンクリック一括作成**できます。初めての方はこちらから始めてください。
 
-- **Request Engine を設定したい** → [RequestEngine/RE_README.md](./RequestEngine/RE_README.md)
-- **ワークフローの詳細設定** → [N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md)
+**👉 [LAMBDA_CFN_README.md](./RequestEngine/aws_lambda/CFn/LAMBDA_CFN_README.md)**
+
+### その他の Request Engine
+
+- **AWS Lambda（手動セットアップ）** → [LAMBDA_README.md](./RequestEngine/aws_lambda/apne1/LAMBDA_README.md)
+- **Azure Functions** → [AZFUNC_README.md](./RequestEngine/azure_functions/jpeast/AZFUNC_README.md)
+- **Cloudflare Workers** → [CFWORKER_README.md](./RequestEngine/cloudflare_workers/global/CFWORKER_README.md)
+- **GCP Cloud Run** → [RUN_README.md](./RequestEngine/gcp_cloudrun/ane1/RUN_README.md)
+- **Request Engine 全体のセキュリティ設定** → [RE_README.md](./RequestEngine/RE_README.md)
+
+### ワークフロー詳細設定
+
+- **ワークフロー設定ガイド** → [N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md)
 - **User-Agent設定** → [NODE175_USERAGENT_README.md](./EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md)
 - **トラブルシューティング** → [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
 
