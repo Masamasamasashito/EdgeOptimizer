@@ -6,7 +6,7 @@ CRAFTED BY [にしラボ / Nishi Labo](https://4649-24.com)
 
 ## 🎬 デモ動画
 
-[![Edge Optimizer Demo](https://img.youtube.com/vi/XYEp38gtJlU/maxresdefault.jpg)](https://youtu.be/XYEp38gtJlU)
+[![Edge Optimizer Demo](https://img.youtube.com/vi/XYEp38gtJlU/hqdefault.jpg)](https://youtu.be/XYEp38gtJlU)
 
 ▶️ クリックして YouTube で視聴
 
