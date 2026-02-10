@@ -71,6 +71,7 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
   - `*/funcfiles/` - Actual function code
 - `terraform/` - Infrastructure as Code modules
 - `EOn8nWorkflowJson/` - n8n workflow definitions for import
+- `test/` - **OSS公開を避けるファイルの置き場。このディレクトリ内のファイルを他のディレクトリへ移動禁止。**
 
 ## Docs
 
@@ -147,4 +148,6 @@ Critical variables in `EO_Infra_Docker/.env`:
    - 指定がない限り、思考プロセスおよび出力のすべてを日本語で行うこと。
 3. **Change Control Protocol:** Prioritize architectural integrity. Request formal approval before executing any structural, design, or logic modifications.
    - 構造・デザイン・コードの変更前には、変更案を提示し承認を得るプロセスを必須とする。
+4. **Markdown Style:** Do not use `---` (horizontal rule) in markdown files.
+   - マークダウンファイルで水平線（`---`）を使用しないこと。
 
