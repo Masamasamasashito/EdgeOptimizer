@@ -15,7 +15,7 @@
 >
 > 手動セットアップは 11 ステップあり、IAM ポリシー・ロール・Secrets Manager など多くの AWS リソースを個別に作成する必要があります。
 >
-> **[CloudFormation 版](../CFn/LAMBDA_CFN_README.md)** を使えば、Lambda Layer 作成以外のリソースを **ワンクリックで一括作成** できます。
+> **[CloudFormation 版](../CFn/LAMBDA_CFN_README.md)** を使えば、Lambda Layehr 作成以外のリソースを **ワンクリックで一括作成** できます。
 >
 > - ✅ IAM ユーザー・ポリシー・ロールを自動作成
 > - ✅ Secrets Manager を自動作成
@@ -39,7 +39,7 @@
 
 ---
 
-**重要**: リクエストエンジン接続認証と照合用リクエストシークレットによるトークン検証に関する命名や設定の詳細は、[RequestEngine\RE_README.md](../RE_README.md) を参照してください。
+**重要**: リクエストエンジン接続認証と照合用リクエストシークレットによるトークン検証に関する命名や設定の詳細は、[RE_README.md](../../RE_README.md) を参照してください。
 
 ---
 
@@ -413,5 +413,5 @@ GitHub Actionsが使用する専用ロールを作成します。
 ## 関連ドキュメント
 
 - [CloudFormation 版セットアップ手順（推奨）](../CFn/LAMBDA_CFN_README.md)
-- [Request Engine セキュリティ設定](../RE_README.md)
+- [Request Engine セキュリティ設定](../../RE_README.md)
 - [QUICK_START.md（全体の導入ガイド）](../../../QUICK_START.md)
