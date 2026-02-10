@@ -11,6 +11,7 @@
 - [STEP 3: デプロイ後の設定](#step-3-デプロイ後の設定)
 - [STEP 4: n8n Credentials 設定](#step-4-n8n-credentials-設定)
 - [STEP 5: GitHub Actions 設定](#step-5-github-actions-設定)
+- [STEP 6: n8n ワークフローノード設定](#step-6-n8n-ワークフローノード設定)
 - [パラメータ一覧](#パラメータ一覧)
 - [トラブルシューティング](#トラブルシューティング)
 
@@ -54,7 +55,8 @@
 
 Lambda Layer は CloudFormation デプロイ**前**に手動で作成する必要があります。
 
-> **💡 WSL2 / Docker 環境が無い場合:** Lambda Layer の zip ファイルはリポジトリに同梱されています。Docker でビルドせずに、以下のファイルをそのまま AWS コンソールからアップロードできます：
+> **💡 WSL2 / Docker 環境が無い場合:**
+> Lambda Layer の zip ファイルはリポジトリに同梱されています。Docker でビルドせずに、以下のファイルをそのまま AWS コンソールからアップロードできます：
 >
 > 📦 [`RequestEngine/aws_lambda/apne1/funcfiles/requests-py314-slim-layer.zip`](../apne1/funcfiles/requests-py314-slim-layer.zip)
 >
@@ -96,7 +98,6 @@ exit
 2. `token.actions.githubusercontent.com` が存在するか確認
 
 **既存の場合の対応:**
-
 `eo-aws-cfnstack.yml` で以下の2箇所をコメントアウト:
 
 1. `GitHubOIDCProvider` リソース（329-349行目付近）
@@ -227,6 +228,92 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 
 ---
 
+## STEP 6: n8n ワークフローノード設定
+
+STEP 4 で Credential と #280AWS ノードの設定が完了しました。ここでは、ワークフローを実行するために必要な残りのノード設定を行います。
+
+### 6-1. #010 XMLサイトマップURL設定
+
+Warmup対象サイトのXMLサイトマップURLを設定します。
+
+1. n8n ワークフロー画面で **`010 Step.0 Starter by XML sitemap`** ノードをダブルクリック
+2. Code 内の URL を、Warmup対象サイトのXMLサイトマップURLに変更:
+   ```javascript
+   // 例: あなたのサイトのサイトマップURL
+   const sitemapUrl = "https://example.com/sitemap.xml";
+   ```
+3. 「Save」
+
+> **💡 ヒント:** サイトマップURLが不明な場合は、`https://あなたのドメイン/sitemap.xml` または `https://あなたのドメイン/sitemap_index.xml` を確認してください。
+
+### 6-2. #015-020 DNS認証設定
+
+Edge Optimizer は、Warmup対象ドメインの所有権を DNS TXTレコードで検証します（第三者サイトへの不正リクエスト防止）。
+
+**1. DNS TXTレコードを追加:**
+
+Warmup対象ドメインのDNS設定で、以下のTXTレコードを追加してください：
+
+| レコード名 | タイプ | 値 |
+|-----------|-------|-----|
+| `_eo-auth.example.com` | TXT | `eo-authorized-yourtoken`（任意の文字列） |
+
+**2. n8n #020ノードのトークンを設定:**
+
+1. **`020 DNS Auth`** ノードをダブルクリック
+2. Code 内の `DNSTXT_TOKEN` を、DNS TXTレコードに設定した値と同じ値に変更:
+   ```javascript
+   const DNSTXT_TOKEN = "eo-authorized-yourtoken"; // ← DNS TXTレコードと同じ値
+   ```
+3. 「Save」
+
+**3. 設定確認:**
+
+```bash
+# Linux / macOS
+dig TXT _eo-auth.example.com +short
+
+# Windows (PowerShell)
+Resolve-DnsName -Name "_eo-auth.example.com" -Type TXT
+```
+
+> 詳細: [N8N_WORKFLOW_README.md](../../../EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) の「DNS認証ノード（#015-020）の詳細設定」参照
+
+### 6-3. #180 Request Engine 設定
+
+GEO分散リクエストで使用するクラウド・リージョンとAccept-Language（言語）を設定します。
+
+1. **`180 RequestEngine Settings`** ノードをダブルクリック
+2. Code 内の `requestEngineList` を編集:
+   ```javascript
+   const requestEngineList = [
+     {
+       type_area: 'AwsLambda_ap-northeast-1',
+       accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',
+     },
+   ];
+   ```
+3. 「Save」
+
+> **💡 ヒント:** 東京リージョンの Lambda を STEP 1-5 で作成した場合、上記のデフォルト設定のままで動作します。
+>
+> 他のリージョン・クラウドを追加する場合は [NODE180_REQUESTENGINE_README.md](../../../EO_n8nWorkflow_Json/NODE180_REQUESTENGINE_README.md) を参照してください。
+
+### 6-4. 動作確認
+
+すべてのノード設定が完了したら、ワークフローをテスト実行します。
+
+1. n8n ワークフロー画面で **「Test Workflow」** をクリック
+2. 各ノードが順次実行され、結果が表示されます
+3. #280AWS ノードでレスポンスが返ってくれば成功です
+
+> **⚠️ エラーが出た場合:**
+> - **401エラー**: `N8N_EO_REQUEST_SECRET`（.env）と Secrets Manager の `LAMBDA_REQUEST_SECRET` が一致しているか確認
+> - **DNS認証拒否**: DNS TXTレコードと #020ノードの `DNSTXT_TOKEN` が一致しているか確認
+> - **Lambda実行エラー**: Lambda 関数のコードがデプロイ済みか確認（GitHub Actions で最新コードをプッシュ）
+
+---
+
 ## パラメータ一覧
 
 | パラメータ | デフォルト | 説明 |
@@ -295,3 +382,6 @@ Resource handler returned message: "Role/Policy with name ... already exists"
 
 - [LAMBDA_README.md](../apne1/LAMBDA_README.md) - Lambda 詳細セットアップ手順
 - [RE_README.md](../../RE_README.md) - Request Engine 全体のセキュリティ設定
+- [N8N_WORKFLOW_README.md](../../../EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) - n8nワークフロー設定ガイド
+- [NODE180_REQUESTENGINE_README.md](../../../EO_n8nWorkflow_Json/NODE180_REQUESTENGINE_README.md) - Request Engine設定ガイド（type_area・accept_language一覧）
+- [NODE175_USERAGENT_README.md](../../../EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md) - User-Agent設定ガイド
