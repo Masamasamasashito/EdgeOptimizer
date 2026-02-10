@@ -554,5 +554,5 @@
 
 ---
 
-*EO Request Engine — Nishi Labo*
+*EO Request Engine — [にしラボ / Nishi Labo](https://4649-24.com)*
 
