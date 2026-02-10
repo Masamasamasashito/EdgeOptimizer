@@ -54,50 +54,49 @@ docker compose up -d
 ### Step 4: n8n ユーザー作成（1分）
 
 1. ブラウザで http://localhost:5678 にアクセス
-2. 2. 初回アクセス時に **オーナーアカウント作成画面** が表示されます
-   3. 3. 以下を入力して「Next」をクリック:
-      4.    - **First Name**: 任意（例: Admin）
-            -    - **Last Name**: 任意（例: User）
-                 -    - **Email**: 任意のメールアドレス
-                      -    - **Password**: 8文字以上の安全なパスワード
-                       
-                           - > **⚠️ 注意:** このアカウント情報はローカル環境のPostgreSQLに保存されます。忘れないようにメモしてください。
-                             >
-                             > ---
-                             >
-                             > ### Step 5: n8n Workflow インポート（1分）
-                             >
-                             > n8nのダッシュボードが表示されたら、Edge Optimizerのワークフローをインポートします。
-                             >
-                             > 1. n8n ダッシュボード右上の **「...」メニュー** または **「Import from File」** をクリック
-                             > 2. 2. リポジトリ内の以下のファイルを選択してインポート:
-                             >   
-                             >    3. ```
-                             >       EO_n8nWorkflow_Json/eo-n8n-workflow-jp.json
-                             >       ```
-                             >
-                             > 3. インポート完了後、ワークフロー一覧に Edge Optimizer のワークフローが表示されます
-                             >
-                             > 4. > **📖 詳細なワークフロー設定ガイド:**
-                             >    > > [EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) を参照してください。
-                             >    > > > Credentials設定・ノード設定など、詳しい手順が記載されています。
-                             >    > > >
-                             >    > > > ---
-                             >    > > >
-                             >    > > > **🎉 セットアップ完了！**
-                             >    > > >
-                             >    > > > これで Edge Optimizer の基本環境が動作しています。
-                             >    > > >
-                             >    > > > ---
-                             >    > > >
-                             >    > > > ## 🎯 次のステップ
-                             >    > > >
-                             >    > > > - **Request Engine を設定したい** → [RequestEngine/RE_README.md](./RequestEngine/RE_README.md)
-                             >    > > > - - **ワークフローの詳細設定** → [N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md)
-                             >    > > >   - - **User-Agent設定** → [NODE175_USERAGENT_README.md](./EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md)
-                             >    > > >     - - **トラブルシューティング** → [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
-                             >    > > >      
-                             >    > > >       - ---
-                             >    > > >
-                             >    > > > **困ったときは→ [Issues](https://github.com/Masamasamasashito/EdgeOptimizer/issues)**
-                             >    > > > 
+2. 初回アクセス時に **オーナーアカウント作成画面** が表示されます
+3. 以下を入力して「Next」をクリック:
+   - **First Name**: 任意（例: Admin）
+   - **Last Name**: 任意（例: User）
+   - **Email**: 任意のメールアドレス
+   - **Password**: 8文字以上の安全なパスワード
+
+> **⚠️ 注意:** このアカウント情報はローカル環境のPostgreSQLに保存されます。忘れないようにメモしてください。
+
+---
+
+### Step 5: n8n Workflow インポート（1分）
+
+n8nのダッシュボードが表示されたら、Edge Optimizerのワークフローをインポートします。
+
+1. n8n ダッシュボード右上の **「...」メニュー** または **「Import from File」** をクリック
+2. リポジトリ内の以下のファイルを選択してインポート:
+   ```
+   EO_n8nWorkflow_Json/eo-n8n-workflow-jp.json
+   ```
+3. インポート完了後、ワークフロー一覧に Edge Optimizer のワークフローが表示されます
+
+> **📖 詳細なワークフロー設定ガイド:**
+>
+> [EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) を参照してください。
+>
+> Credentials設定・ノード設定など、詳しい手順が記載されています。
+
+---
+
+**🎉 セットアップ完了！**
+
+これで Edge Optimizer の基本環境が動作しています。
+
+---
+
+## 🎯 次のステップ
+
+- **Request Engine を設定したい** → [RequestEngine/RE_README.md](./RequestEngine/RE_README.md)
+- **ワークフローの詳細設定** → [N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md)
+- **User-Agent設定** → [NODE175_USERAGENT_README.md](./EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md)
+- **トラブルシューティング** → [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
+
+---
+
+**困ったときは→ [Issues](https://github.com/Masamasamasashito/EdgeOptimizer/issues)**
