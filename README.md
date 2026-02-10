@@ -207,4 +207,13 @@ Request Engine is an essential component running on Serverless Computing, design
 - [CFWORKER_README.md](RequestEngine/cloudflare_workers/global/CFWORKER_README.md) - Cloudflare Workers
 - [RUN_README.md](RequestEngine/gcp_cloudrun/ane1/RUN_README.md) - GCP Cloud Run
 
+# 8. n8n Workflow Setup
+
+n8nワークフローのインポートと設定ガイドです。
+
+👉 See detailed setup guide here:
+- [N8N_WORKFLOW_README.md](EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) - n8nワークフロー設定ガイド（インポート・Credentials・ノード設定）
+- [NODE175_USERAGENT_README.md](EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md) - User-Agent設定ガイド（iOS/Android/Desktop一覧）
+- [NODE180_REQUESTENGINE_README.md](EO_n8nWorkflow_Json/NODE180_REQUESTENGINE_README.md) - Request Engine設定ガイド（type_area/accept_language一覧・280ノード作成方法）
+
 
