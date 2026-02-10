@@ -4,6 +4,12 @@
 
 CRAFTED BY [にしラボ / Nishi Labo](https://4649-24.com)
 
+## 🎬 デモ動画
+
+[![Edge Optimizer Demo](https://img.youtube.com/vi/XYEp38gtJlU/maxresdefault.jpg)](https://youtu.be/XYEp38gtJlU)
+
+▶️ クリックして YouTube で視聴
+
 ## What is Edge Optimizer?
 
 **Edge Optimizer (EO)** は、AWS Lambda / Azure Functions / GCP Cloud Run / Cloudflare Workers のサーバーレス関数からGEO分散リクエストを実行し、世界中のCDNエッジにキャッシュを生成できるOSSです。
