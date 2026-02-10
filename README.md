@@ -1,4 +1,62 @@
-# Edge Optimizer : Multi Cloud Serverless Request
+# Edge Optimizer
+
+**GEO分散 × アセットWarmup × URLフィルタリング × バリアント対応 × 4層セキュリティ**を兼ね備えた、唯一のCDNキャッシュWarmup OSS
+
+CRAFTED BY にしラボ (https://4649-24.com)
+
+## What is Edge Optimizer?
+
+**Edge Optimizer (EO)** は、AWS Lambda / Azure Functions / GCP Cloud Run / Cloudflare Workers のサーバーレス関数からGEO分散リクエストを実行し、世界中のCDNエッジにキャッシュを生成できるOSSです。
+
+n8n（ワークフローオーケストレーション）+ Playwright（ヘッドレスブラウザ）+ Request Engine（サーバーレス関数）の3層アーキテクチャで、メインドキュメント＋全アセット（CSS/JS/画像/フォント）を、任意のUser-Agent/Accept-Languageバリアントで、世界中からWarmupできます。
+
+## こんな経験、ありませんか？
+
+> 💸 広告キャンペーン開始直後、LCPが3秒超えてCVRが激減した
+>
+> 😱 デプロイ直後の初回アクセスだけ異常に遅い（でも放置してる）
+>
+> 🌏 「海外からのアクセスが遅い」とクレームが来たが、打つ手がない
+>
+> 📊 CDN入れたのにキャッシュヒット率が上がらない、原因不明
+
+**原因はすべて同じ：CDNエッジにキャッシュが無い**
+
+既存のCache Warmerは「メインドキュメントだけ」「単一ロケーション」しかWarmupしません。Edge Optimizerは、**世界中のエッジに、全アセットも、想定されたペルソナのバリアントで事前にWarmup**できます。
+
+## 機能比較
+
+| 機能 | 既存Cache Warmer | Edge Optimizer |
+|-----|------------------|----------------|
+| **アセットWarmup** | ❌ メインドキュメント止まり | ✅ CSS/JS/画像/フォント全対応 |
+| **GEO分散リクエスト** | ❌ 単一ロケーション | ✅ AWS/Azure/GCP/CF Workers |
+| **現地CDNエッジWarmup** | ❌ ツール実行地のみ | ✅ ユーザーが居る現地エッジを直接Warmup |
+| **URLフィルタリング** | ❌ XMLサイトマップ全件 | ✅ キャッシュすべきURLのみにフィルタリング |
+| **バリアント対応** | ❌ 固定UA or 無配慮 | ✅ User-Agent/Accept-Language自由設定 |
+| **セキュリティ** | ⚠️ 簡易的 | ✅ 4層（DNS認証/クラウド認証/トークン照合/レート制御） |
+| **オーケストレーション** | ❌ なし | ✅ n8nでノーコード/ローコード自動化 |
+| **IaC** | ❌ なし | ✅ CloudFormation, Bicep, GitHub Actions |
+
+## 対応CDN
+
+Request EngineはレスポンスヘッダーからCDNを自動検出します。
+
+| CDN | 検出ヘッダー |
+|-----|------------|
+| Cloudflare | `cf-ray` |
+| AWS CloudFront | `x-amz-cf-id` |
+| Azure Front Door | `x-azure-ref` |
+| Akamai | `x-akamai-request-id` |
+| Fastly | `x-served-by` |
+| Vercel | `x-vercel-cache` |
+| GCP CDN | `server: google-edge-cache` |
+| NitroCDN | `x-nitro-cache` |
+| RabbitLoader | `x-rl-cache` |
+
+## コスト
+
+- **維持費**: ゼロ円（OSS/セルフホスティング）
+- **稼働コスト**: サーバーレス関数の従量課金 + self hosted n8n実行環境
 
 # Quick Start
 
@@ -141,11 +199,12 @@ we recommend using the n8n Queue Mode Test as a measure to prevent memory exhaus
 Request Engine is an essential component running on Serverless Computing, designed for purposes such as cache performance verification from edge locations, cache warmup, and security checks.
 
 👉 See detailed setup guide here:
-- RequestEngine\RE_README.md
-- RequestEngine\aws_lambda\apne1\LAMBDA_README.md
-- RequestEngine\aws_lambda\CFn\LAMBDA_CFN_README.md :point_left: Recommend!!
-- RequestEngine\azure_functions\jpeast\AZFUNC_README.md
-- RequestEngine\cloudflare_workers\global\CFWORKER_README.md
-- RequestEngine\gcp_cloudrun\ane1\RUN_README.md
+- [RE_README.md](RequestEngine/RE_README.md) - Request Engine全体
+- [LAMBDA_README.md](RequestEngine/aws_lambda/apne1/LAMBDA_README.md) - AWS Lambda
+- [LAMBDA_CFN_README.md](RequestEngine/aws_lambda/CFn/LAMBDA_CFN_README.md) - AWS Lambda CFn 👈 Recommend!
+- [AZFUNC_README.md](RequestEngine/azure_functions/jpeast/AZFUNC_README.md) - Azure Functions
+- [AZFUNC_BICEP_README.md](RequestEngine/azure_functions/bicep/AZFUNC_BICEP_README.md) - Azure Bicep
+- [CFWORKER_README.md](RequestEngine/cloudflare_workers/global/CFWORKER_README.md) - Cloudflare Workers
+- [RUN_README.md](RequestEngine/gcp_cloudrun/ane1/RUN_README.md) - GCP Cloud Run
 
 
