@@ -40,6 +40,10 @@ services:
       # node_modules
       # NODE_FUNCTION_ALLOW_BUILTIN: crypto
 
+      #　CF Cache Purge
+      N8N_EO_CF_CACHE_PURGE_ZONE_ID: ${N8N_EO_CF_CACHE_PURGE_ZONE_ID}
+      N8N_EO_CF_CACHE_PURGE_USER_API_TOKEN: ${N8N_EO_CF_CACHE_PURGE_USER_API_TOKEN}
+
       # For Generate Token and Matching
       N8N_EO_REQUEST_SECRET: ${N8N_EO_REQUEST_SECRET}
       # Allow .env Variables Access in Code/Function Nodes (e.g., $env.N8N_EO_REQUEST_SECRET)
