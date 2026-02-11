@@ -79,6 +79,12 @@ Edge Optimizerはキャッシュウォーマーだけではありません。GEO
 | **モバイル/デスクトップ検証** | User-Agentバリアントごとにレスポンスの差異を検出 |
 | **外形監視** | 定期実行で世界各地からのアクセス可否・レスポンス異常を検知 |
 
+## 実行結果・実証データ
+
+実際のEdge Optimizer実行結果（AWS Lambda + Azure Functions → Cloudflare CDN）を分析したレポートです。1回目のWarmupでキャッシュMISS 231件を検知・修復し、2回目で全504リクエストがキャッシュHIT 100%を達成。市場における競合比較・ビジネスポテンシャルの考察も含みます。
+
+👉 [ANALYSIS_REPORT.md](RequestResults/ANALYSIS_REPORT.md)
+
 ---
 
 ## 🚀 Quick Start（5分で動作確認）
