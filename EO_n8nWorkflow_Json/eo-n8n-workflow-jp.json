@@ -10,11 +10,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1184,
-        1408
+        12448,
+        -80
       ],
       "typeVersion": 1,
-      "id": "619f22e9-073e-486f-b42a-f342bf471938",
+      "id": "352caa34-4102-4126-88b4-d553a298ed22",
       "name": "Sticky Note"
     },
     {
@@ -25,11 +25,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -80,
-        1904
+        13536,
+        688
       ],
       "typeVersion": 1,
-      "id": "504c9364-096b-4dec-97c6-f228c8c14022",
+      "id": "1a9ae242-b54f-4b6d-86a3-8a6871265197",
       "name": "Sticky Note1"
     },
     {
@@ -40,11 +40,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        544,
-        1600
+        14160,
+        384
       ],
       "typeVersion": 1,
-      "id": "28bc521c-7bf5-4adb-b467-a3fd5addadc1",
+      "id": "439b98eb-926c-4932-8dbb-4c68375aea5d",
       "name": "Sticky Note4"
     },
     {
@@ -55,11 +55,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1248,
-        1536
+        14864,
+        320
       ],
       "typeVersion": 1,
-      "id": "20f2d098-80fc-47ec-8407-20d5982756fb",
+      "id": "2561c31d-0cc4-428c-b1ca-aa87d62121ac",
       "name": "Sticky Note6"
     },
     {
@@ -70,11 +70,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -784,
-        2368
+        12832,
+        1152
       ],
       "typeVersion": 1,
-      "id": "b23f1f8e-d5dc-4b4e-98b8-36297302a89b",
+      "id": "8ca1d413-c8e1-40e7-997c-d22e8be86037",
       "name": "Sticky Note7"
     },
     {
@@ -86,11 +86,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        256,
-        2144
+        13872,
+        928
       ],
       "typeVersion": 1,
-      "id": "931439c8-c402-4f37-8120-bfca244eb137",
+      "id": "3f78b2aa-44c7-4e3c-9458-feaa211f0f29",
       "name": "Sticky Note9"
     },
     {
@@ -101,11 +101,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        944,
-        2592
+        14560,
+        1376
       ],
       "typeVersion": 1,
-      "id": "f2b83e76-13c6-421c-98a8-44767b8bfa0d",
+      "id": "7db2f11b-e731-4d8a-b221-75cdd9e823bb",
       "name": "Sticky Note10"
     },
     {
@@ -116,11 +116,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        736,
-        2592
+        14352,
+        1376
       ],
       "typeVersion": 1,
-      "id": "6fcd3ca6-4aba-435b-ac27-dc728c05482b",
+      "id": "594f56e8-2341-446d-b7a8-20b03e44fa3b",
       "name": "Sticky Note11"
     },
     {
@@ -131,11 +131,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1872,
-        2544
+        15488,
+        1328
       ],
       "typeVersion": 1,
-      "id": "8db9d58d-0910-4170-8ea9-aed3980f71c5",
+      "id": "712dcaf7-6b48-4067-92c4-243219458412",
       "name": "Sticky Note12"
     },
     {
@@ -147,11 +147,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1664,
-        3600
+        15280,
+        2608
       ],
       "typeVersion": 1,
-      "id": "7c03ef61-84d3-442e-8fee-1bd35da9933d",
+      "id": "31122ad7-cd78-422e-a605-ba55795adfd7",
       "name": "Sticky Note13"
     },
     {
@@ -163,11 +163,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2032,
-        2208
+        15648,
+        992
       ],
       "typeVersion": 1,
-      "id": "d1eabe69-6f90-4e98-a676-9540d7c80266",
+      "id": "d0e2c844-e787-406d-bd20-a06300e19470",
       "name": "Sticky Note14"
     },
     {
@@ -178,11 +178,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2640,
-        2656
+        16256,
+        1440
       ],
       "typeVersion": 1,
-      "id": "cd855a89-4861-4baf-a7b0-542713e119cf",
+      "id": "8b8aaa3c-2970-41eb-8d5f-1315bc532c35",
       "name": "Sticky Note16"
     },
     {
@@ -193,11 +193,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2992,
-        2656
+        16608,
+        1440
       ],
       "typeVersion": 1,
-      "id": "db378c9d-95f4-49eb-836f-1112b5d3ea67",
+      "id": "130ab360-8174-4459-81e6-eeeceb4e43c6",
       "name": "Sticky Note17"
     },
     {
@@ -208,11 +208,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -736,
-        3120
+        12880,
+        2128
       ],
       "typeVersion": 1,
-      "id": "e4b3c8bd-fe46-427f-b529-9062792dc930",
+      "id": "f68adc0a-1f7c-403b-b411-199d1a9646c3",
       "name": "Sticky Note15"
     },
     {
@@ -224,11 +224,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1120,
-        2384
+        14736,
+        1168
       ],
       "typeVersion": 1,
-      "id": "0a767e2e-de5d-4f7c-bece-f515d02a1161",
+      "id": "46c8585b-3362-4fc4-9daa-09dbb90efb71",
       "name": "Sticky Note19"
     },
     {
@@ -239,11 +239,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        320,
-        1600
+        13936,
+        384
       ],
       "typeVersion": 1,
-      "id": "e47ebd28-48a0-4044-836f-e54bd77c09e8",
+      "id": "92e8f56f-04e2-4bad-9eb6-cce6eafd624f",
       "name": "Sticky Note3"
     },
     {
@@ -254,11 +254,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1200,
-        3456
+        12416,
+        2464
       ],
       "typeVersion": 1,
-      "id": "44bc6e04-61c7-41a0-86d8-398e77601828",
+      "id": "f169ae7b-ee3e-43e3-a2bf-28a013999714",
       "name": "Sticky Note22"
     },
     {
@@ -269,11 +269,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        912,
-        1792
+        14528,
+        576
       ],
       "typeVersion": 1,
-      "id": "3d078a4a-4d62-4f8d-9ae5-9584d315dff3",
+      "id": "b044f30b-e95d-47cd-a5a1-b605817517d8",
       "name": "Sticky Note23"
     },
     {
@@ -284,11 +284,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1984,
-        3056
+        15600,
+        2064
       ],
       "typeVersion": 1,
-      "id": "4e672e67-24e5-4423-baf4-d37fafbb95b9",
+      "id": "76d64d8c-0af7-4b8e-879d-aadd879b135e",
       "name": "Sticky Note25"
     },
     {
@@ -299,11 +299,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1376,
-        2384
+        14992,
+        1168
       ],
       "typeVersion": 1,
-      "id": "df56bf7a-5079-406e-924e-a4a4ba0d6ad8",
+      "id": "f5168575-2e15-4744-ad76-5b6c01825567",
       "name": "Sticky Note21"
     },
     {
@@ -314,27 +314,27 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1648,
-        2464
+        15264,
+        1248
       ],
       "typeVersion": 1,
-      "id": "209e2956-fd63-429b-8b2b-a42b93040548",
+      "id": "0dd19e09-1a7b-44f0-87fb-14d1c2be829a",
       "name": "Sticky Note27"
     },
     {
       "parameters": {
         "content": "# Step.1\n\nAsset Merge\n&\nFiltering\n&\nVariant\n\nHigh‑Precision \nTargetURLs \nCreator\n\n100から199ノード",
-        "height": 864,
+        "height": 1168,
         "width": 150,
         "color": 6
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1360,
-        2112
+        12256,
+        896
       ],
       "typeVersion": 1,
-      "id": "d54295f9-c995-4186-9f4f-ed71d3538950",
+      "id": "0fd10b82-eb69-476f-a7ca-f711dd2428c1",
       "name": "Sticky Note34"
     },
     {
@@ -346,11 +346,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1360,
-        3120
+        12256,
+        2128
       ],
       "typeVersion": 1,
-      "id": "b3236e90-9dbd-44c4-bfb0-b65a5bcf1ba0",
+      "id": "b463ac61-331b-4b26-843a-3e8215104365",
       "name": "Sticky Note35"
     },
     {
@@ -362,11 +362,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        0,
-        0
+        13616,
+        -1216
       ],
       "typeVersion": 1,
-      "id": "769a995e-8a9b-4fc4-ad2a-fbae2cba6595",
+      "id": "0b00bcaf-422a-40d3-a991-39e3515d3463",
       "name": "Sticky Note29"
     },
     {
@@ -377,11 +377,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -416,
-        2592
+        13200,
+        1376
       ],
       "typeVersion": 1,
-      "id": "37f23293-5729-4630-a92d-7051facbcc46",
+      "id": "2a5e54a0-5a17-490d-8577-debab92ccfe9",
       "name": "Sticky Note24"
     },
     {
@@ -392,11 +392,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1968,
-        4288
+        15584,
+        3296
       ],
       "typeVersion": 1,
-      "id": "bb4a0d92-22fe-4077-bfb5-987a0901285c",
+      "id": "4cccc121-e2a1-4c33-b102-2ccff615e09f",
       "name": "Sticky Note30"
     },
     {
@@ -407,11 +407,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -144,
-        2688
+        13376,
+        1472
       ],
       "typeVersion": 1,
-      "id": "6db2343f-2d69-45d3-bbec-fcf0ea77c293",
+      "id": "a5ad3ff2-7a4b-4df4-b39e-7ed8b793dd91",
       "name": "Sticky Note39"
     },
     {
@@ -423,11 +423,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2272,
-        2336
+        15888,
+        1120
       ],
       "typeVersion": 1,
-      "id": "85bbc650-ba19-44b0-84bc-5892c43d20e3",
+      "id": "c737a7a0-3e03-4af9-9b6e-913c60dd451a",
       "name": "Sticky Note18"
     },
     {
@@ -439,11 +439,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1360,
-        1472
+        12256,
+        256
       ],
       "typeVersion": 1,
-      "id": "8f055662-ff5a-4eb1-9137-bf7f4434583f",
+      "id": "358ea251-b763-4dd7-88bb-10e44b992537",
       "name": "Sticky Note38"
     },
     {
@@ -455,11 +455,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        1520,
-        3376
+        15136,
+        2384
       ],
       "typeVersion": 1,
-      "id": "63e377e1-462d-42ac-92bc-70c35a3a4716",
+      "id": "93c73c24-9a1c-4d71-a22d-82f9131b688b",
       "name": "Sticky Note41"
     },
     {
@@ -470,11 +470,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2704,
-        3040
+        16320,
+        2048
       ],
       "typeVersion": 1,
-      "id": "b97a1799-41c3-409a-9e27-e37818ced8c9",
+      "id": "2c9d0905-9333-4110-8479-17561d249a00",
       "name": "Sticky Note26"
     },
     {
@@ -486,11 +486,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2320,
-        1904
+        15936,
+        688
       ],
       "typeVersion": 1,
-      "id": "fe349ff5-12c0-40d6-9b5e-03ed6dc71329",
+      "id": "b1fe2305-3bd2-46d3-b918-5445ffedd8da",
       "name": "Sticky Note5"
     },
     {
@@ -500,11 +500,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3168,
-        2608
+        16784,
+        1392
       ],
       "typeVersion": 1,
-      "id": "272c364c-c4a3-4d1a-89ec-71d079806a55",
+      "id": "6fb6fd56-82b9-46f9-b40d-2207be3a80ff",
       "name": "Sticky Note20"
     },
     {
@@ -516,11 +516,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1168,
-        2224
+        12448,
+        1008
       ],
       "typeVersion": 1,
-      "id": "c2504584-80a1-4483-8ddc-9142f2f816ad",
+      "id": "15fe10a5-f347-4db7-86e5-8978393ef101",
       "name": "Sticky Note32"
     },
     {
@@ -532,11 +532,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -352,
-        4448
+        13264,
+        3456
       ],
       "typeVersion": 1,
-      "id": "ef975fc9-0dd9-4092-a675-d45c04924651",
+      "id": "c5099f4f-209a-4283-a72b-f02cf92ef68a",
       "name": "Sticky Note44"
     },
     {
@@ -547,11 +547,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        2304,
-        1200
+        15920,
+        -16
       ],
       "typeVersion": 1,
-      "id": "24991ff2-aca2-4256-9d9e-f9115c773cfe",
+      "id": "c7d91015-bf5a-47a4-a7a9-9ba490d3386d",
       "name": "Sticky Note8"
     },
     {
@@ -562,11 +562,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        3216,
-        1536
+        16832,
+        320
       ],
       "typeVersion": 1,
-      "id": "617e16aa-3b02-42d7-83d0-4750b7af9d25",
+      "id": "5435dde3-e058-4c1e-ba28-b3838c8d3db2",
       "name": "Sticky Note46"
     },
     {
@@ -576,10 +576,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -752,
-        2432
+        12864,
+        1216
       ],
-      "id": "b218b458-a582-4376-83af-385595cb99dd",
+      "id": "a0672c5a-1d5c-4514-805e-be49324b0bc4",
       "name": "120 Loop Over All Web Page Urls"
     },
     {
@@ -607,10 +607,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -576,
-        2560
+        13040,
+        1344
       ],
-      "id": "1dcfa815-12eb-4daf-b697-3565b0456125",
+      "id": "2230e1ce-a999-4e0a-8d54-d47c80d039e3",
       "name": "125-1 HTTP Req to Get All TargetUrls through Playwright Container",
       "alwaysOutputData": false
     },
@@ -621,10 +621,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -400,
-        2656
+        13216,
+        1440
       ],
-      "id": "d861abfe-d33d-4612-b9b4-0776b7daa36c",
+      "id": "8f94345f-5d25-49b6-8b95-8b92e0fda81a",
       "name": "130 Random Sleep (ms)",
       "alwaysOutputData": true
     },
@@ -645,10 +645,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1088,
-        2512
+        12528,
+        1296
       ],
-      "id": "7432106d-093d-4f57-824e-aba83cd30ac2",
+      "id": "ebc30ba2-15ce-403c-8985-f3f0af9e6d7d",
       "name": "125-2 Direct HTTP Req to All Web Page Urls"
     },
     {
@@ -660,23 +660,23 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        -64,
-        2400
+        13552,
+        1184
       ],
-      "id": "d8a0bdd4-6e05-445d-a238-82bdcf67d694",
+      "id": "b89e1486-5180-4a45-a9a6-5545fb2069b7",
       "name": "135 Merge Assets to URLs"
     },
     {
       "parameters": {
-        "jsCode": "const out = [];\n\n// -----------------------------------------------------------\n// ユーザー設定エリア\n// -----------------------------------------------------------\n\n// Warmup対象とするURLプレフィックス\nconst REQUEST_TARGET_URL_PREFIXES = [\n  //'https://sample.com'\n  // ↓ ダブルCDN等の場合\n  //'https://cdn-ileamdm.nitrocdn.com',\n];\n\n// 無視するスキーム\nconst IGNORE_SCHEMES = ['javascript:', 'mailto:', 'tel:', 'data:', '#'];\n\n// -----------------------------------------------------------\n// 処理ロジック\n// -----------------------------------------------------------\n\n// 1. item から loc (ページURL) を取り出す\nfunction getLoc(item) {\n  return item.json?.loc || item.loc || null;\n}\n\n// 2. item から HTML本文 を取り出す\nfunction getHtmlDoc(item) {\n  // === 🚀 修正箇所: Playwright APIからのレスポンス構造に対応 ===\n  // 1. Playwright APIのレスポンス (item.json.response.html) からHTMLを取得\n  if (typeof item.json?.response?.html === 'string') return item.json.response.html;\n  // =======================================================\n  \n  if (typeof item.json?.html === 'string') return item.json.html; // 既存の115ノード互換性\n  if (typeof item.json?.data === 'string') return item.json.data;\n  return '';\n}\n\n// 対象URLかどうか判定\nfunction isTargetUrl(url) {\n  if (!url) return false;\n  // スキームチェック\n  if (IGNORE_SCHEMES.some(sch => url.startsWith(sch))) return false;\n  // プレフィックスチェック\n  return REQUEST_TARGET_URL_PREFIXES.some(prefix => url.startsWith(prefix));\n}\n\n// -----------------------------------------------------------\n// 正規表現パターン\n// -----------------------------------------------------------\n\n// A. 【絶対パス用】 http(s)://で始まる文字列を無差別に拾う\n// 注意: PlaywrightがレンダリングしたDOMから、data-srcなどではない最終的なURLを抽出\nconst absoluteUrlPattern = /https?:\\/\\/[^\\s\"'()<>]+/g;\n\n// B. 【相対パス用】 href=\"...\" または src=\"...\" の中身を拾う\nconst relativePathPattern = /(?:href|src)\\\\s*=\\\\s*([\\\"'])(.*?)\\\\1/gi;\n\n\n// -----------------------------------------------------------\n// メインループ\n// -----------------------------------------------------------\n\nfor (const item of items) {\n  const pageUrl = getLoc(item);\n  const html = getHtmlDoc(item); // 修正された関数を使用\n  const assetsSet = new Set(); // 重複排除用Set\n\n  if (pageUrl && html.length > 0) {\n\n    // --- 戦略A: 絶対パスの抽出 ---\n    let match;\n    while ((match = absoluteUrlPattern.exec(html)) !== null) {\n      const rawUrl = match[0];\n      \n      // ここでクエリパラメータ除去は行わない（Node 15の責務）\n      if (isTargetUrl(rawUrl)) {\n        assetsSet.add(rawUrl);\n      }\n    }\n\n    // --- 戦略B: 相対パスの抽出と結合 ---\n    relativePathPattern.lastIndex = 0;\n\n    while ((match = relativePathPattern.exec(html)) !== null) {\n      const rawVal = match[2]; // クォートの中身\n      \n      try {\n        // ベースURL(pageUrl)を使って絶対パスに変換\n        const resolvedUrlObj = new URL(rawVal, pageUrl);\n        const resolvedUrl = resolvedUrlObj.href;\n\n        if (isTargetUrl(resolvedUrl)) {\n          assetsSet.add(resolvedUrl);\n        }\n      } catch (e) {\n        continue;\n      }\n    }\n  }\n\n  out.push({\n    json: {\n      pageUrl: pageUrl,\n      assetUrls: Array.from(assetsSet),\n      count: assetsSet.size\n    },\n  });\n}\n\nreturn out;"
+        "jsCode": "const out = [];\n\n// -----------------------------------------------------------\n// ユーザー設定エリア\n// -----------------------------------------------------------\n\n// Warmup対象とするURLプレフィックス\nconst REQUEST_TARGET_URL_PREFIXES = [\n  'https://sample.com'\n  // ↓ ダブルCDN等の場合\n  //'https://cdn-ileamdm.nitrocdn.com',\n];\n\n// 無視するスキーム\nconst IGNORE_SCHEMES = ['javascript:', 'mailto:', 'tel:', 'data:', '#'];\n\n// -----------------------------------------------------------\n// 処理ロジック\n// -----------------------------------------------------------\n\n// 1. item から loc (ページURL) を取り出す\nfunction getLoc(item) {\n  return item.json?.loc || item.loc || null;\n}\n\n// 2. item から HTML本文 を取り出す\nfunction getHtmlDoc(item) {\n  // === 🚀 修正箇所: Playwright APIからのレスポンス構造に対応 ===\n  // 1. Playwright APIのレスポンス (item.json.response.html) からHTMLを取得\n  if (typeof item.json?.response?.html === 'string') return item.json.response.html;\n  // =======================================================\n  \n  if (typeof item.json?.html === 'string') return item.json.html; // 既存の115ノード互換性\n  if (typeof item.json?.data === 'string') return item.json.data;\n  return '';\n}\n\n// 対象URLかどうか判定\nfunction isTargetUrl(url) {\n  if (!url) return false;\n  // スキームチェック\n  if (IGNORE_SCHEMES.some(sch => url.startsWith(sch))) return false;\n  // プレフィックスチェック\n  return REQUEST_TARGET_URL_PREFIXES.some(prefix => url.startsWith(prefix));\n}\n\n// -----------------------------------------------------------\n// 正規表現パターン\n// -----------------------------------------------------------\n\n// A. 【絶対パス用】 http(s)://で始まる文字列を無差別に拾う\n// 注意: PlaywrightがレンダリングしたDOMから、data-srcなどではない最終的なURLを抽出\nconst absoluteUrlPattern = /https?:\\/\\/[^\\s\"'()<>]+/g;\n\n// B. 【相対パス用】 href=\"...\" または src=\"...\" の中身を拾う\nconst relativePathPattern = /(?:href|src)\\\\s*=\\\\s*([\\\"'])(.*?)\\\\1/gi;\n\n\n// -----------------------------------------------------------\n// メインループ\n// -----------------------------------------------------------\n\nfor (const item of items) {\n  const pageUrl = getLoc(item);\n  const html = getHtmlDoc(item); // 修正された関数を使用\n  const assetsSet = new Set(); // 重複排除用Set\n\n  if (pageUrl && html.length > 0) {\n\n    // --- 戦略A: 絶対パスの抽出 ---\n    let match;\n    while ((match = absoluteUrlPattern.exec(html)) !== null) {\n      const rawUrl = match[0];\n      \n      // ここでクエリパラメータ除去は行わない（Node 15の責務）\n      if (isTargetUrl(rawUrl)) {\n        assetsSet.add(rawUrl);\n      }\n    }\n\n    // --- 戦略B: 相対パスの抽出と結合 ---\n    relativePathPattern.lastIndex = 0;\n\n    while ((match = relativePathPattern.exec(html)) !== null) {\n      const rawVal = match[2]; // クォートの中身\n      \n      try {\n        // ベースURL(pageUrl)を使って絶対パスに変換\n        const resolvedUrlObj = new URL(rawVal, pageUrl);\n        const resolvedUrl = resolvedUrlObj.href;\n\n        if (isTargetUrl(resolvedUrl)) {\n          assetsSet.add(resolvedUrl);\n        }\n      } catch (e) {\n        continue;\n      }\n    }\n  }\n\n  out.push({\n    json: {\n      pageUrl: pageUrl,\n      assetUrls: Array.from(assetsSet),\n      count: assetsSet.size\n    },\n  });\n}\n\nreturn out;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        464,
-        2752
+        13824,
+        1536
       ],
-      "id": "e67b621b-2ff4-4ce4-a68b-3e39d252a121",
+      "id": "940181fc-7ef5-4437-8c3c-162dcba50f80",
       "name": "140 Extract Warmup Page Assets"
     },
     {
@@ -686,10 +686,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        784,
-        2752
+        14400,
+        1536
       ],
-      "id": "5f4ea42b-2635-4c32-b832-8e459f2aff99",
+      "id": "184382e7-644b-441b-b3dc-1325d995d77a",
       "name": "145 Query Param and Anchor Filter",
       "alwaysOutputData": false
     },
@@ -700,10 +700,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        992,
-        2752
+        14608,
+        1536
       ],
-      "id": "6e2d08d1-39a8-4c52-bcb5-7e780978d346",
+      "id": "c2ee424a-77ab-4b42-8bf9-e39b3fc284b7",
       "name": "150 Merge Page and Assets to Unique Urls"
     },
     {
@@ -713,10 +713,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1216,
-        2752
+        14832,
+        1536
       ],
-      "id": "7a9054ee-df29-47e7-9443-bb926fa66958",
+      "id": "1028e241-04e7-47cb-9116-d10b90c95c21",
       "name": "155 Unwanted URL Ptterns Filter"
     },
     {
@@ -726,10 +726,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1440,
-        2752
+        15056,
+        1536
       ],
-      "id": "140eb5a6-748d-4307-bd4b-7e4ee6a6eabb",
+      "id": "9c191b01-e31c-472c-aa34-eae59940015c",
       "name": "160 Asset / MainDoc / Exception Classification"
     },
     {
@@ -760,10 +760,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1696,
-        2752
+        15312,
+        1536
       ],
-      "id": "af98c20c-db63-4ec1-a5c1-b8b58f3e0f32",
+      "id": "877c2b96-92d9-480f-9715-54f76ea344b5",
       "name": "165 exception Filter"
     },
     {
@@ -773,10 +773,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2128,
-        2768
+        15744,
+        1552
       ],
-      "id": "9b37b20d-2cc3-406b-9d82-229471b1bca5",
+      "id": "1631cdc2-7b16-43f2-9e50-a89964963b72",
       "name": "175 Assign UserAgents By UrlType"
     },
     {
@@ -786,23 +786,23 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2640,
-        2768
+        16256,
+        1552
       ],
-      "id": "0ff5f6e3-122d-40b8-a466-e0682d374903",
+      "id": "bad9fa63-7585-4792-abde-c7e62af49dae",
       "name": "185 Add Http Request Number"
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\n// EO Request Engine として利用する Serverless Proxy Fetcher と 言語(Accept-Language)の一覧\n// （主にクラウド種別のサーバレスサービスとエリア）\nconst requestEngineList = [\n\n  { \n    type_area: 'AwsLambda_ap-northeast-1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n\n  { \n    type_area: 'AzureFunctions_japan-east',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'CloudflareWorker_global',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'GcpCloudFunctions_asia-northeast1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  // Example\n  // { \n  //   type_area: 'DirectRequest',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AwsLambda_ap-northeast-1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AzureFunctions_japan-east',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'CloudflareWorker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'GcpCloudFunctions_asia-northeast1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n\n  // { \n  //   type_area: 'AkamaiEdgeworker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  \n  // ※ accept_language無しの場合\n  // { \n  //   type_area: 'CloudflareWorker_global' ,\n  //   accept_language: 'nothing',\n  // },  \n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const baseData = item.json ?? item;\n\n  // targetUrl / tokenCalculatedByN8n が無い行はスキップ\n  if (!baseData.targetUrl || !baseData.tokenCalculatedByN8n) continue;\n\n  // 1件の入力に対し、requestEngineList 全エンジンを展開\n  for (const requestEngine of requestEngineList) {\n    // 既存 headers（User-Agent 等）を壊さないようにコピー\n    const headers = { ...(baseData.headers || {}) };\n\n    if (\n      requestEngine.accept_language &&\n      requestEngine.accept_language !== 'nothing'\n    ) {\n      // Accept-Language を付与するパターン\n      headers['Accept-Language'] = requestEngine.accept_language;\n    } else {\n      // “nothing” の場合は Accept-Language ヘッダを付けない（存在していれば削除）\n      delete headers['Accept-Language'];\n    }\n\n    out.push({\n      json: {\n        // 元データ引き継ぎ\n        ...baseData,\n\n        // Request Engine 情報\n        cloud_type_area: requestEngine.type_area,\n\n        // User-Agent など既存ヘッダ + Accept-Language を反映\n        headers,\n      },\n    });\n  }\n}\n\nreturn out;"
+        "jsCode": "const items = $input.all();\n\n// EO Request Engine として利用する Serverless Proxy Fetcher と 言語(Accept-Language)の一覧\n// （主にクラウド種別のサーバレスサービスとエリア）\nconst requestEngineList = [\n\n  { \n    type_area: 'AwsLambda_ap-northeast-1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'AzureFunctions_japan-east',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n/*\n  { \n    type_area: 'CloudflareWorker_global',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'GcpCloudFunctions_asia-northeast1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n*/\n  // Example\n  // { \n  //   type_area: 'DirectRequest',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AwsLambda_ap-northeast-1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AzureFunctions_japan-east',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'CloudflareWorker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'GcpCloudFunctions_asia-northeast1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n\n  // { \n  //   type_area: 'AkamaiEdgeworker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  \n  // ※ accept_language無しの場合\n  // { \n  //   type_area: 'CloudflareWorker_global' ,\n  //   accept_language: 'nothing',\n  // },  \n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const baseData = item.json ?? item;\n\n  // targetUrl / tokenCalculatedByN8n が無い行はスキップ\n  if (!baseData.targetUrl || !baseData.tokenCalculatedByN8n) continue;\n\n  // 1件の入力に対し、requestEngineList 全エンジンを展開\n  for (const requestEngine of requestEngineList) {\n    // 既存 headers（User-Agent 等）を壊さないようにコピー\n    const headers = { ...(baseData.headers || {}) };\n\n    if (\n      requestEngine.accept_language &&\n      requestEngine.accept_language !== 'nothing'\n    ) {\n      // Accept-Language を付与するパターン\n      headers['Accept-Language'] = requestEngine.accept_language;\n    } else {\n      // “nothing” の場合は Accept-Language ヘッダを付けない（存在していれば削除）\n      delete headers['Accept-Language'];\n    }\n\n    out.push({\n      json: {\n        // 元データ引き継ぎ\n        ...baseData,\n\n        // Request Engine 情報\n        cloud_type_area: requestEngine.type_area,\n\n        // User-Agent など既存ヘッダ + Accept-Language を反映\n        headers,\n      },\n    });\n  }\n}\n\nreturn out;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2320,
-        2768
+        15936,
+        1552
       ],
-      "id": "0e014e3c-304c-4f55-8705-b24f6dcf1bb7",
+      "id": "04036b24-6f88-41b4-9678-2746b9301d17",
       "name": "180 RequestEngine Settings"
     },
     {
@@ -814,10 +814,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        -768,
-        3232
+        12848,
+        2240
       ],
-      "id": "b2eedba5-6acb-4f2a-8377-e478fa96fbf3",
+      "id": "9553b479-3ea6-4a95-9c6f-bf056cc6e641",
       "name": "220 Loop Over Request Target Urls",
       "alwaysOutputData": true,
       "notesInFlow": false
@@ -947,10 +947,10 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.3,
       "position": [
-        -464,
-        3392
+        13152,
+        2400
       ],
-      "id": "86be1903-1c77-4cdb-9452-13690bc806f4",
+      "id": "3d1d46dc-be86-4bec-81c2-308624cf7ac8",
       "name": "225 Request Engine Switcher"
     },
     {
@@ -970,7 +970,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"audience\": \"https://eo-re-d01-cloudrun-ane1-4yharzvoqq-an.a.run.app\",\n  \"includeEmail\": true\n}",
+        "jsonBody": "{\n  \"audience\": \"https://eo-re-d01-cloudrun-ane1-xxxxxxxxxx-an.a.run.app\",\n  \"includeEmail\": true\n}",
         "options": {
           "response": {
             "response": {
@@ -982,18 +982,12 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -272,
-        4064
+        13344,
+        3072
       ],
-      "id": "16c67107-ba21-4e83-97c3-ca7942e3dba3",
+      "id": "7ab10d74-fe5c-4aad-b70d-0272db376fb9",
       "name": "235 Get IDtoken From GCP Service Account Access Token",
-      "alwaysOutputData": false,
-      "credentials": {
-        "googleApi": {
-          "id": "iuOzBoOIfsCT41rU",
-          "name": "Dummy GCP"
-        }
-      }
+      "alwaysOutputData": false
     },
     {
       "parameters": {
@@ -1012,10 +1006,10 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -32,
-        4064
+        13584,
+        3072
       ],
-      "id": "81410cad-cd67-46fd-af19-1a402bcfb502",
+      "id": "54283713-4cee-435c-bc37-0431eecffeb1",
       "name": "240 IDtoken to json"
     },
     {
@@ -1025,10 +1019,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        816,
-        3344
+        14432,
+        2352
       ],
-      "id": "352cb76c-8b0d-4a07-862d-61d0258e27b4",
+      "id": "bf9f2fcf-14cd-4267-bd58-fc0f5ac54ae0",
       "name": "285 JSON data REMOVER"
     },
     {
@@ -1038,10 +1032,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        816,
-        3536
+        14432,
+        2544
       ],
-      "id": "9bf63728-a593-4781-843f-99cec337e9ef",
+      "id": "61be5392-8a01-470f-81c2-42b012bc6141",
       "name": "295 JSON result REMOVER"
     },
     {
@@ -1051,10 +1045,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -160,
-        3856
+        13456,
+        2864
       ],
-      "id": "522f1f20-ddbb-42d7-ad6f-7201337ef17d",
+      "id": "e719b40e-2135-4e30-9dbe-258ad11f82d1",
       "name": "230 data Keeper for GCP"
     },
     {
@@ -1064,10 +1058,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        848,
-        4160
+        14464,
+        3168
       ],
-      "id": "c3be235e-c187-4f86-bae5-02f2d7946ba8",
+      "id": "f2a293af-0cb2-4673-ad54-971d6fbd9cfa",
       "name": "305 GCP Arranger"
     },
     {
@@ -1077,10 +1071,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1792,
-        4208
+        15408,
+        3216
       ],
-      "id": "e77f082a-742b-4a0d-bb8a-9e4dd5a81449",
+      "id": "bab74eb1-108a-4dd8-acf2-121a0b40d1aa",
       "name": "340 Random Sleep (ms)",
       "alwaysOutputData": true
     },
@@ -1091,10 +1085,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2032,
-        3216
+        15648,
+        2224
       ],
-      "id": "ca594d0f-2893-451d-a123-13a08115b352",
+      "id": "8f4722d4-f9f9-4957-a5b6-453c160f7a6c",
       "name": "350 Json Flattener for Csv"
     },
     {
@@ -1104,10 +1098,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1920,
-        1920
+        15536,
+        704
       ],
-      "id": "38bd4c7e-b1eb-4287-9ee5-e39bad0a255c",
+      "id": "3da47022-0455-4275-95eb-e8f786d4d5a5",
       "name": "115 Step.1 Separate Starter Dummy"
     },
     {
@@ -1117,10 +1111,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2736,
-        3216
+        16352,
+        2224
       ],
-      "id": "cdb8bc50-90a7-4ced-8cb6-6ec4a17b17f9",
+      "id": "9a71fad4-504e-4e37-95b5-4a79dd7f5175",
       "name": "355 Eviction Detector"
     },
     {
@@ -1128,10 +1122,10 @@
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
       "position": [
-        -640,
-        1712
+        12976,
+        496
       ],
-      "id": "a57818bd-ad23-4707-9321-3d43276d91b9",
+      "id": "8c621ae8-a1e8-42ba-8990-a86cb996de5e",
       "name": "010 Step.0 Starter by XML sitemap"
     },
     {
@@ -1155,10 +1149,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -464,
-        1712
+        13152,
+        496
       ],
-      "id": "bf72dfe7-a7dd-4270-a91d-3b6a987ad79d",
+      "id": "faabf142-e325-4234-8e35-ea9dbf1cf1fa",
       "name": "015 DNS Fetch TXT"
     },
     {
@@ -1168,10 +1162,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -288,
-        1712
+        13328,
+        496
       ],
-      "id": "39a953cd-8d2b-4017-b835-c055f0fd8e59",
+      "id": "02e604b8-58c6-4423-a346-917753ed5dd7",
       "name": "020 DNS Auth"
     },
     {
@@ -1188,10 +1182,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -64,
-        1712
+        13552,
+        496
       ],
-      "id": "948054db-1e80-47ab-8bd1-10a60b242baa",
+      "id": "50e4b3f8-12a3-4053-9cc0-7914d71c50eb",
       "name": "040 Direct HTTP Req to get Tier2 XML sitemap URLs"
     },
     {
@@ -1201,10 +1195,10 @@
       "type": "n8n-nodes-base.xml",
       "typeVersion": 1,
       "position": [
-        128,
-        1712
+        13744,
+        496
       ],
-      "id": "7fc98c0e-f744-4149-8c7d-835c7abf0fa3",
+      "id": "d3cb27cb-f4f1-46ce-b212-f1c5cf474aaf",
       "name": "045 XML to JSON"
     },
     {
@@ -1214,10 +1208,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        352,
-        1712
+        13968,
+        496
       ],
-      "id": "b914b4e6-86ee-48aa-b598-81b4339b335e",
+      "id": "93f33e61-5e66-4baf-882a-f94ce83b435a",
       "name": "050 JSON to urls by loc"
     },
     {
@@ -1227,10 +1221,10 @@
       "type": "n8n-nodes-base.splitInBatches",
       "typeVersion": 3,
       "position": [
-        592,
-        1712
+        14208,
+        496
       ],
-      "id": "8e02c057-5f10-449c-8520-e599afc8d83d",
+      "id": "d6a3c984-c2a6-47c0-a1ab-0e8d1c103506",
       "name": "055 Loop Over Tier2 locs"
     },
     {
@@ -1248,10 +1242,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        768,
-        1792
+        14384,
+        576
       ],
-      "id": "a0cd6d09-4728-41a5-91c2-3b2497042dda",
+      "id": "a212801e-601a-4ae0-a18f-9745eb13a310",
       "name": "060 Direct HTTP Req to Tier2 locs"
     },
     {
@@ -1261,10 +1255,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        928,
-        1856
+        14544,
+        640
       ],
-      "id": "0e051006-3342-499f-9e06-52638e32401c",
+      "id": "59c56d60-7c08-461c-b3f9-ec0ce1cbbf82",
       "name": "065 Random Sleep (ms)",
       "alwaysOutputData": true
     },
@@ -1275,10 +1269,10 @@
       "type": "n8n-nodes-base.xml",
       "typeVersion": 1,
       "position": [
-        1120,
-        1696
+        14736,
+        480
       ],
-      "id": "8a366b05-9d0c-4c57-b06d-0b87b7d256e4",
+      "id": "62ae4412-fdbe-4778-bb42-e71a2c447335",
       "name": "070 XML to JSON"
     },
     {
@@ -1288,10 +1282,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1328,
-        1696
+        14944,
+        480
       ],
-      "id": "fb55bddd-5ca2-457e-b48c-5c6dba94303d",
+      "id": "950a3e6b-848a-45cb-af98-9398ee9fb640",
       "name": "075 Clean Page Urls with JSON"
     },
     {
@@ -1301,10 +1295,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -288,
-        1472
+        13088,
+        -288
       ],
-      "id": "8c22edfe-1a39-49ca-8701-760badf5b515",
+      "id": "c69b6325-cf4a-4c55-a22a-db68b54e23dd",
       "name": "30 Response Secret Catcher"
     },
     {
@@ -1317,17 +1311,11 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -560,
-        1472
+        12848,
+        -288
       ],
-      "id": "80f18e3a-153d-4e65-89e5-a20dd89e19bb",
-      "name": "025 Credential Fetch Request",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "JzB9PZ51pxKq63hX",
-          "name": "EO_RE_Func_japaneast_AppKey"
-        }
-      }
+      "id": "68f3cfa7-f759-473d-880a-e548afc1b0bb",
+      "name": "025 Credential Fetch Request"
     },
     {
       "parameters": {
@@ -1336,10 +1324,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -80,
-        1488
+        13376,
+        -272
       ],
-      "id": "5fb61db6-5f34-41f7-8ca9-0da71c775674",
+      "id": "6ee442a1-ebeb-4597-898e-fbb68add60bd",
       "name": "30 Secret Injection"
     },
     {
@@ -1351,11 +1339,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -656,
-        1312
+        12816,
+        -464
       ],
       "typeVersion": 1,
-      "id": "286c9e9a-49e0-4093-9ad8-f49c338ca470",
+      "id": "ffbc5753-acf6-402c-8a59-dfe74797e9c1",
       "name": "Sticky Note37"
     },
     {
@@ -1367,11 +1355,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        512,
-        4432
+        14128,
+        3440
       ],
       "typeVersion": 1,
-      "id": "10ac53bb-66b7-446b-9200-0a5b7cddde2d",
+      "id": "2adcbae2-13cc-407b-abde-3566a831b850",
       "name": "Sticky Note45"
     },
     {
@@ -1383,11 +1371,11 @@
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
-        -1344,
-        5184
+        12256,
+        4048
       ],
       "typeVersion": 1,
-      "id": "2e4bf855-a461-44de-a931-7f91a4ba4719",
+      "id": "9cba2e50-efa9-411d-9481-c8a7a47fe697",
       "name": "Sticky Note48"
     },
     {
@@ -1397,10 +1385,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3200,
-        5040
+        16816,
+        4048
       ],
-      "id": "96948e39-2025-4a91-8cd6-5265fa4c3c56",
+      "id": "d1b49992-984a-4870-8758-acf24a7cc68d",
       "name": "415 Step.3 Separate Starter Dummy"
     },
     {
@@ -1412,10 +1400,10 @@
       "type": "n8n-nodes-base.convertToFile",
       "typeVersion": 1.1,
       "position": [
-        -928,
-        5360
+        12688,
+        4368
       ],
-      "id": "8f046a1a-ac9b-496d-b739-7badbb2eb620",
+      "id": "c06c30f6-d0ff-4051-86e2-af0f6e38750e",
       "name": "420 JSON to WarmupHistoryCSV"
     },
     {
@@ -1453,10 +1441,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        592,
-        3344
+        14208,
+        2352
       ],
-      "id": "8c609b92-71a6-4003-b309-242b8e2c4f3b",
+      "id": "699a84c8-fc67-42f0-86fe-daafb6b47d31",
       "name": "280DirectRequest"
     },
     {
@@ -1519,19 +1507,13 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        592,
-        3952
+        14208,
+        2960
       ],
-      "id": "f6d6fa0c-06ad-4a77-8e4f-7bf22dad2488",
+      "id": "5b210e7d-9f2b-4f9e-9c48-c50794e1458e",
       "name": "280CF-global RequestEngine ZeroTrust",
       "retryOnFail": true,
-      "waitBetweenTries": 5000,
-      "credentials": {
-        "httpCustomAuth": {
-          "id": "PjSzJTmlLNGjN3ow",
-          "name": "Dummy CFWorker"
-        }
-      }
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1578,10 +1560,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        592,
-        4160
+        14208,
+        3168
       ],
-      "id": "e624eb6b-fc0e-4ac2-84ee-a317f132fadd",
+      "id": "b644f31a-4e0c-497e-a4ab-31ed61f1c973",
       "name": "280GCP-asia-northeast1 RequestEngine Oauth2 Bearer"
     },
     {
@@ -1592,14 +1574,14 @@
       "type": "n8n-nodes-base.awsLambda",
       "typeVersion": 1,
       "position": [
-        592,
-        3536
+        14208,
+        2544
       ],
-      "id": "183b5be4-2009-4323-a94d-a31b81fb757b",
+      "id": "21222b14-f9d4-4332-8f50-8ad933d5d929",
       "name": "280AWS-apne1 RequestEngine AccessKey",
       "credentials": {
         "aws": {
-          "id": "Wc9FW6idtZk9tShE",
+          "id": "Cstsl8yWBOrKJ66G",
           "name": "AWS (IAM) account Dummy"
         }
       }
@@ -1644,14 +1626,14 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        592,
-        3744
+        14208,
+        2752
       ],
-      "id": "2df2bc05-3c11-4802-b722-fadec4cbbb3e",
+      "id": "7cf671f7-47b5-4e3b-8887-4940a80db846",
       "name": "280AZ-japan-east RequestEngine KeyVault",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "4oorBtBP5SuAimco",
+          "id": "hB0mEoppBj9zs3D6",
           "name": "Azure Dummy Hedaer Auth"
         }
       }
@@ -1663,10 +1645,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1040,
-        3344
+        14656,
+        2352
       ],
-      "id": "0d1d7f5b-bead-474e-a30b-6642e1c8ab16",
+      "id": "84b7c4b9-2c08-4519-ae80-affabeeb9ea8",
       "name": "290 DirectRequest Arranger"
     },
     {
@@ -1676,10 +1658,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        832,
-        3744
+        14448,
+        2752
       ],
-      "id": "d0b2e632-ee8e-402d-8f07-53d201c95c26",
+      "id": "993df6de-295b-4033-9c4a-3252cd84fc77",
       "name": "300 AZ Arranger"
     },
     {
@@ -1689,10 +1671,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        1504,
-        1888
+        15136,
+        704
       ],
-      "id": "73e12f59-95d2-4e1e-88f9-c492e38f6693",
+      "id": "73cefc5f-b34c-4d1f-a820-7f5055233edf",
       "name": "110 Step.1 Starter SimpleUrlList"
     },
     {
@@ -1702,10 +1684,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3024,
-        2768
+        16640,
+        1552
       ],
-      "id": "518c189b-363a-439b-9396-02766c5ccb41",
+      "id": "8dcb35b2-a03b-4188-9bf8-438049063fea",
       "name": "195 Wrap Json In Data"
     },
     {
@@ -1717,10 +1699,10 @@
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        320,
-        4064
+        13936,
+        3072
       ],
-      "id": "15bab6a8-8fde-4faa-b45e-db651da9340a",
+      "id": "bb359ff0-fc50-45d2-9796-6bda8319a791",
       "name": "245 data and GCP IDtoken Merger"
     },
     {
@@ -1730,10 +1712,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        2848,
-        2768
+        16464,
+        1552
       ],
-      "id": "191ef2f0-19d6-4e46-bc6f-b27aac131686",
+      "id": "ebf019f5-6f6e-4274-a837-1a06ccea0606",
       "name": "190 Add Http Request UUID"
     },
     {
@@ -1743,10 +1725,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3232,
-        2768
+        16944,
+        1840
       ],
-      "id": "4d49003f-3001-4ba9-94f5-2c353c8f9316",
+      "id": "312c79bb-7fa7-4db6-9433-9ff0e294386e",
       "name": "210 Step.2 Separate Starter Dummy"
     },
     {
@@ -1756,10 +1738,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1072,
-        3232
+        12480,
+        2240
       ],
-      "id": "f82907a2-77c6-48be-bf44-08712484df0e",
+      "id": "49bd82bc-5bdd-4444-a3fd-faaf15476d2e",
       "name": "215 Add httpRequestRoundID"
     },
     {
@@ -1771,11 +1753,160 @@
       "type": "n8n-nodes-base.crypto",
       "typeVersion": 1,
       "position": [
-        1936,
-        2768
+        15552,
+        1552
       ],
-      "id": "86914151-6e20-4704-817e-4245aefe934c",
+      "id": "d9ebb06c-0e94-4d70-9131-73b582d15061",
       "name": "170 n8n RequestSecret Token Generator"
+    },
+    {
+      "parameters": {
+        "content": "# TXTレコードによるDNS認証\n\n1. DNSレコードの登録\nDNSにて、以下TXTレコードを追加してください。\n・ホスト名　:　_eo-auth.[あなたのドメイン]\n・値 (内容)　:　EX) eo-authorized-2025\n2. 「20 DNS Auth」ノードの「DNSTXT_TOKEN」を「eo-authorized-2025」と編集",
+        "height": 288,
+        "width": 486,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        13024,
+        96
+      ],
+      "typeVersion": 1,
+      "id": "a447549c-48db-44ef-864f-dd118f648347",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13008,
+        1824
+      ],
+      "id": "f38dee47-505f-479d-9455-e089b2e1289a",
+      "name": "141-1 Once CF Cache Purge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.cloudflare.com/client/v4/zones/{{$env.N8N_EO_CF_CACHE_PURGE_ZONE_ID}}/purge_cache",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$env.N8N_EO_CF_CACHE_PURGE_USER_API_TOKEN}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"purge_everything\":true\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        13248,
+        1824
+      ],
+      "id": "57a7a89e-95cb-4aaa-8635-e3442c0dce82",
+      "name": "141-2 CF Full Purge",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a85e49cf-3a95-4517-ac21-00af4a161153",
+              "leftValue": "={{ $json.purge_everything }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        13472,
+        1824
+      ],
+      "id": "23804ade-16b6-4c72-b305-a8db529615ae",
+      "name": "141-3 Full Purge Comp Check"
+    },
+    {
+      "parameters": {
+        "amount": 15
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        13744,
+        1840
+      ],
+      "id": "ab6d854d-e32f-4803-945d-98c1e32e6a19",
+      "name": "141-4 Sleep for Full Purge",
+      "webhookId": "1dc110af-1ee4-4aa5-8fa0-ec79080285fa"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        14208,
+        1648
+      ],
+      "id": "fed8eb2d-b275-403f-9fc8-aaca6addb0d1",
+      "name": "142 Merge After CF Cache Purge"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        13952,
+        1840
+      ],
+      "id": "eaeef5c4-604c-4b56-85d9-f0cb402ab40a",
+      "name": "141-5 OUTPUT Deleter"
+    },
+    {
+      "parameters": {
+        "content": "# 設定10\n\n## 通常時\n140→145\n\n## CF Cache パージ\n141と142は、Step.2 の前にCF Cache パージをしたい場合のみ、以下の2系統を追加して利用\n\n系統①140→142→145\n系統②140→141-1,2,3,4,5→142\n\nまた、141-2　で　以下の2変数が必要。\n.envと docker-compose.yml に記載する\n\nN8N_EO_CF_CACHE_PURGE_ZONE_ID\nN8N_EO_CF_CACHE_PURGE_USER_API_TOKEN",
+        "height": 464,
+        "width": 534,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        12448,
+        1632
+      ],
+      "typeVersion": 1,
+      "id": "84e98601-1a9b-44c2-81c5-604be21d55e7",
+      "name": "Sticky Note28"
     }
   ],
   "pinData": {
@@ -2413,6 +2544,67 @@
       "main": [
         []
       ]
+    },
+    "141-1 Once CF Cache Purge": {
+      "main": [
+        [
+          {
+            "node": "141-2 CF Full Purge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "141-2 CF Full Purge": {
+      "main": [
+        [
+          {
+            "node": "141-3 Full Purge Comp Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "141-3 Full Purge Comp Check": {
+      "main": [
+        [],
+        [
+          {
+            "node": "141-4 Sleep for Full Purge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "141-4 Sleep for Full Purge": {
+      "main": [
+        [
+          {
+            "node": "141-5 OUTPUT Deleter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "142 Merge After CF Cache Purge": {
+      "main": [
+        []
+      ]
+    },
+    "141-5 OUTPUT Deleter": {
+      "main": [
+        [
+          {
+            "node": "142 Merge After CF Cache Purge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -2421,10 +2613,11 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "7d4cdc43-8203-483e-97ba-ca48e41a44b8",
+  "versionId": "ed1c2a62-82f9-402c-99ae-5594cc9da6ec",
   "meta": {
-    "instanceId": "448f766a569d9f99225f92707c70839acb353c0f2aed31023e195f8796fef2cd"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f15ab73f025f519777eb926ac6288aacdc3c751b845263011523918749277b18"
   },
-  "id": "KDXoO0LbUHerLKP-f1Ono",
+  "id": "mqBctE8KCKiPPRtoAWpFe",
   "tags": []
 }
