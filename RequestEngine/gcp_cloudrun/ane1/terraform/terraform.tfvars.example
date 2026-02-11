@@ -1,0 +1,39 @@
+# ==============================================================================
+# Terraform Variables - Example Configuration
+# ==============================================================================
+# Usage:
+#   1. cp terraform.tfvars.example terraform.tfvars
+#   2. Edit terraform.tfvars with your actual values
+#   3. terraform plan -var-file=terraform.tfvars
+#
+# IMPORTANT: terraform.tfvars contains sensitive values. Do NOT commit to git.
+# ==============================================================================
+
+# --- Required: GCP Project ---
+gcp_project_id     = "<GCPプロジェクトID>"         # e.g., "eo-re-d01-pr-ane1"
+gcp_project_number = "<GCPプロジェクト番号>"        # e.g., "123456789012"
+
+# --- Required: GitHub Actions OIDC ---
+github_org  = "<Github組織名orユーザー名>"          # e.g., "Masamasamasashito"
+github_repo = "<Githubリポジトリ名>"                # e.g., "EdgeOptimizer"
+
+# --- Optional: Naming Convention (defaults shown) ---
+# project_prefix = "eo"
+# component      = "re"
+# environment    = "d01"
+# region_short   = "ane1"
+
+# --- Optional: GCP Region (default shown) ---
+# gcp_region = "asia-northeast1"
+
+# --- Optional: Cloud Run Settings (defaults shown) ---
+# cloud_run_memory        = "512Mi"
+# cloud_run_cpu           = "1"
+# cloud_run_max_instances = 10
+# cloud_run_min_instances = 0
+# cloud_run_timeout       = 300
+# cloud_run_port          = 8080
+
+# --- Optional: Secret Manager (defaults shown) ---
+# secret_name     = "eo-re-d01-secretmng"
+# secret_key_name = "CLOUDRUN_REQUEST_SECRET"
