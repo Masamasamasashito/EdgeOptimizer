@@ -141,8 +141,6 @@ Set the following secrets in your GitHub Repository settings (Settings > Secrets
 |---|---|
 | `EO_CF_WORKER_USER_API_TOKEN_FOR_GITHUB` | Cloudflare API Token with Workers permissions. |
 | `EO_CF_ACCOUNT_ID` | Your Cloudflare Account ID. |
-| `EO_CF_WORKER_DOMAIN` | Worker custom domain for wrangler.toml routes pattern (e.g. `eo-re-d01-cfworker-global.sample.com/*`). |
-| `EO_CF_WORKER_ZONE_NAME` | Parent domain for wrangler.toml routes zone_name (e.g. `sample.com`). |
 
 **Note:**
 Please make sure to register CFWORKER_REQUEST_SECRET (N8N_EO_REQUEST_SECRET) as a secret in your Cloudflare Worker's Secrets.

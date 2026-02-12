@@ -61,14 +61,12 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 1. 取得した認証情報をGitHubリポジトリの環境変数として安全に保存
     - 対象のGitHubリポジトリを開く
     - 「Settings」タブ → 左メニューの「Secrets and variables」 → 「Actions」をクリック
-    - 「New repository secret」をクリックし、以下の4つを追加
+    - 「New repository secret」をクリックし、以下の2つを追加
         1. `EO_CF_WORKER_USER_API_TOKEN_FOR_GITHUB`,手順4でコピーしたユーザーAPIトークン,wranglerデプロイ認証用
         2. `EO_CF_ACCOUNT_ID`,手順4で確認したアカウントID,アカウント識別用
-        3. `EO_CF_WORKER_DOMAIN`,Workerのカスタムドメイン（例: `eo-re-d01-cfworker-global.sample.com/*`）,wrangler.toml の routes pattern 用
-        4. `EO_CF_WORKER_ZONE_NAME`,親ドメイン（例: `sample.com`）,wrangler.toml の routes zone_name 用
 
 - wrangler.toml は `.github/workflows/deploy-to-cf-worker-global.yml` の中で EOF により動的生成している
-- routes の pattern のカスタムドメイン名を GitHub シークレット `EO_CF_WORKER_DOMAIN` から参照する構成
+- ルーティングは手順2で設定したカスタムドメインで行うため、wrangler.toml に routes 設定は不要
 
 ## 手順 6: Workflowファイルの作成
 

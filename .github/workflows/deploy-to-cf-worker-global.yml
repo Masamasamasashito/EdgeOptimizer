@@ -50,12 +50,6 @@ jobs:
           main = "src/worker.ts"
           compatibility_date = "2026-01-13"
 
-          # シークレットから取得したドメインを設定
-          workers_dev = false
-          routes = [
-            { pattern = "${{ secrets.EO_CF_WORKER_DOMAIN }}", zone_name = "${{ secrets.EO_CF_WORKER_ZONE_NAME }}" }
-          ]
-
           [observability]
           enabled = false
           head_sampling_rate = 1
