@@ -64,9 +64,6 @@ _cached_secretmng_requestsecret_value: Optional[str] = None
 # Cache for GCP Secret Manager secret (CLOUDRUN_REQUEST_SECRET) value
 # Retrieved on first request, subsequent requests use cached value
 
-# Region to short name mapping
-_REGION_TO_SHORT = {"asia-northeast1": "ane1"}
-
 
 # ======================================================================
 # Get Secret from GCP Secret Manager (retrieved once, cached thereafter)
@@ -180,7 +177,7 @@ def requestengine_tail():
 
     # Get GCP region and convert to short name
     gcp_region = _get_gcp_region()
-    gcp_region_display = _REGION_TO_SHORT.get(gcp_region, gcp_region)
+    gcp_region_display = gcp_region
 
     try:
         # ==================================================================
