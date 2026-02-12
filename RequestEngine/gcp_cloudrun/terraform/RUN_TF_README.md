@@ -2,7 +2,7 @@
 
 Terraform を使用した GCP Cloud Run Request Engine インフラストラクチャの構築手順です。
 
-※Terraform でうまくできない場合、お手数ですが [RUN_README.md](../RUN_README.md) の手動手順（gcloud CLI / GUIコンソール）を参照してください。
+※Terraform でうまくできない場合、お手数ですが [RUN_README.md](../ane1/RUN_README.md) の手動手順（gcloud CLI / GUIコンソール）を参照してください。
 
 ## 目次
 
@@ -110,7 +110,7 @@ terraform --version
 ### 1-1. 変数ファイルの作成
 
 ```bash
-cd RequestEngine/gcp_cloudrun/ane1/terraform/
+cd RequestEngine/gcp_cloudrun/terraform/
 
 # テンプレートをコピー
 cp terraform.tfvars.example terraform.tfvars
@@ -263,7 +263,7 @@ terraform output cloud_run_service_url
 
 ### 6-2. n8n ワークフローノードの設定
 
-共通のノード設定手順は [N8N_NODE_SETUP.md](../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) を参照してください。
+共通のノード設定手順は [N8N_NODE_SETUP.md](../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) を参照してください。
 
 GCP Cloud Run 固有の設定:
 
@@ -287,7 +287,7 @@ GCP Cloud Run 固有の設定:
 
 > `audience` に `/requestengine_tail` を含めて ID Token を発行すると、Cloud Run 側で宛先不一致とみなされ **401 Unauthorized** エラーが発生します。
 
-詳細は [RUN_README.md](../RUN_README.md) の「OAuth2 Bearerトークン認証を使用する」セクションを参照してください。
+詳細は [RUN_README.md](../ane1/RUN_README.md) の「OAuth2 Bearerトークン認証を使用する」セクションを参照してください。
 
 ## パラメータ一覧
 
@@ -378,8 +378,8 @@ terraform {
 
 ## 関連ドキュメント
 
-- [RUN_README.md](../RUN_README.md) - GCP Cloud Run 手動セットアップ手順
-- [RE_README.md](../../../RE_README.md) - Request Engine 全体のセキュリティ設定
-- [N8N_NODE_SETUP.md](../../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - n8n ワークフローノード設定ガイド
-- [AZFUNC_BICEP_README.md](../../../azure_functions/bicep/AZFUNC_BICEP_README.md) - Azure Functions Bicep 構築手順
-- [LAMBDA_CFN_README.md](../../../aws_lambda/CFn/LAMBDA_CFN_README.md) - AWS Lambda CloudFormation 構築手順
+- [RUN_README.md](../ane1/RUN_README.md) - GCP Cloud Run 手動セットアップ手順
+- [RE_README.md](../../RE_README.md) - Request Engine 全体のセキュリティ設定
+- [N8N_NODE_SETUP.md](../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - n8n ワークフローノード設定ガイド
+- [AZFUNC_BICEP_README.md](../../azure_functions/bicep/AZFUNC_BICEP_README.md) - Azure Functions Bicep 構築手順
+- [LAMBDA_CFN_README.md](../../aws_lambda/CFn/LAMBDA_CFN_README.md) - AWS Lambda CloudFormation 構築手順
