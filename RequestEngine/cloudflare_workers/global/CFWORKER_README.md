@@ -79,7 +79,7 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 
 [.github\workflows\deploy-to-cf-worker-global.yml](.github\workflows\deploy-to-cf-worker-global.yml)
 
-## 手順 7: Cloudflare WorkerでGithubリポジトリを登録
+## 手順 7: Cloudflare WorkerでGithubリポジトリを登録（GitHub Actions運用時は不要）
 
 1. 「Workers & Pages」 の一覧から、対象のWorkerをクリックして開く
 2. 画面上部のタブから 「設定 (Settings)」 をクリック
