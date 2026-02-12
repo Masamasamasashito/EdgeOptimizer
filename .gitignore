@@ -55,6 +55,22 @@ caddy_data/
 caddy_config/
 
 # ==========================================
+# 🏗️ Terraform
+# ==========================================
+# Provider plugins and modules (large binaries, auto-downloaded by terraform init)
+.terraform/
+
+# State files (may contain secrets such as passwords, keys)
+*.tfstate
+*.tfstate.backup
+
+# Variables file with actual values (project ID, secrets)
+terraform.tfvars
+
+# Plan output files
+*.tfplan
+
+# ==========================================
 # 🔍 SearXNG (Search Engine)
 # ==========================================
 # Auto-generated settings file on update
