@@ -74,6 +74,18 @@ _CDN_DETECTION_CONFIG = [
     # Vercel
     ("x-vercel-cache", "x-vercel-cache"),
     ("x-vercel-id", "x-vercel-cache"),
+    # Sakura Internet Web Accelerator (さくらウェブアクセラレータ)
+    ("x-webaccel-origin-status", "x-cache"),
+    # Bunny CDN
+    ("cdn-pullzone", "cdn-cache"),
+    ("cdn-uid", "cdn-cache"),
+    ("cdn-requestid", "cdn-cache"),
+    # Alibaba Cloud CDN
+    ("eagleid", "x-cache"),
+    ("x-swift-savetime", "x-cache"),
+    ("x-swift-cachetime", "x-cache"),
+    # CDNetworks
+    ("x-cnc-request-id", "x-cache"),
     # General / Fastly
     ("x-cache", "x-cache"),
     ("x-served-by", "x-cache"),
@@ -338,6 +350,20 @@ def _detect_cdn(res_headers: Dict[str, str]) -> Dict[str, Optional[str]]:
         result["cdn-header-value"] = server_header
         if "x-vercel-cache" in headers_lower:
             result["cdn-cache-status"] = headers_lower["x-vercel-cache"]
+
+    # Bunny CDN Server header detection
+    if "bunnycdn" in server_header.lower():
+        result["cdn-header-name"] = "server"
+        result["cdn-header-value"] = server_header
+        if "cdn-cache" in headers_lower:
+            result["cdn-cache-status"] = headers_lower["cdn-cache"]
+
+    # Alibaba Cloud CDN (Tengine) Server header detection
+    if "tengine" in server_header.lower():
+        result["cdn-header-name"] = "server"
+        result["cdn-header-value"] = server_header
+        if "x-cache" in headers_lower:
+            result["cdn-cache-status"] = headers_lower["x-cache"]
 
     # Azure Front Door Via header detection
     via_header = headers_lower.get("via", "")
