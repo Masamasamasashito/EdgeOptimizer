@@ -11,7 +11,7 @@ resource "google_secret_manager_secret" "request_secret" {
   project   = var.gcp_project_id
   secret_id = var.secret_name
 
-  labels = local.common_labels
+  labels = local.eo_gcp_resource_labels
 
   replication {
     auto {}

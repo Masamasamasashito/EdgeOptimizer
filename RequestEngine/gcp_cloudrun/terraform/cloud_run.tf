@@ -13,7 +13,7 @@ resource "google_cloud_run_v2_service" "request_engine" {
   name     = "${local.name_prefix}-cloudrun-${local.region_short}"
   location = var.gcp_region
 
-  labels = local.common_labels
+  labels = local.eo_gcp_resource_labels
 
   template {
     service_account = google_service_account.runtime.email

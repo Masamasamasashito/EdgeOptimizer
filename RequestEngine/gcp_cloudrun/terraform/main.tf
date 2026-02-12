@@ -50,7 +50,7 @@ locals {
   name_prefix  = "${var.project_prefix}-${var.component}-${var.environment}"
   region_short = var.region_short
 
-  common_labels = {
+  eo_gcp_resource_labels = {
     project     = var.project_prefix
     component   = var.component
     environment = var.environment

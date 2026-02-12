@@ -12,7 +12,7 @@ resource "google_artifact_registry_repository" "cloud_run_source_deploy" {
   format        = "DOCKER"
   description   = "Cloud Run Source Deployments"
 
-  labels = local.common_labels
+  labels = local.eo_gcp_resource_labels
 
   depends_on = [google_project_service.artifact_registry]
 }

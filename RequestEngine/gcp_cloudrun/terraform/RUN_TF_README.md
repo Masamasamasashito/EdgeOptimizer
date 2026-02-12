@@ -32,14 +32,36 @@ Terraform を使用した GCP Cloud Run Request Engine インフラストラク�
 | **Terraform プロバイダ** | Terraform Cloud Provider Plugin | Terraform がクラウド API を操作するためのプラグイン（`hashicorp/google`） | 「Terraform プロバイダ」 |
 | **WIF ID プロバイダ (IdP)** | Workload Identity Federation Identity Provider | GitHub Actions OIDC トークンを GCP 認証に変換する ID 連携の窓口 | 「WIF IdP」「ID プロバイダ」 |
 
-### GCP タグキーと EO ラベルの使い分け
+### GCP タグキーと EO リソースラベルの使い分け
 
-GCP Resource Manager タグと EO の `common_labels` は意図的に異なる値を使用しています。命名が異なることで「どちらの環境識別か」が一目で区別できます。
+GCP には**2種類の環境識別の仕組み**があり、EdgeOptimizerでは両方を使用しています。
 
-| レイヤー | キー | 値 | 管理場所 | 用途 |
+**1. GCP Resource Manager タグ**（組織レベル）
+
+| 正式名称 | キー | 値 | 管理場所 | 用途 |
 |---------|------|-----|---------|------|
-| GCP Resource Manager タグ | タグキー `environment` | タグ値 `Development` / `Production` 等（Google 固定4種） | 組織コンソール | 課金レポート・ポリシー適用 |
-| EO `common_labels` | ラベルキー `environment` | ラベル値 `d01` / `p01` 等（EO 独自命名） | `variables.tf` → `main.tf` | リソース命名・複数環境の区別 |
+| Organization Resource Manager Tag | タグキー `environment` | タグ値 `Development` / `Production` 等（Google 固定4種） | GCP 組織コンソール | 課金レポート・組織ポリシー適用 |
+
+**2. GCP リソースラベル**（リソースレベル）
+
+`eo_gcp_resource_labels`（`main.tf` の `locals` で定義した `map(string)`）を各リソースに `labels = local.eo_gcp_resource_labels` として付与:
+
+```
+eo_gcp_resource_labels
+  │
+  ├── project     = "eo"         ← GCP ラベルキー "project"  に ラベル値 "eo" を設定
+  ├── component   = "re"         ← GCP ラベルキー "component" に ラベル値 "re" を設定
+  ├── environment = "d01"        ← GCP ラベルキー "environment" に ラベル値 "d01" を設定
+  └── managed-by  = "terraform"  ← GCP ラベルキー "managed-by" に ラベル値 "terraform" を設定
+        │                │
+        │                └─ GCP ラベル値（各リソースに実際に付く value）
+        └─ GCP ラベルキー（各リソースに実際に付く key）
+```
+
+付与先: Cloud Run / Secret Manager / Artifact Registry
+用途: リソース識別・フィルタリング・コスト配分
+
+両者は意図的に異なる値（タグ値 `Development` vs ラベル値 `d01`）を使うことで「どちらの環境識別か」が一目で区別できます。
 
 ### Terraform ファイル構成
 
