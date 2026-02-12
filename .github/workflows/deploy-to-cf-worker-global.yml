@@ -1,4 +1,4 @@
-﻿name: Deploy CloudFlare Worker Global
+name: Deploy CloudFlare Worker Global
 
 on:
 #   push:
@@ -27,7 +27,7 @@ jobs:
       cancel-in-progress: true # 新しい実行が来たら古い実行を自動キャンセル
     steps:
       # Checkout the latest code,Get Repository on Runner.以降のステップがソースにアクセス可能になる
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
