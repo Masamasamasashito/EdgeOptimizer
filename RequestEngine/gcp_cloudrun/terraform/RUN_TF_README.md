@@ -32,6 +32,15 @@ Terraform を使用した GCP Cloud Run Request Engine インフラストラク�
 | **Terraform プロバイダ** | Terraform Cloud Provider Plugin | Terraform がクラウド API を操作するためのプラグイン（`hashicorp/google`） | 「Terraform プロバイダ」 |
 | **WIF ID プロバイダ (IdP)** | Workload Identity Federation Identity Provider | GitHub Actions OIDC トークンを GCP 認証に変換する ID 連携の窓口 | 「WIF IdP」「ID プロバイダ」 |
 
+### GCP タグキーと EO ラベルの使い分け
+
+GCP Resource Manager タグと EO の `common_labels` は意図的に異なる値を使用しています。命名が異なることで「どちらの環境識別か」が一目で区別できます。
+
+| レイヤー | キー | 値 | 管理場所 | 用途 |
+|---------|------|-----|---------|------|
+| GCP Resource Manager タグ | タグキー `environment` | タグ値 `Development` / `Production` 等（Google 固定4種） | 組織コンソール | 課金レポート・ポリシー適用 |
+| EO `common_labels` | ラベルキー `environment` | ラベル値 `d01` / `p01` 等（EO 独自命名） | `variables.tf` → `main.tf` | リソース命名・複数環境の区別 |
+
 ### Terraform ファイル構成
 
 | ファイル | 説明 |
@@ -138,15 +147,6 @@ gcloud resource-manager tags bindings create \
   --parent=//cloudresourcemanager.googleapis.com/projects/$EO_GCP_PROJECT_NUMBER \
   --location=global
 ```
-
-**GCP タグキーと EO ラベルの使い分け**
-
-GCP Resource Manager タグと EO の `common_labels` は意図的に異なる値を使用しています。命名が異なることで「どちらの環境識別か」が一目で区別できます。
-
-| レイヤー | キー | 値 | 管理場所 | 用途 |
-|---------|------|-----|---------|------|
-| GCP Resource Manager タグ | タグキー `environment` | タグ値 `Development` / `Production` 等（Google 固定4種） | 組織コンソール | 課金レポート・ポリシー適用 |
-| EO `common_labels` | ラベルキー `environment` | ラベル値 `d01` / `p01` 等（EO 独自命名） | `variables.tf` → `main.tf` | リソース命名・複数環境の区別 |
 
 ### 0-4. Terraform インストール/更新
 
