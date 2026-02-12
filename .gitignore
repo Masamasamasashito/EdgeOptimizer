@@ -55,6 +55,12 @@ caddy_data/
 caddy_config/
 
 # ==========================================
+# 🔍 SearXNG (Search Engine)
+# ==========================================
+# Auto-generated settings file on update
+EO_Infra_Docker/searxng/settings.yml.new
+
+# ==========================================
 # ⚙️ System, Logs & General
 # ==========================================
 # General log files
