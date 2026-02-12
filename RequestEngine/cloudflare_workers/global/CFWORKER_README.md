@@ -135,19 +135,20 @@ n8n保持の照合用リクエストシークレット(docker-compose.ymlの環�
 n8nに持たせる「通行手形（IDとパスワード）」を作成し、Cloudflare Access ( Zero Trust ) でWorkerを保護する
 
 1. Cloudflare Zero Trust ダッシュボード にアクセス
-2. 左メニューの Accessコントロール → サービス資格情報 をクリック
-3. サービストークンを作成する をクリック
+2. 左メニューの Accessコントロール > サービス資格情報 をクリック
+3. サービストークンを追加する をクリック
 	- サービストークン名（`eo-re-d01-cfworker-global-service-token-for-n8n`）を入力
     - 有効期限：無期限
     - Create Service Token をクリック
     - 重要: ここで表示される Client ID と Client Secret を必ずコピーして控えて。Secretはこの画面を閉じると二度と表示されない
+4. 保存 をクリック
 
 ## 手順 12: Cloudflare Access で Worker を保護
 
 Workerのカスタムドメインに対して「Accessアプリケーション」を作成し、サービストークンを持っている場合のみ通す設定
 
 1. Zero Trust ダッシュボードの Accessコントロール → アプリケーション をクリック
-2. アプリケーションを追加する →セルフホスト を選択
+2. アプリケーションを追加する > セルフホスト > 選択する をクリック
 3. 基本情報（そのままスルー）
 4. Access ポリシー (重要。先にポリシー作る):
 	- 新しいポリシーを作成する
@@ -169,6 +170,7 @@ Workerのカスタムドメインに対して「Accessアプリケーション�
     	- Domain: <sample.com>
     - 既存のポリシーを選択
     - `eo-re-d01-cfworker-global Allow n8n HTTPSrequests ServiceToken`を選ぶ
+    - 確認 をクリック
 	- ポリシーテスター
 		- 1 ユーザー (100%) は ブロック済みです　と出ればOK
   - ログイン方法
@@ -190,7 +192,7 @@ View details
 となったらOK。n8n workflowまわすと、`Error ・ Cloudflare Access`というタイトルページになること。
 単純にカスタムドメインをブラウザで叩いて、アクセス出来ないことを確認。
 
-## 手順 13: n8n Credentials登録 と HTTP Requestノードにサービストークン設定
+## 手順 13: n8n Credentials登録
 
 n8nからリクエストエンジンにリクエストを送る際、リクエストヘッダにサービストークン情報を載せる設定  
   
@@ -208,17 +210,17 @@ n8n Credentials登録
   }
 }
 ```
+
+## 手順 14: n8n 280CF-global RequestEngine ZeroTrustノードでWorkerサブドメインとCredentials設定  
   
-n8nでWorkerサブドメインとCredentialsをHTTP Requestノードで設定  
-  
-1. n8n のワークフロー画面で該当するCloudflareのリクエストエンジンのHTTP Requestノードを開く
-2. Parameters > URL にCFワーカーで設定したサブドメインを「https://」から始まるURLで末尾に「/」を付けて登録
+1. n8n のワークフロー画面で280CF-global RequestEngine ZeroTrustノードのCloudflareリクエストエンジンのHTTP Requestノードを開く
+2. Parameters > URL にCFワーカーで設定したカスタムドメインを「https://」から始まるURLで末尾に「/」を付けて登録
   - EX) `https://eo-re-d01-cfworker-global.<sample.com>/`
 3. Authentication > Generic Credential Typeを選ぶ
 4. Generic Auth Type > Custom Authを選ぶ
 5. Custom Auth > `EO_RE_CF_HeaderAuth_ServiceToken`を選ぶ
 
-## 手順 14: n8n workflow実行、動作確認
+## 手順 15: n8n workflow実行、動作確認
 
 1. Execute workflowを押す
 2. n8n workflowが実行される
