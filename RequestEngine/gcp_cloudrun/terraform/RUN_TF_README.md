@@ -421,19 +421,43 @@ GCP Cloud Run 固有の設定:
 
 **ノード 280: GCP-asia-northeast1 RequestEngine Oauth2 Bearer**
 
-ノード 235 で取得した ID Token を使い、Cloud Run サービスにリクエストを送信するノードです。
+ノード 245（data and GCP IDtoken Merger）でマージされたデータと ID Token を使い、Cloud Run サービスにリクエストを送信するノードです。
 
+データフロー: `225 Switcher` → `235 Get IDtoken` → `240 IDtoken to json` → `245 Merger`（230 data Keeper と合流）→ **`280 GCP Request`**
+
+- **Type**: `HTTP Request`（n8n-nodes-base.httpRequest v4.3）
 - **Method**: `POST`
 - **URL**: `<Cloud Run サービス URL>/requestengine_tail`
   - STEP 5-2 で確認したサービス URL に `/requestengine_tail` を付加
   - 例: `https://eo-re-d01-cloudrun-ane1-xxxxxxxxxx-an.a.run.app/requestengine_tail`
-- **Authentication**: `None`（ヘッダーで直接指定するため）
-- **Headers**:
-  - `Authorization`: `Bearer {{ $json.idToken }}`（ノード 235/240 で取得した ID Token）
-  - `Content-Type`: `application/json`
+- **Authentication**: なし（ヘッダーで直接指定するため）
+- **Send Headers**: 有効化（4件）
+
+  | Header | Value | 説明 |
+  |--------|-------|------|
+  | `User-Agent` | `={{ $json.data.headers["User-Agent"] }}` | 180 ノードで設定された UA |
+  | `Accept-Language` | `={{ $json.data.headers["Accept-Language"] }}` | 180 ノードで設定された言語 |
+  | `Authorization` | `={{ 'Bearer ' + $json.gcf.idToken }}` | 235/240 で取得した OAuth2 ID Token |
+  | `Content-Type` | `application/json` | 固定値 |
+
 - **Send Body**: 有効化
 - **Specify Body**: `Using JSON`
-- **JSON Body**: `{{ $json }}`（ノード 245 でマージされたデータをそのまま送信）
+- **JSON Body**:
+  ```json
+  {
+    "targetUrl": "{{ $json.data.targetUrl }}",
+    "tokenCalculatedByN8n": "{{ $json.data.tokenCalculatedByN8n }}",
+    "headers": "{{ $json.data.headers }}",
+    "httpRequestNumber": "{{ $json.data.httpRequestNumber }}",
+    "httpRequestUUID": "{{ $json.data.httpRequestUUID }}",
+    "httpRequestRoundID": "{{ $json.data.httpRequestRoundID }}",
+    "urltype": "{{ $json.data.urltype }}"
+  }
+  ```
+- **Options**:
+  - Timeout: `180000`（180秒）
+  - Max Redirects: `5`
+  - Full Response: `true`（ヘッダー含む完全レスポンスを取得）
 
 詳細は [RUN_README.md](../ane1/RUN_README.md) の「OAuth2 Bearerトークン認証を使用する」セクションを参照してください。
 

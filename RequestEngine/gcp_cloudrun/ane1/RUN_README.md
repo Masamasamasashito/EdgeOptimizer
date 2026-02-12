@@ -1351,20 +1351,34 @@ OAuth2 Bearer認証を使用するには、n8nワークフローでID Tokenを�
    - Service Account EmailはOauth2_Invoker SAのService Account Email
 3. **240 IDtoken to json**: 取得したID TokenをJSON形式に変換
 4. **245 data and GCP IDtoken Merger**: リクエストデータとID Tokenを結合
-5. **280GCP-ane1 RequestEngine Oauth2 Bearer**: 取得した ID Token をヘッダーに設定し、Cloud Run サービスに全データを送信します。
+5. **280GCP-asia-northeast1 RequestEngine Oauth2 Bearer**: 取得した ID Token をヘッダーに設定し、Cloud Run サービスに全データを送信します（n8n-nodes-base.httpRequest v4.3）。
     - **Method**: `POST`
     - **URL**: `https://eo-re-d01-cloudrun-ane1-<ハッシュ値>-an.a.run.app/requestengine_tail`
         - **重要**: こちらの URL には末尾の **`/requestengine_tail` を必ず含めてください**。
-    - **Authentication**: `None` (ヘッダーで直接指定するため)
-    - **Headers**:
-        - **Name**: `Authorization`
-        - **Value**: `Bearer {{ $json.idToken }}` (ノード 235/240 で取得したトークンを指定)
-        - **Name**: `Content-Type`
-        - **Value**: `application/json`
-    - **Send Body**: 有効化 (リクエストデータを送信)
+    - **Authentication**: なし（ヘッダーで直接指定するため）
+    - **Send Headers**: 有効化（4件）
+        - `User-Agent`: `={{ $json.data.headers["User-Agent"] }}`（180 ノードで設定された UA）
+        - `Accept-Language`: `={{ $json.data.headers["Accept-Language"] }}`（180 ノードで設定された言語）
+        - `Authorization`: `={{ 'Bearer ' + $json.gcf.idToken }}`（ノード 235/240 で取得した ID Token）
+        - `Content-Type`: `application/json`
+    - **Send Body**: 有効化
     - **Specify Body**: `Using JSON` を選択
-    - **JSON Body**: `{{ $json }}` と入力（ノード 245 でマージされたデータをそのまま送信）
-        > **重要**: ノード 245 の出力データ構造が `{ "data": { ... }, "idToken": "..." }` の形式の場合、Cloud Run側は `data` キーを認識するため、`{{ $json }}` で問題ありません。もしエラーが発生する場合は、`{{ JSON.stringify($json) }}` を試してください。
+    - **JSON Body**:
+        ```json
+        {
+          "targetUrl": "{{ $json.data.targetUrl }}",
+          "tokenCalculatedByN8n": "{{ $json.data.tokenCalculatedByN8n }}",
+          "headers": "{{ $json.data.headers }}",
+          "httpRequestNumber": "{{ $json.data.httpRequestNumber }}",
+          "httpRequestUUID": "{{ $json.data.httpRequestUUID }}",
+          "httpRequestRoundID": "{{ $json.data.httpRequestRoundID }}",
+          "urltype": "{{ $json.data.urltype }}"
+        }
+        ```
+    - **Options**:
+        - Timeout: `180000`（180秒）
+        - Max Redirects: `5`
+        - Full Response: `true`（ヘッダー含む完全レスポンスを取得）
 
 このフローにより、n8nワークフローからOAuth2 Bearer認証でCloud Runサービスに安全にアクセスできます。
 
@@ -1995,8 +2009,8 @@ JSON parameter needs to be valid JSON
   - **解決**: n8nのHTTP Requestノードで以下の設定を確認してください:
     1. **Send Body**: 有効化されているか確認
     2. **Specify Body**: `Using JSON` を選択
-    3. **JSON Body**: `{{ $json }}` と入力（ノード 245 の出力をそのまま送信）
-    4. **Content-Type ヘッダー**: `application/json` が設定されているか確認
+    3. **JSON Body**: `$json.data.*` から各フィールドを個別指定（`targetUrl`, `tokenCalculatedByN8n`, `headers`, `httpRequestNumber`, `httpRequestUUID`, `httpRequestRoundID`, `urltype`）
+    4. **Send Headers**: 4件（`User-Agent`, `Accept-Language`, `Authorization`, `Content-Type`）が設定されているか確認
 - **原因2**: ノード 245 の出力データが無効な形式
   - **解決**: ノード 245 の出力を確認し、有効なJSON形式になっているか確認してください
     - ノード 245 の後に **「Set」** ノードを追加して、データ構造を確認することを推奨します
@@ -2006,8 +2020,8 @@ JSON parameter needs to be valid JSON
 
 **確認方法**:
 1. ノード 245 の出力を確認（「Execute Workflow」で実行して確認）
-2. ノード 280 の「JSON Body」フィールドに `{{ $json }}` が正しく入力されているか確認
-3. ノード 280 の「Headers」に `Content-Type: application/json` が設定されているか確認
+2. ノード 280 の「JSON Body」フィールドに `$json.data.*` の各フィールドが正しく指定されているか確認
+3. ノード 280 の「Headers」に 4件（`User-Agent`, `Accept-Language`, `Authorization`, `Content-Type`）が設定されているか確認
 
 ### エラー: "Permission 'iam.serviceAccounts.setIamPolicy' denied" (Workload Identity設定時)
 
