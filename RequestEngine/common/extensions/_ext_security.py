@@ -18,6 +18,45 @@ EXTENSION_NAME = "security"
 EXTENSION_PREFIX = "eo.security."
 
 
+# ======================================================================
+# Analyze Security Headers
+# ======================================================================
+def _analyze_security_headers(res_headers: Dict[str, str], target_url: str) -> Dict[str, Any]:
+    """
+    Analyze security headers and return metrics
+    Included in Core Web Vitals / PageSpeed Insights / Security metrics
+    """
+    security = {}
+    security["is_https"] = target_url.startswith("https://")
+
+    headers_lower = {k.lower(): v for k, v in res_headers.items()}
+
+    # Security header definitions (header name -> key name mapping)
+    security_headers = {
+        "strict-transport-security": "hsts",
+        "content-security-policy": "csp",
+        "x-content-type-options": "x_content_type_options",
+        "x-frame-options": "x_frame_options",
+        "x-xss-protection": "x_xss_protection",
+        "referrer-policy": "referrer_policy",
+    }
+
+    # Check each security header
+    for header_name, key_prefix in security_headers.items():
+        header_value = headers_lower.get(header_name)
+        security[f"{key_prefix}_present"] = header_value is not None
+        if header_value:
+            security[f"{key_prefix}_value"] = header_value
+
+    # Permissions-Policy (formerly Feature-Policy) - Special handling
+    permissions_policy = headers_lower.get("permissions-policy") or headers_lower.get("feature-policy")
+    security["permissions_policy_present"] = permissions_policy is not None
+    if permissions_policy:
+        security["permissions_policy_value"] = permissions_policy
+
+    return security
+
+
 def build_output(context: Dict[str, Any]) -> Dict[str, Any]:
     """
     Build security extension output

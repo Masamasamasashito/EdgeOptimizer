@@ -192,46 +192,6 @@ def _calc_token(url: str, secret: str) -> str:
 
 
 # ======================================================================
-# Analyze Security Headers
-# ======================================================================
-def _analyze_security_headers(res_headers: Dict[str, str], target_url: str) -> Dict[str, Any]:
-    """
-    Analyze security headers and return metrics
-    Included in Core Web Vitals / PageSpeed Insights / Security metrics
-    """
-    security = {}
-    security["is_https"] = target_url.startswith("https://")
-
-    headers_lower = {k.lower(): v for k, v in res_headers.items()}
-
-    # Security header definitions (header name -> key name mapping)
-    security_headers = {
-        "strict-transport-security": "hsts",
-        "content-security-policy": "csp",
-        "x-content-type-options": "x_content_type_options",
-        "x-frame-options": "x_frame_options",
-        "x-xss-protection": "x_xss_protection",
-        "referrer-policy": "referrer_policy",
-        "public-key-pins": "hpkp",
-    }
-
-    # Check each security header
-    for header_name, key_prefix in security_headers.items():
-        header_value = headers_lower.get(header_name)
-        security[f"{key_prefix}_present"] = header_value is not None
-        if header_value:
-            security[f"{key_prefix}_value"] = header_value
-
-    # Permissions-Policy (formerly Feature-Policy) - Special handling
-    permissions_policy = headers_lower.get("permissions-policy") or headers_lower.get("feature-policy")
-    security["permissions_policy_present"] = permissions_policy is not None
-    if permissions_policy:
-        security["permissions_policy_value"] = permissions_policy
-
-    return security
-
-
-# ======================================================================
 # Get HTTP Protocol Version
 # ======================================================================
 def _get_http_protocol_version(response: requests.Response) -> Optional[str]:
@@ -539,7 +499,7 @@ def _build_flat_result(
     # ==================================================================
     # 3. Execution Environment / Timestamp Information
     # ==================================================================
-    ordered_result["eo.meta.area"] = area
+    ordered_result["eo.meta.re-area"] = area
     if execution_id is not None:
         ordered_result["eo.meta.execution-id"] = execution_id
     if request_start_timestamp is not None:
@@ -564,21 +524,21 @@ def _build_flat_result(
         ordered_result["eo.meta.cdn-cache-status"] = cdn_info["cdn-cache-status"]
 
     # ==================================================================
-    # 6. Measurements (eo.measure.*)
+    # 6. Measurements
     # ==================================================================
     if duration_ms is not None:
-        ordered_result["eo.measure.duration-ms"] = round(duration_ms, 2)
+        ordered_result["eo.meta.duration-ms"] = round(duration_ms, 2)
     if Initial_Response_ms is not None:
-        ordered_result["eo.measure.ttfb-ms"] = round(Initial_Response_ms, 2)
+        ordered_result["eo.meta.ttfb-ms"] = round(Initial_Response_ms, 2)
     if content_length_bytes is not None:
-        ordered_result["eo.measure.actual-content-length"] = content_length_bytes
-    ordered_result["eo.measure.redirect-count"] = redirect_count
+        ordered_result["eo.meta.actual-content-length"] = content_length_bytes
+    ordered_result["eo.meta.redirect-count"] = redirect_count
     if retry_info:
-        ordered_result["eo.measure.retry-attempts"] = retry_info.get("retry_attempts", 0)
+        ordered_result["eo.meta.retry-attempts"] = retry_info.get("retry_attempts", 0)
         if retry_info.get("retry_delays"):
-            ordered_result["eo.measure.retry-delays-ms"] = [round(d * 1000, 2) for d in retry_info.get("retry_delays", [])]
+            ordered_result["eo.meta.retry-delays-ms"] = [round(d * 1000, 2) for d in retry_info.get("retry_delays", [])]
         if retry_info.get("last_error"):
-            ordered_result["eo.measure.retry-last-error"] = retry_info.get("last_error")
+            ordered_result["eo.meta.retry-last-error"] = retry_info.get("last_error")
 
     # ==================================================================
     # 7. Extensions (eo.security.* etc.)
