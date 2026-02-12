@@ -58,6 +58,23 @@ export interface ExecutionResultParams {
   resourceInfo?: ResourceInfo | null;
 }
 
+// Extension context passed to extension build functions
+// Matches Python: context = {"target_url": ..., "res_headers": ...}
+export interface ExtensionContext {
+  targetUrl: string;
+  resHeaders: StringRecord;
+}
+
+// Extension build function signature
+export type ExtensionBuildFunc = (context: ExtensionContext) => JsonRecord;
+
+// Extension configuration stored in the registry
+export interface ExtensionConfig {
+  prefix: string;
+  buildFunc: ExtensionBuildFunc;
+  defaultEnabled: boolean;
+}
+
 // Error context state (information preserved when an error occurs)
 export interface ExecutionContextState extends Partial<ExecutionResultParams> {
   area: string;

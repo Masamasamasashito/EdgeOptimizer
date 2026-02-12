@@ -18,6 +18,9 @@ import type {
   StringRecord,
   ResourceInfo,
   ExecutionResultParams,
+  ExtensionContext,
+  ExtensionBuildFunc,
+  ExtensionConfig,
 } from "../global/funcfiles/src/_01_types";
 
 // ======================================================================
@@ -102,17 +105,43 @@ const CDN_DETECTION_CONFIG: ReadonlyArray<readonly [string, string]> = [
 ];
 
 // ======================================================================
-// Security Header Definitions
+// Extension Registry (拡張機能レジストリ)
 // ======================================================================
-// Matches RequestEngine/common/extensions/_ext_security.py
-const SECURITY_HEADERS: ReadonlyArray<readonly [string, string]> = [
-  ["strict-transport-security", "hsts"],
-  ["content-security-policy", "csp"],
-  ["x-content-type-options", "x_content_type_options"],
-  ["x-frame-options", "x_frame_options"],
-  ["x-xss-protection", "x_xss_protection"],
-  ["referrer-policy", "referrer_policy"],
-];
+// Matches RequestEngine/common/request_engine_core.py _EXTENSION_REGISTRY
+//
+// 拡張機能の追加方法:
+// 1. RequestEngine/cloudflare_workers/common/extensions/_ext_<name>.ts を作成
+// 2. ファイル内で registerExtension() を呼び出す
+// 3. deploy-to-cf-worker-global.yml の _02_extensions.ts 生成ステップに import を追加
+//    (_02_extensions.ts はワークフローで動的生成。Python版のcat条件結合と同等)
+
+const _EXTENSION_REGISTRY: Map<string, ExtensionConfig> = new Map();
+
+/**
+ * Register an extension module
+ *
+ * Matches RequestEngine/common/request_engine_core.py register_extension()
+ *
+ * @param name - Extension name (e.g. "security")
+ * @param prefix - Output key prefix (e.g. "eo.security.")
+ * @param buildFunc - Function that builds extension output
+ * @param defaultEnabled - Whether enabled by default
+ */
+export function registerExtension(
+  name: string,
+  prefix: string,
+  buildFunc: ExtensionBuildFunc,
+  defaultEnabled: boolean = true,
+): void {
+  _EXTENSION_REGISTRY.set(name, { prefix, buildFunc, defaultEnabled });
+}
+
+/**
+ * Get registered extensions (for debugging/logging)
+ */
+export function getRegisteredExtensions(): Map<string, ExtensionConfig> {
+  return new Map(_EXTENSION_REGISTRY);
+}
 
 // ======================================================================
 // Token Calculation (SHA-256)
@@ -401,51 +430,6 @@ function detectCdn(resHeaders: StringRecord): {
 }
 
 // ======================================================================
-// Security Headers Analysis
-// ======================================================================
-
-/**
- * Analyze security headers and return metrics
- *
- * Matches RequestEngine/common/extensions/_ext_security.py _analyze_security_headers()
- *
- * @param resHeaders - Response headers (StringRecord)
- * @param targetUrl - Target URL
- * @returns Security metrics with eo.security.* prefix
- */
-function analyzeSecurityHeaders(
-  resHeaders: StringRecord,
-  targetUrl: string,
-): JsonRecord {
-  const headersLower: StringRecord = {};
-  for (const [k, v] of Object.entries(resHeaders)) {
-    headersLower[k.toLowerCase()] = v;
-  }
-
-  const security: JsonRecord = {};
-  security["is_https"] = targetUrl.startsWith("https://");
-
-  // Check each security header
-  for (const [headerName, keyPrefix] of SECURITY_HEADERS) {
-    const headerValue = headersLower[headerName];
-    security[`${keyPrefix}_present`] = headerValue !== undefined;
-    if (headerValue) {
-      security[`${keyPrefix}_value`] = headerValue;
-    }
-  }
-
-  // Permissions-Policy (formerly Feature-Policy) - Special handling
-  const permissionsPolicy =
-    headersLower["permissions-policy"] ?? headersLower["feature-policy"];
-  security["permissions_policy_present"] = permissionsPolicy !== undefined;
-  if (permissionsPolicy) {
-    security["permissions_policy_value"] = permissionsPolicy;
-  }
-
-  return security;
-}
-
-// ======================================================================
 // Build Flat Result
 // ======================================================================
 
@@ -562,13 +546,24 @@ export function buildFlatResult(params: ExecutionResultParams): JsonRecord {
   result["eo.meta.redirect-count"] = redirectCount ?? 0;
 
   // ==================================================================
-  // 7. Extensions (eo.security.*)
-  //    Matches RequestEngine/common/extensions/_ext_security.py
+  // 7. Extensions (eo.security.* etc.)
+  //    Matches RequestEngine/common/request_engine_core.py build_extension_output()
   // ==================================================================
-  const securityMetrics = analyzeSecurityHeaders(respHeadersRecord, targetUrl);
-  const sortedSecurityKeys = Object.keys(securityMetrics).sort();
-  for (const key of sortedSecurityKeys) {
-    result[`eo.security.${key}`] = securityMetrics[key];
+  const extensionContext: ExtensionContext = {
+    targetUrl,
+    resHeaders: respHeadersRecord,
+  };
+
+  for (const [, ext] of _EXTENSION_REGISTRY) {
+    try {
+      const rawOutput = ext.buildFunc(extensionContext);
+      const sortedKeys = Object.keys(rawOutput).sort();
+      for (const key of sortedKeys) {
+        result[`${ext.prefix}${key}`] = rawOutput[key];
+      }
+    } catch (e) {
+      result[`${ext.prefix}error`] = String(e);
+    }
   }
 
   // ==================================================================

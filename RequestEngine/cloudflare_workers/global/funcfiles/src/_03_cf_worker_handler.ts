@@ -47,6 +47,9 @@ import {
   determineResourceType,
 } from "../../../common/request_engine_core";
 
+// Side-effect import: registers extensions into the extension registry
+import "./_02_extensions";
+
 // ==========================================
 // Input Parser
 // ==========================================
