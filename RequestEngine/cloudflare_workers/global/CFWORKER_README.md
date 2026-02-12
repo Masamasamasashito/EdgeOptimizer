@@ -285,6 +285,32 @@ Cloudflare製のリクエストエンジンは、エリア指定できないglob
     1. ランダム秒間リクエスト機能
     2. ユーザーエージェント分散機能
 
+# Workers fetch API の制約事項（プロトコル/TLS情報）
+
+Cloudflare Workers の Request Engine では、以下のメタデータキーに固定値を出力する。
+
+| キー | 出力値 |
+|------|--------|
+| `eo.meta.http-protocol-version` | 固定値（下記参照） |
+| `eo.meta.tls-version` | 固定値（下記参照） |
+
+**固定値**: `"unavailable: Workers fetch API does not expose outgoing connection info (https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties)"`
+
+## 理由
+
+Workers の `request.cf.httpProtocol` / `request.cf.tlsVersion` はクライアント→Worker間（incoming）の接続情報のみ提供する。Worker→ターゲットURL間（outgoing）の `fetch()` API レスポンスにはプロトコル/TLS情報が含まれない。
+
+Python版 Request Engine（AWS Lambda / Azure Functions / GCP Cloud Run）では `requests` ライブラリの `response.raw` オブジェクトから outgoing のプロトコル/TLS情報を取得可能だが、Workers の `fetch()` API にはこの機能がない。
+
+## 公式ドキュメント
+
+- https://developers.cloudflare.com/workers/runtime-apis/request/#incomingrequestcfproperties
+  - `request.cf` は incoming request の情報のみ
+- https://developers.cloudflare.com/workers/runtime-apis/response/
+  - Response オブジェクトにプロトコル/TLS プロパティなし
+- https://developers.cloudflare.com/workers/runtime-apis/fetch/
+  - fetch() API に outgoing 接続情報の公開なし
+
 # 【参考】wpfixfast製 cf workers に投げるリクエスト1URLだけシンプル
 
 - Cloudflare Workersで日本のTier1 NRTをCache Warm
