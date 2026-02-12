@@ -13,6 +13,12 @@ on:
 #       # - '.github/workflows/deploy-to-cf-worker-global.yml'
 
   workflow_dispatch:
+    inputs:
+      ext_security:
+        description: 'Enable security extension (eo.security.*)'
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   cf_worker_deploy: # ジョブ名（任意）。実行単位の論理名
@@ -37,6 +43,17 @@ jobs:
       - name: Install dependencies
         working-directory: ./RequestEngine/cloudflare_workers/global/funcfiles
         run: npm install
+
+      - name: Show extension flags
+        run: |
+          EXT_SECURITY="${{ inputs.ext_security }}"
+          EXT_SECURITY="${EXT_SECURITY:-true}"
+          echo "Extension flags: security=$EXT_SECURITY"
+          if [ "$EXT_SECURITY" == "true" ]; then
+            echo "  [INCLUDED] eo.security.* (inlined in request_engine_core.ts)"
+          else
+            echo "  [WARNING] eo.security.* cannot be excluded in CF Workers (inlined in TypeScript bundle)"
+          fi
 
       - name: Build worker (strip comments only, no minify)
         working-directory: ./RequestEngine/cloudflare_workers/global/funcfiles
