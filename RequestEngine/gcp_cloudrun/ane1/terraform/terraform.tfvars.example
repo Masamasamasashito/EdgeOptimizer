@@ -27,7 +27,7 @@ github_repo = "<Githubリポジトリ名>"                # e.g., "EdgeOptimizer
 # gcp_region = "asia-northeast1"
 
 # --- Optional: Cloud Run Settings (defaults shown) ---
-# cloud_run_memory        = "512Mi"
+# cloud_run_memory        = "128Mi"
 # cloud_run_cpu           = "1"
 # cloud_run_max_instances = 10
 # cloud_run_min_instances = 0

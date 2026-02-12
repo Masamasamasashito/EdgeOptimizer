@@ -69,6 +69,20 @@ resource "google_cloud_run_v2_service" "request_engine" {
   ]
 }
 
+# ==============================================================================
+# OAuth2 Invoker SA - Cloud Run Invoker role (service-level)
+# ==============================================================================
+# Allow OAuth2 Invoker SA to invoke this Cloud Run service.
+# Without this binding, n8n requests will receive 401 Unauthorized.
+# Reference: RUN_README.md "Cloud Run サービス起動元ロールを付与"
+resource "google_cloud_run_v2_service_iam_member" "oauth2_invoker" {
+  project  = google_cloud_run_v2_service.request_engine.project
+  location = google_cloud_run_v2_service.request_engine.location
+  name     = google_cloud_run_v2_service.request_engine.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.oauth2_invoker.email}"
+}
+
 # NOTE: No google_cloud_run_v2_service_iam_member for allUsers.
 # Cloud Run requires OAuth2 Bearer token (ID token) for authentication.
 # n8n uses OAuth2 Invoker SA to obtain ID token and invoke the service.

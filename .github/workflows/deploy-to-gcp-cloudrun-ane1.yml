@@ -235,7 +235,7 @@ jobs:
             --region ${{ env.EO_GCP_REGION }} \
             --platform managed \
             --set-env-vars "EO_GCP_PROJECT_ID=${{ env.EO_GCP_PROJECT_ID }},CLOUDRUN_REQUEST_SECRET_NAME=${{ env.EO_CLOUDRUN_REQUEST_SECRET_NAME }}" \
-            --memory 512Mi \
+            --memory 128Mi \
             --cpu 1 \
             --timeout 300 \
             --max-instances 10 \

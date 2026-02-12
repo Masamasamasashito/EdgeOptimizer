@@ -99,9 +99,9 @@ variable "github_repo" {
 # --- Cloud Run Settings ---
 
 variable "cloud_run_memory" {
-  description = "Cloud Run instance memory (e.g., 512Mi, 1Gi)"
+  description = "Cloud Run instance memory (e.g., 128Mi, 512Mi, 1Gi)"
   type        = string
-  default     = "512Mi"
+  default     = "128Mi"
 }
 
 variable "cloud_run_cpu" {

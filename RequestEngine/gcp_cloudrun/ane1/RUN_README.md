@@ -33,15 +33,46 @@ GCP Cloud Run上で動作するRequest Engineの実装です。他の実装（Cl
 | **器 (Host)** | **Cloud Run サービス**<br>`https://[NAME].a.run.app` | **Function App**<br>`https://[APP].azurewebsites.net` | **Lambda 関数**<br>（API Gateway / Function URL で公開） | **Worker**<br>`https://[WORKER].[SUBDOMAIN].workers.dev` | サーバー、スケーリング、認証等の「箱」の管理。 |
 | **中身 (Logic)** | **エンドポイント（関数名相当）**<br>`/[EndpointName]` | **関数 (Function)**<br>`/api/[FunctionName]` | **ハンドラ (Handler)**<br>イベント・パスに応じて1関数が実行 | **ルート・ハンドラ**<br>リクエスト URL に応じた処理 | 実際の個別処理（フェッチ等）を呼び出す窓口。 |
 
-# GCP サーバーレス 3 世代比較
+# GCP サーバーレス世代比較
 
-EOでは、**Cloud Run** を採用しています。
+EOでは、**Cloud Run（gen1）** を採用しています。
 
-| サービス・世代 | 基盤 | URL 構造 (例) | 世代の特徴 |
-| :--- | :--- | :--- | :--- |
-| **Cloud Functions (第1世代)** | 旧世代 | `https://[REGION]-[PROJECT_ID].cloudfunctions.net/[FUNC_NAME]` | 1リクエスト毎に1インスタンス。並行処理不可。 |
-| **Cloud Functions (第2世代)** | Cloud Run | `https://[FUNC_NAME]-[HASH]-[REGION].a.run.app` | Cloud Run のサブセット。関数の枠組みに制限される。 |
-| **Cloud Run** | **最新・主力** | `https://[SERVICE_NAME]-[HASH]-[REGION].a.run.app` | **最高性能・最安。** 1インスタンスで多数のリクエストを同時処理可能。 |
+GCP サーバーレスは Cloud Functions → Cloud Run へ進化し、Cloud Run 自体にも実行環境の世代（gen1 / gen2）が存在します。
+
+| サービス・世代 | 基盤 | サンドボックス | 最小メモリ | コールドスタート | 世代の特徴 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Cloud Functions (第1世代)** | 旧世代 | gVisor | 128 MiB | 速い | 1リクエスト毎に1インスタンス。並行処理不可。 |
+| **Cloud Functions (第2世代)** | Cloud Run | gVisor | 128 MiB | 速い | Cloud Run のサブセット。関数の枠組みに制限される。 |
+| **Cloud Run gen1** ← EO採用 | **最新・主力** | gVisor | **128 MiB** | **速い** | **最高性能・最安。** 1インスタンスで多数のリクエストを同時処理可能。軽量ワークロード向け。 |
+| **Cloud Run gen2** | 最新・主力 | microVM | 512 MiB | やや遅い | フル Linux 互換（全syscall、namespaces、cgroups）。NFS マウント対応。CPU/ネットワーク性能向上。料金は gen1 と同額。 |
+
+### Cloud Run gen1 / gen2 の詳細比較
+
+| 項目 | gen1 | gen2 |
+| :--- | :--- | :--- |
+| **サンドボックス技術** | gVisor（システムコールをエミュレーション） | microVM（フル Linux カーネル） |
+| **Linux カーネル** | 4.4.0 | 5.15.60 |
+| **Linux 互換性** | 大部分のシステムコールに対応（一部非対応） | 完全互換 |
+| **コールドスタート** | **速い**（バーストトラフィックに強い） | やや遅い |
+| **CPU 性能** | 標準 | **高速** |
+| **ネットワーク性能** | 標準 | **高速**（パケットロス時に顕著） |
+| **somaxconn** | 128 | **4096** |
+| **最小メモリ** | **128 MiB** | 512 MiB |
+| **NFS マウント** | 不可 | **可** |
+| **Direct VPC egress** | 基本対応 | **最適化済み** |
+| **料金** | 同一 | 同一 |
+
+### EO Request Engine が gen1 を採用する理由
+
+| 観点 | 判断 |
+| :--- | :--- |
+| **トラフィック特性** | n8n からの間欠的バースト呼び出し → コールドスタートの速さが重要 |
+| **メモリ** | 128Mi で十分（gen2 は最小 512 MiB が必要） |
+| **Linux 互換性** | Python + Flask + HTTP リクエスト処理のみ → gen1 で十分 |
+| **NFS / VPC** | 不要 |
+| **CPU 負荷** | 軽量（HTTP 転送 + SHA-256 検証程度） |
+
+gen2 への変更が必要な場合は、デプロイコマンドに `--execution-environment gen2` を追加し、メモリを `512Mi` 以上に設定してください。
 
 ## Cloud Runにおける「2つのレイヤー」による効率化
 
@@ -1059,7 +1090,7 @@ flowchart LR
 | :--- | :--- | :--- |
 | **I/O 待ちが多い場合** (フェッチ待ち等) | **増やすのが有効** | リクエストの大半が外部サーバーからのレスポンス待ち（I/O 待ち）である場合、スレッドを増やすことで待ち時間を有効活用し、並列度を高めることができます。Python の GIL (Global Interpreter Lock) も I/O 待ちの間は解放されるため、スレッドによる並列化が非常に効果的です。 |
 | **CPU 負荷が高い場合** (重い計算等) | **増やしても意味がない** | 複雑な計算やデータ加工など、CPU をフルに使う処理が中心の場合、Python のスレッドは GIL の影響で同時に 1 つしか動きません。この場合はスレッドではなく、Worker プロセス（`--workers`）を増やす必要があります。 |
-| **メモリが不足気味の場合** | **増やすのは慎重に** | スレッドを増やすごとに、スタック領域などのメモリが消費されます。Cloud Run のメモリ制限（今回は 512Mi）を超えると OOM (Out Of Memory) でコンテナがクラッシュするため、メモリ使用量を見ながら調整が必要です。 |
+| **メモリが不足気味の場合** | **増やすのは慎重に** | スレッドを増やすごとに、スタック領域などのメモリが消費されます。Cloud Run のメモリ制限（今回は 128Mi）を超えると OOM (Out Of Memory) でコンテナがクラッシュするため、メモリ使用量を見ながら調整が必要です。 |
 | **接続先への負荷を抑えたい場合** | **増やしすぎない** | 1 プロセスで同時に投げるリクエスト数が増えるため、相手先のサーバーや API のレートリミットに抵触しやすくなります。 |
 
 > **gunicornとは**: gunicorn（Green Unicorn）は、Python WSGIアプリケーション用のHTTPサーバーです。Flaskアプリケーション（`main.py`）を本番環境で実行するために使用されます。Flaskの開発サーバー（`app.run()`）は開発用であり、本番環境ではgunicornのようなWSGIサーバーが必要です。Cloud Runでは、gunicornがFlaskアプリケーションを起動し、HTTPリクエストを処理します。`requirements.txt`に`gunicorn==21.*`が含まれているため、自動的にインストールされます。
@@ -1091,7 +1122,7 @@ GitHub Actionsワークフローは以下の設定でCloud Runサービスをデ
 
 - **サービス名**: `eo-re-d01-cloudrun-ane1`
 - **リージョン**: ane1（`asia-northeast1`）
-- **メモリ**: `512Mi`
+- **メモリ**: `128Mi`
 - **CPU**: `1`
 - **タイムアウト**: `300秒`（5分）
 - **最小インスタンス数**: `0`（アイドル時の課金を回避）
@@ -1140,7 +1171,7 @@ Last updated on 2026-01-22T04:27:12.501201Z by eo-gcp-sa-d01-deploy-ane1@<GCPプ
   Container None
     Image:           asia-northeast1-docker.pkg.dev/<GCPプロジェクトID>/cloud-run-source-deploy/eo-re-d01-cloudrun-ane1@sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     Port:            8080
-    Memory:          512Mi
+    Memory:          128Mi
     CPU:             1
     Secrets:
       CLOUDRUN_REQUEST_SECRET_NAME eo-re-d01-secretmng:latest
@@ -2252,7 +2283,7 @@ logging.warning("Content size exceeds {MAX_CONTENT_SIZE_FOR_ANALYSIS} bytes")
 
 **対策**:
 - `--min-instances 0`に設定（デフォルト）
-- メモリを必要最小限に設定（`--memory 512Mi`）
+- メモリを必要最小限に設定（`--memory 128Mi`）
 - タイムアウトを適切に設定（`--timeout 300`）
 
 #### Secret Managerの課金ポイント

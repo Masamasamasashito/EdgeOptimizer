@@ -255,7 +255,10 @@ terraform output cloud_run_service_url
 3. 設定:
    - Name: `EO_RE_GCP_RUN_ane1_OAuth2_Invoker_SA`
    - STEP 3-2 でダウンロードした JSON キーの内容を転記
-   - **重要**: `private_key` フィールドの改行文字（`\n`）を含めた**そのままの形式**で貼り付け
+   - **Service Account Email**: JSON キー内の `client_email` を入力
+   - **Private Key**: JSON キー内の `private_key` フィールドの改行文字（`\n`）を含めた**そのままの形式**で貼り付け
+   - **Set up for use in HTTP Request node**: 有効化
+   - **Scope(s)**: `https://www.googleapis.com/auth/iam`（IAM API へのアクセス用）
 4. 「Save」
 
 ### 6-2. n8n ワークフローノードの設定
@@ -263,7 +266,28 @@ terraform output cloud_run_service_url
 共通のノード設定手順は [N8N_NODE_SETUP.md](../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) を参照してください。
 
 GCP Cloud Run 固有の設定:
-- `280 GCP-ane1 RequestEngine Oauth2 Bearer` ノードの URL に Cloud Run サービス URL + エンドポイントパスを設定
+
+**ノード 235: OIDC ID Token 取得**
+
+- URL: `https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/<OAuth2_Invoker_SA_EMAIL>:generateIdToken`
+- Send Body (JSON):
+  ```json
+  {
+    "audience": "<Cloud Run サービスのデフォルト HTTPS エンドポイント URL>",
+    "includeEmail": true
+  }
+  ```
+
+**【重要】audience URL と リクエスト先 URL の違い**
+
+| ノード | URL に含めるもの | `/requestengine_tail` |
+|--------|-----------------|----------------------|
+| 235 (ID Token 取得) `audience` | サービス URL のみ | **含めない** |
+| 280 (GCP Request) `URL` | サービス URL + パス | **含める** |
+
+> `audience` に `/requestengine_tail` を含めて ID Token を発行すると、Cloud Run 側で宛先不一致とみなされ **401 Unauthorized** エラーが発生します。
+
+詳細は [RUN_README.md](../RUN_README.md) の「OAuth2 Bearerトークン認証を使用する」セクションを参照してください。
 
 ## パラメータ一覧
 
@@ -282,7 +306,7 @@ GCP Cloud Run 固有の設定:
 | `github_org` | (入力必須) | GitHub 組織名 / ユーザー名 |
 | `github_repo` | (入力必須) | GitHub リポジトリ名 |
 | **Cloud Run 設定** |||
-| `cloud_run_memory` | `512Mi` | インスタンスメモリサイズ |
+| `cloud_run_memory` | `128Mi` | インスタンスメモリサイズ |
 | `cloud_run_cpu` | `1` | インスタンス CPU |
 | `cloud_run_max_instances` | `10` | 最大インスタンス数 |
 | `cloud_run_min_instances` | `0` | 最小インスタンス数 |
