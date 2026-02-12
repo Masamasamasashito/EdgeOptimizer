@@ -86,6 +86,9 @@ _CDN_DETECTION_CONFIG = [
     ("x-swift-cachetime", "x-cache"),
     # CDNetworks
     ("x-cnc-request-id", "x-cache"),
+    # KeyCDN
+    ("x-pull", "x-cache"),
+    ("x-edge-location", "x-cache"),
     # General / Fastly
     ("x-cache", "x-cache"),
     ("x-served-by", "x-cache"),
