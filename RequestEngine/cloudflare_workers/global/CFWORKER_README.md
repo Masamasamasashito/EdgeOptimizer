@@ -12,7 +12,7 @@ Cloudflare Github 連携(独自ドメインのサブドメインでWorker作る�
   - 例: `eo-re-d01-cfworker-global`を入力、「デプロイ (Deploy)」 をクリック
 	- この時点では xxx.<Cloudflareアカウント名>.workers.dev という仮のドメインが割り当てられる
 
-`.github\workflows\deploy-to-gcp-cloudrun-ane1.yml`とgithub上のシークレットが設定して有れば、WorkerがCloudflare上に無くても、新規Workerが**カスタムドメイン無し**で作成される。
+`.github/workflows/deploy-to-cf-worker-global.yml`とgithub上のシークレットが設定して有れば、WorkerがCloudflare上に無くても、新規Workerが**カスタムドメイン無し**で作成される。
 
 ## 手順 2: サブドメインを設定
 
@@ -39,11 +39,11 @@ DNSレコードの画面で確認。
 2. プロキシステータスが 「プロキシ済み」 になれば完了。
 3. ブラウザで https://eo-re-d01-cfworker-global.sample.com にアクセスしてHello World!確認
 
-## 手順 4: Cloudflare APIトークンとアカウントIDの取得
+## 手順 4: Cloudflare ユーザーAPIトークンとアカウントIDの取得
 
 Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudflareへのアクセス権限を与える
 
-1. APIトークン作成
+1. ユーザーAPIトークン作成
     - Cloudflareダッシュボード「(右上)ユーザー」→「プロフィール」→「APIトークン」
     - 「トークンを作成」**をクリック
     - 「Cloudflare Workers を編集する (Edit Cloudflare Workers)」テンプレートの「使用する」を選択
@@ -61,25 +61,24 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 1. 取得した認証情報をGitHubリポジトリの環境変数として安全に保存
     - 対象のGitHubリポジトリを開く
     - 「Settings」タブ → 左メニューの「Secrets and variables」 → 「Actions」をクリック
-    - 「New repository secret」**をクリックし、以下の2つを追加
-        1. `EO_CLOUDFLARE_WORKER_USER_API_TOKEN_FOR_GITHUB`,手順4でコピーしたAPIトークン,認証用トークン
-        2. `CLOUDFLARE_ACCOUNT_ID`,手順4で確認したアカウントID,アカウント識別用
+    - 「New repository secret」をクリックし、以下の3つを追加
+        1. `EO_CF_WORKER_USER_API_TOKEN_FOR_GITHUB`,手順4でコピーしたユーザーAPIトークン,wranglerデプロイ認証用
+        2. `EO_CF_ACCOUNT_ID`,手順4で確認したアカウントID,アカウント識別用
+        3. `EO_CF_WORKER_DOMAIN`,Workerのカスタムドメイン（例: `eo-re-d01-cfworker-global.sample.com/*`）,wrangler.toml の routes 用
+
+- wrangler.toml は `.github/workflows/deploy-to-cf-worker-global.yml` の中で EOF により動的生成している
+- routes の pattern のカスタムドメイン名を GitHub シークレット `EO_CF_WORKER_DOMAIN` から参照する構成
 
 ## 手順 6: Workflowファイルの作成
 
 1. プロジェクトのルートディレクトリに、GitHub Actions用の設定ファイルを作成
-    - ファイルパス: `.github/workflows/deploy-to-cf-worker-global.yml` 
+    - ファイルパス: `.github/workflows/deploy-to-cf-worker-global.yml`
 2. 以下を参照。
     - Cloudflare公式のアクション cloudflare/wrangler-action を使用するのが最も簡単で推奨される方法
 
 [.github\workflows\deploy-to-cf-worker-global.yml](.github\workflows\deploy-to-cf-worker-global.yml)
 
-## 手順 7: wrangler.toml の設定
-
-- wrangler.toml の中でシークレットサービスを利用するため、deploy-to-cf-worker-global.yml の中でwrangler.tomlをEOFで作っている
-- routes の patternのカスタムドメイン名をGithubシークレットサービスで`EO_CLOUDFLARE_WORKER_DOMAIN`として登録、参照する様にしている
-
-## 手順 8: Cloudflare WorkerでGithubリポジトリを登録
+## 手順 7: Cloudflare WorkerでGithubリポジトリを登録
 
 1. 「Workers & Pages」 の一覧から、対象のWorkerをクリックして開く
 2. 画面上部のタブから 「設定 (Settings)」 をクリック
@@ -98,7 +97,7 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 13. ビルドに Gitリポジトリが表示され、`Git リポジトリにコミットをプッシュして最初のビルドを開始できるようになりました`とでたらOK
 14. 監視パスを構築する > `RequestEngine/cloudflare_workers/global/funcfiles/*`を追加
 
-## 手順 9: npm install 実行
+## 手順 8: npm install 実行
 
 1. ローカルのgitリポジトリで `docker compose run --rm cfworker_npm_installer`を実行（ 初期は`node:24-slim`をつかっていた ）。
     - `/RequestEngine/cloudflare_workers/global/funcfiles/`でnode_modulesフォルダの必要なライブラリをnpm installするため。package.jsonと同じ階層で実施する。
@@ -107,14 +106,14 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
     - node_modulesはgitリポジトリにはコミットしない
 2. ローカルのエディタを閉じて開きなおす
 
-## 手順 10: 動作確認
+## 手順 9: 動作確認
 
 1. 作成した .github/workflows/deploy-to-cf-worker-global.yml を含めて、変更をコミットし、GitHubの main ブランチへプッシュ
 2. GitHubリポジトリの 「Actions」 タブを開く
 3. 「Deploy to Cloudflare Workers」というワークフローが実行されていることを確認する
 4. 緑色のチェックマーク（Success）がつけばデプロイ完了
 
-## 手順 11: 照合用リクエストシークレット設定
+## 手順 10: 照合用リクエストシークレット設定
 
 n8n保持の照合用リクエストシークレット(docker-compose.ymlの環境変数`N8N_EO_REQUEST_SECRET`の値)とCloudflare Workers(RequestEngine)保持の照合用リクエストシークレットが一致しないと、Warmupリクエスト出来ない様になっている。
 
@@ -130,7 +129,7 @@ n8n保持の照合用リクエストシークレット(docker-compose.ymlの環�
 
 (おそらく不要)n8nコンテナ再起動、CF worker再デプロイ。
 
-## 手順 12: Cloudflare Access サービストークン作成
+## 手順 11: Cloudflare Access サービストークン作成
 
 n8nに持たせる「通行手形（IDとパスワード）」を作成し、Cloudflare Access ( Zero Trust ) でWorkerを保護する
 
@@ -142,7 +141,7 @@ n8nに持たせる「通行手形（IDとパスワード）」を作成し、Clo
     - Create Service Token をクリック
     - 重要: ここで表示される Client ID と Client Secret を必ずコピーして控えて。Secretはこの画面を閉じると二度と表示されない
 
-## 手順 13: Cloudflare Access で Worker を保護
+## 手順 12: Cloudflare Access で Worker を保護
 
 Workerのカスタムドメインに対して「Accessアプリケーション」を作成し、サービストークンを持っている場合のみ通す設定
 
@@ -190,7 +189,7 @@ View details
 となったらOK。n8n workflowまわすと、`Error ・ Cloudflare Access`というタイトルページになること。
 単純にカスタムドメインをブラウザで叩いて、アクセス出来ないことを確認。
 
-## 手順 14: n8n Credentials登録 と HTTP Requestノードにサービストークン設定
+## 手順 13: n8n Credentials登録 と HTTP Requestノードにサービストークン設定
 
 n8nからリクエストエンジンにリクエストを送る際、リクエストヘッダにサービストークン情報を載せる設定  
   
@@ -203,8 +202,8 @@ n8n Credentials登録
 ```
 {
   "headers": {
-    "CF-Access-Client-Id": "手順12のClient ID",
-    "CF-Access-Client-Secret": "手順12のClient Secret"
+    "CF-Access-Client-Id": "手順11のClient ID",
+    "CF-Access-Client-Secret": "手順11のClient Secret"
   }
 }
 ```
@@ -218,7 +217,7 @@ n8nでWorkerサブドメインとCredentialsをHTTP Requestノードで設定
 4. Generic Auth Type > Custom Authを選ぶ
 5. Custom Auth > `EO_RE_CF_HeaderAuth_ServiceToken`を選ぶ
 
-## 手順 15: n8n workflow実行、動作確認
+## 手順 14: n8n workflow実行、動作確認
 
 1. Execute workflowを押す
 2. n8n workflowが実行される

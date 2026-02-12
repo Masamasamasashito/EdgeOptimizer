@@ -53,7 +53,7 @@ jobs:
           # シークレットから取得したドメインを設定
           workers_dev = false
           routes = [
-            { pattern = "${{ secrets.EO_CLOUDFLARE_WORKER_DOMAIN }}", zone_confirm = true }
+            { pattern = "${{ secrets.EO_CF_WORKER_DOMAIN }}", zone_confirm = true }
           ]
 
           [observability]
@@ -75,7 +75,7 @@ jobs:
       - name: Deploy to Cloudflare Worker Global
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.EO_CLOUDFLARE_WORKER_USER_API_TOKEN_FOR_GITHUB }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.EO_CF_WORKER_USER_API_TOKEN_FOR_GITHUB }}
+          accountId: ${{ secrets.EO_CF_ACCOUNT_ID }}
           workingDirectory: ./RequestEngine/cloudflare_workers/global/funcfiles
           command: deploy
