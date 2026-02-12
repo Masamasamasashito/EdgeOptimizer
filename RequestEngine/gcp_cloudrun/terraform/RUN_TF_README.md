@@ -69,7 +69,7 @@ eo_gcp_resource_labels
 |---------|------|
 | `main.tf` | **Terraform プロバイダ**（`hashicorp/google`）設定、ローカル変数（命名規則） |
 | `variables.tf` | 全入力変数の定義（デフォルト値付き） |
-| `apis.tf` | 必要な GCP API の有効化（7件） |
+| `apis.tf` | 必要な GCP API の有効化（8件） |
 | `service_accounts.tf` | Service Account 3件 + 全ロール設定 |
 | `secret_manager.tf` | Secret Manager シークレット作成 |
 | `wif.tf` | Workload Identity Pool / **WIF IdP**（GitHub Actions OIDC 認証） |
@@ -91,7 +91,7 @@ eo_gcp_resource_labels
 
 | リソース種別 | リソース名 | 説明 |
 |-------------|-----------|------|
-| GCP API（7件） | - | cloudfunctions, cloudbuild, artifactregistry, run, secretmanager, iam, iamcredentials |
+| GCP API（8件） | - | cloudfunctions, cloudbuild, artifactregistry, run, secretmanager, compute, iam, iamcredentials |
 | Service Account | `{pj}-gcp-sa-{env}-deploy-{region}` | Deployer SA（GitHub Actions デプロイ用） |
 | Service Account | `{pj}-gcp-sa-{env}-runtime-{region}` | Runtime SA（Cloud Run 実行 + Secret Manager） |
 | Service Account | `{pj}-gcp-sa-{env}-oa2be-inv-{region}` | OAuth2 Invoker SA（n8n 認証用） |
@@ -174,6 +174,25 @@ gcloud resource-manager tags bindings create \
 ```
 
 ### 0-4. Terraform インストール/更新
+
+**WSL Ubuntu / Linux (apt):**
+
+初回インストール:
+```bash
+# sudo で WSL Ubuntu のユーザーパスワードを求められる（Windows のパスワードとは別）
+# 忘れた場合は PowerShell から: wsl -u root passwd <WSLユーザー名>
+sudo echo "sudo password OK"
+
+# HashiCorp GPG キーとリポジトリを追加
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform
+```
+
+更新:
+```bash
+sudo apt update && sudo apt upgrade terraform
+```
 
 **Windows (winget):**
 ```powershell
@@ -281,6 +300,13 @@ PowerShell:
 '{"CLOUDRUN_REQUEST_SECRET":"' + $env:N8N_EO_REQUEST_SECRET + '"}' | gcloud secrets versions add eo-re-d01-secretmng --data-file=-
 ```
 
+**プレースホルダー版（バージョン 1）の無効化・破棄:**
+
+```bash
+gcloud secrets versions disable 1 --secret=eo-re-d01-secretmng
+gcloud secrets versions destroy 1 --secret=eo-re-d01-secretmng
+```
+
 ### 3-2. OAuth2 Invoker SA の JSON キー発行
 
 n8n が Cloud Run を呼び出すための認証キーを発行します。
@@ -292,9 +318,9 @@ n8n が Cloud Run を呼び出すための認証キーを発行します。
 3. ダウンロードされた JSON ファイルを保管
    - ファイル名の後方を `-Oauth2_Invoker-jsonkey-yyyymmdd.json` のように変えておくとわかりやすい
 
-## STEP 4: GitHub Secrets の設定
+## STEP 4: GitHub Secrets ( Repository secrets ) の設定
 
-GitHub リポジトリ > Settings > Secrets and variables > Actions に以下を登録:
+GitHub リポジトリ > Settings > Secrets and variables > Actions > Repository secrets に以下を登録:
 
 | シークレット名 | 値の取得方法 | 説明 |
 |--------------|-------------|------|
@@ -302,6 +328,15 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions に以下を
 | `EO_GCP_WIF_PROVIDER_PATH` | `terraform output wif_provider_path` | WIF IdP（ID プロバイダ）の完全パス |
 | `EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL` | `terraform output deploy_sa_email` | Deployer SA のメールアドレス |
 | `EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL` | `terraform output runtime_sa_email` | Runtime SA のメールアドレス |
+
+**`terraform output` の出力例（GitHub Secrets に登録する値）:**
+
+```
+gcp_project_id      = "eo-re-d01-pr-ane1"
+wif_provider_path   = "projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/providers/eo-gcp-idp-gh-oidc-wif-d01"
+deploy_sa_email     = "eo-gcp-sa-d01-deploy-ane1@eo-re-d01-pr-ane1.iam.gserviceaccount.com"
+runtime_sa_email    = "eo-gcp-sa-d01-runtime-ane1@eo-re-d01-pr-ane1.iam.gserviceaccount.com"
+```
 
 **一括確認:**
 
@@ -315,10 +350,17 @@ Terraform で作成した Cloud Run サービスにはプレースホルダー�
 
 ### 5-1. GitHub Actions ワークフローの実行
 
+> **注意**: GitHub Actions のワークフロー実行は **GUI（GitHub Web UI）からのみ** 対応しています。CLI（`gh workflow run` 等）からの実行は、デプロイ先やオプションの誤選択を防ぐため現状では使用していません。
+
 1. GitHub リポジトリ > **Actions** タブ
 2. 左サイドバー > **Deploy GCP Cloud Run ane1**
-3. 「Run workflow」> ブランチ `main` を選択 > 「Run workflow」
-4. ワークフローが完了するまで待機（約5〜10分）
+3. 「Run workflow」> ブランチ `main` を選択
+4. 以下の extension オプションは**選択しないことを推奨**（現状、開発が追いついていないため）:
+   - `Enable measure extension (eo.measure.*)`
+   - `Enable performance extension (eo.performance.*)`
+   - `Enable security extension (eo.security.*)`
+5. 「Run workflow」を実行
+6. ワークフローが完了するまで待機（約5〜10分）
 
 ### 5-2. デプロイ結果の確認
 
@@ -342,8 +384,9 @@ terraform output cloud_run_service_url
 2. Credential Type: `Google Service Account API`
 3. 設定:
    - Name: `EO_RE_GCP_RUN_ane1_OAuth2_Invoker_SA`
+   - Region: `asia-northeast1`
    - STEP 3-2 でダウンロードした JSON キーの内容を転記
-   - **Service Account Email**: JSON キー内の `client_email` を入力
+   - **Service Account Email**: OAuth2 Invoker SA（`eo-gcp-sa-d01-oa2be-inv-ane1`）の JSON キー内 `client_email` の値を入力
    - **Private Key**: JSON キー内の `private_key` フィールドの改行文字（`\n`）を含めた**そのままの形式**で貼り付け
    - **Set up for use in HTTP Request node**: 有効化
    - **Scope(s)**: `https://www.googleapis.com/auth/iam`（IAM API へのアクセス用）
@@ -365,6 +408,7 @@ GCP Cloud Run 固有の設定:
     "includeEmail": true
   }
   ```
+  `audience` の値は STEP 5-2 で確認した Cloud Run サービス URL（`terraform output cloud_run_service_url` または `gcloud run services describe` で取得）を使用
 
 **【重要】audience URL と リクエスト先 URL の違い**
 
@@ -374,6 +418,22 @@ GCP Cloud Run 固有の設定:
 | 280 (GCP Request) `URL` | サービス URL + パス | **含める** |
 
 > `audience` に `/requestengine_tail` を含めて ID Token を発行すると、Cloud Run 側で宛先不一致とみなされ **401 Unauthorized** エラーが発生します。
+
+**ノード 280: GCP-asia-northeast1 RequestEngine Oauth2 Bearer**
+
+ノード 235 で取得した ID Token を使い、Cloud Run サービスにリクエストを送信するノードです。
+
+- **Method**: `POST`
+- **URL**: `<Cloud Run サービス URL>/requestengine_tail`
+  - STEP 5-2 で確認したサービス URL に `/requestengine_tail` を付加
+  - 例: `https://eo-re-d01-cloudrun-ane1-xxxxxxxxxx-an.a.run.app/requestengine_tail`
+- **Authentication**: `None`（ヘッダーで直接指定するため）
+- **Headers**:
+  - `Authorization`: `Bearer {{ $json.idToken }}`（ノード 235/240 で取得した ID Token）
+  - `Content-Type`: `application/json`
+- **Send Body**: 有効化
+- **Specify Body**: `Using JSON`
+- **JSON Body**: `{{ $json }}`（ノード 245 でマージされたデータをそのまま送信）
 
 詳細は [RUN_README.md](../ane1/RUN_README.md) の「OAuth2 Bearerトークン認証を使用する」セクションを参照してください。
 

@@ -51,10 +51,13 @@ resource "google_project_iam_member" "deployer_ar_repo_admin" {
 }
 
 # Deployer SA - actAs Compute Engine default SA
+# Compute Engine API 有効化により自動作成されるデフォルト SA に対する権限
 resource "google_service_account_iam_member" "deployer_actAs_compute" {
   service_account_id = "projects/${var.gcp_project_id}/serviceAccounts/${var.gcp_project_number}-compute@developer.gserviceaccount.com"
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.deployer.email}"
+
+  depends_on = [google_project_service.compute_engine]
 }
 
 # ==============================================================================
@@ -112,8 +115,12 @@ resource "google_service_account_iam_member" "oauth2_invoker_self_token_creator"
 # ==============================================================================
 # Compute Engine Default SA - Artifact Registry permission
 # ==============================================================================
+# Compute Engine API 有効化時に自動作成されるデフォルト SA
+# Cloud Build がコンテナビルド時にこの SA を使用するため、AR 権限が必要
 resource "google_project_iam_member" "compute_default_ar_repo_admin" {
   project = var.gcp_project_id
   role    = "roles/artifactregistry.repoAdmin"
   member  = "serviceAccount:${var.gcp_project_number}-compute@developer.gserviceaccount.com"
+
+  depends_on = [google_project_service.compute_engine]
 }

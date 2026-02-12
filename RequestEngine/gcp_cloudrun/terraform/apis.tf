@@ -34,6 +34,12 @@ resource "google_project_service" "secret_manager" {
   disable_on_destroy = false
 }
 
+resource "google_project_service" "compute_engine" {
+  project            = var.gcp_project_id
+  service            = "compute.googleapis.com"
+  disable_on_destroy = false
+}
+
 resource "google_project_service" "iam" {
   project            = var.gcp_project_id
   service            = "iam.googleapis.com"
