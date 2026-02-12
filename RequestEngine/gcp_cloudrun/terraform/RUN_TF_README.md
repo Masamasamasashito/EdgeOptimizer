@@ -146,6 +146,9 @@ Terraform が GCP API を呼び出すための認証とプロジェクト設定:
 # 1. ADC（Application Default Credentials）認証
 #    Terraform 等のツールが GCP API を呼び出すための認証情報を取得
 gcloud auth application-default login
+# ⚠ WSL Ubuntu の場合、「Your browser has been opened to visit:」と表示されるが
+#   ブラウザは自動で開かない。表示された URL を手動でブラウザにコピー＆ペーストし、
+#   Google アカウント認証を完了すること。操作しないとプロセスがここから進まない。
 
 # 2. プロジェクト設定 + クォータプロジェクト統一（WARNING 防止）
 gcloud config set project $EO_GCP_PROJECT_ID
