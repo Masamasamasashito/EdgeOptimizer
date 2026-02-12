@@ -30,7 +30,7 @@ Terraform を使用した GCP Cloud Run Request Engine インフラストラク�
 | 用語 | 正式名称 | 役割 | 本文中の表記 |
 |------|---------|------|-------------|
 | **Terraform プロバイダ** | Terraform Cloud Provider Plugin | Terraform がクラウド API を操作するためのプラグイン（`hashicorp/google`） | 「Terraform プロバイダ」 |
-| **WIF ID プロバイダ (IdP)** | Workload Identity Federation Identity Provider | GitHub Actions OIDC トークンを GCP 認証に変換する ID 連携の窓口 | 「WIF IdP」「ID プロバイダ」 |
+| **WIF ID プロバイダ (IdP)** | GCP Workload Identity Federation Identity Provider | GitHub Actions OIDC トークンを GCP 認証に変換する ID 連携の窓口 | 「WIF IdP」「ID プロバイダ」 |
 
 ### GCP タグキーと EO リソースラベルの使い分け
 

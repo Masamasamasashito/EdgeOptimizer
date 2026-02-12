@@ -150,4 +150,6 @@ Critical variables in `EO_Infra_Docker/.env`:
    - 構造・デザイン・コードの変更前には、変更案を提示し承認を得るプロセスを必須とする。
 4. **Markdown Style:** Do not use `---` (horizontal rule) in markdown files.
    - マークダウンファイルで水平線（`---`）を使用しないこと。
+5. **Naming Readability:** When proposing names for variables, functions, files, or any identifiers, prioritize "first-glance comprehension" over technical precision alone. A name must be understandable to someone seeing it for the first time without reading the source code.
+   - 命名提案時は「初見で意味が通るか」を最優先基準とする。技術的正確さだけでは不十分。コードを読まずとも名前だけで意図が伝わること。
 
