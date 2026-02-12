@@ -537,8 +537,12 @@ def _execute_http_request_with_retry(
     headers: Dict[str, str],
 ) -> Tuple[requests.Response, Dict[str, Any]]:
     """
-    Execute HTTP request with retry
+    Execute HTTP request with retry (stream=True)
     Automatically retry for temporary errors.
+
+    Note: stream=True makes requests.get() return when response headers are received
+    (before body download). This enables accurate TTFB measurement in the caller.
+    The caller MUST consume the body (response.content) and close the response.
     """
     retry_info = {
         "retry_attempts": 0,
@@ -556,6 +560,7 @@ def _execute_http_request_with_retry(
                 headers=headers,
                 timeout=HTTP_REQUEST_TIMEOUT,
                 allow_redirects=True,
+                stream=True,
             )
 
             status_code = response.status_code

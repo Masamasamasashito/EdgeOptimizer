@@ -366,9 +366,9 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     # Execute HTTP request (with retry)
     # ==================================================================
     # Initial_Response_ms (Time To First Byte) measurement
-    # Definition: Time from sending HTTP request to receiving first byte (response headers) from server
-    # Includes: DNS lookup, TCP connection establishment, TLS handshake (for HTTPS), server internal processing, network latency
-    # Measurement method: Record time just before sending request, measure when entering with block (when response headers received = first byte received)
+    # Definition: Time from sending HTTP request to receiving response headers from server
+    # Includes: DNS lookup, TCP connection, TLS handshake, server processing, network latency
+    # Measurement: stream=True makes requests.get() return at headers-received (before body download)
     http_request_start_time = time.time()
     try:
         # ==================================================================
@@ -382,21 +382,18 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
 
         with response:
             # ==================================================================
-            # Receive WarmupResultData from Target URL
-            # ==================================================================
-            # ==================================================================
-            # Initial_Response_ms measurement: when entering with block = when response headers received (first byte received)
+            # TTFB measurement (stream=True: headers already received, body not yet downloaded)
             # ==================================================================
             ttfb_end = time.time()
             Initial_Response_ms = (ttfb_end - http_request_start_time) * 1000
 
             # ==================================================================
-            # Get HTTP protocol version
+            # Get HTTP protocol version (connection still open with stream=True)
             # ==================================================================
             http_protocol_version = _get_http_protocol_version(response)
 
             # ==================================================================
-            # Get TLS version
+            # Get TLS version (connection still open with stream=True)
             # ==================================================================
             tls_version = _get_tls_version(response, target_url)
 
@@ -411,18 +408,10 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             redirect_count = len(response.history) if hasattr(response, 'history') else 0
 
             # ==================================================================
-            # Get body size
+            # Download body (cache warmup) and measure actual content length
             # ==================================================================
-            # Get from Content-Length header
-            content_length_header = res_headers.get("Content-Length") or res_headers.get("content-length")
-            if content_length_header:
-                try:
-                    content_length = int(content_length_header)
-                except (ValueError, TypeError):
-                    content_length = 0
-            else:
-                # If no Content-Length header, content_length remains 0 for warmup purpose
-                content_length = 0
+            body_content = response.content
+            content_length = len(body_content)
 
             # ==================================================================
             # Build result
