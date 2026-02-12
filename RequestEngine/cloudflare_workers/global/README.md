@@ -63,9 +63,9 @@ The worker accepts JSON payloads compatible with the EO ecosystem.
 ```json
 {
   "data": {
-    "targeturl": "https://sample.com/page1",
+    "targetUrl": "https://sample.com/page1",
     "urltype": "main_document",
-    "token": "generated-sha256-hash", // SHA256(url + N8N_EO_REQUEST_SECRET)
+    "tokenCalculatedByN8n": "generated-sha256-hash", // SHA256(url + N8N_EO_REQUEST_SECRET)
     "headers": {
       "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
       "Accept-Language": "ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7"
@@ -93,17 +93,49 @@ The JSON keys follow a specific convention for clarity and standardization:
     - *Note: This ensures the data structure is instantly familiar to web developers.*
 
 - **`eo.*`**: These are proprietary metrics added by **Nishi Labo** for the **Edge Optimizer**.
-    - `eo.meta.*`: Metadata and context (Conditions, IDs, Regions).
-    - `eo.measure.*`: All measurement values (Performance, Security, etc.).
+    - `eo.meta.*`: Metadata, context, and measurements (IDs, Regions, Timing, CDN detection).
+    - `eo.security.*`: Security header analysis (HSTS, CSP, etc.).
 
 ```jsonc
 {
   // --- Request General Info ---
+  "headers.general.status-code": 200,
+  "headers.general.status-message": "OK",
   "headers.general.request-url": "https://target-site.com/page1",
   "headers.general.http-request-method": "GET",
-  "headers.general.status-code": "200 OK",
-  "headers.general.connection-protocol": "HTTP/2", // Protocol (n8n -> Worker)
-  "headers.general.connection-tls-version": "TLSv1.3", // TLS Version (n8n -> Worker)
+
+  // --- EO Metadata & Identification ---
+  "eo.meta.http-request-number": 1,
+  "eo.meta.http-request-uuid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "eo.meta.http-request-round-id": 1739000000,
+  "eo.meta.urltype": "main_document",
+
+  // --- EO Execution Environment ---
+  "eo.meta.re-area": "NRT",                   // Cloudflare Colo Code
+  "eo.meta.execution-id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "eo.meta.request-start-timestamp": 1739000000.123,
+  "eo.meta.request-end-timestamp": 1739000000.456,
+
+  // --- EO Protocol (Workers API limitation: fixed values) ---
+  "eo.meta.http-protocol-version": "unavailable: Workers fetch API does not expose outgoing connection info (...)",
+  "eo.meta.tls-version": "unavailable: Workers fetch API does not expose outgoing connection info (...)",
+
+  // --- EO CDN Detection ---
+  "eo.meta.cdn-header-name": "cf-ray",
+  "eo.meta.cdn-header-value": "xxxxxxxx-NRT",
+  "eo.meta.cdn-cache-status": "HIT",
+
+  // --- EO Measurements ---
+  "eo.meta.duration-ms": 125.45,
+  "eo.meta.ttfb-ms": 45.12,
+  "eo.meta.actual-content-length": 1024,
+  "eo.meta.redirect-count": 0,
+
+  // --- EO Security ---
+  "eo.security.is_https": true,
+  "eo.security.hsts_present": true,
+  "eo.security.hsts_value": "max-age=31536000; includeSubDomains",
+  // ... (csp, x_content_type_options, x_frame_options, etc.)
 
   // --- Response Headers (From Origin) ---
   "headers.response-headers.content-type": "text/html; charset=utf-8",
@@ -112,18 +144,9 @@ The JSON keys follow a specific convention for clarity and standardization:
   "headers.response-headers.content-length": "1024",
 
   // --- Request Headers (Sent to Origin) ---
-  "headers.request-headers.user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
+  "headers.request-headers.user-agent": "Mozilla/5.0 ...",
   "headers.request-headers.accept-encoding": "gzip",
-  "headers.request-headers.x-eo-client": "eo-cloudflare-worker",
-
-  // --- EO Metadata & Context ---
-  "eo.meta.http-request-number": 1,           // ID passed from input (pass-through)
-  "eo.meta.area": "NRT",                      // Execution Region (Cloudflare Colo Code)
-  
-  // --- EO Measurements (Performance & Security) ---
-  "eo.measure.duration-ms": 125,              // Total duration of the fetch request
-  "eo.measure.ttfb-ms": 45,                   // Time To First Byte (latency)
-  "eo.measure.actual-content-length": 1024,   // Actual size of the downloaded body
+  "headers.request-headers.x-eo-re": "cloudflare"
 }
 ```
 
