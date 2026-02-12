@@ -478,7 +478,7 @@ GCP Cloud Run 固有の設定:
 | `github_org` | (入力必須) | GitHub 組織名 / ユーザー名 |
 | `github_repo` | (入力必須) | GitHub リポジトリ名 |
 | **Cloud Run 設定** |||
-| `cloud_run_memory` | `128Mi` | インスタンスメモリサイズ |
+| `cloud_run_memory` | `512Mi` | インスタンスメモリサイズ（CPU always allocated 時の最小値） |
 | `cloud_run_cpu` | `1` | インスタンス CPU |
 | `cloud_run_max_instances` | `10` | 最大インスタンス数 |
 | `cloud_run_min_instances` | `0` | 最小インスタンス数 |

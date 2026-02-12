@@ -152,4 +152,6 @@ Critical variables in `EO_Infra_Docker/.env`:
    - マークダウンファイルで水平線（`---`）を使用しないこと。
 5. **Naming Readability:** When proposing names for variables, functions, files, or any identifiers, prioritize "first-glance comprehension" over technical precision alone. A name must be understandable to someone seeing it for the first time without reading the source code.
    - 命名提案時は「初見で意味が通るか」を最優先基準とする。技術的正確さだけでは不十分。コードを読まずとも名前だけで意図が伝わること。
+6. **File Path References:** When referencing files in code comments, documentation, or any text, always use the full path from the repository root directory. Never use bare filenames.
+   - コメント・ドキュメント等でファイルを参照する際は、リポジトリルートからのフルパスで記載すること。ファイル名単体での記載は禁止。
 

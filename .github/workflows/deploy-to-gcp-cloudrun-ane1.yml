@@ -35,7 +35,7 @@ env:
   EO_GCP_CLOUD_RUN_SERVICE_NAME: eo-re-d01-cloudrun-ane1
   EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL: ${{ secrets.EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL }}
   EO_CLOUDRUN_REQUEST_SECRET_NAME: eo-re-d01-secretmng
-  # Cloud Run スペック（variables.tf デフォルト値と同期）
+  # Cloud Run スペック（RequestEngine/gcp_cloudrun/terraform/variables.tf デフォルト値にあわせた）
   EO_GCP_CLOUD_RUN_MEMORY: '512Mi'
   EO_GCP_CLOUD_RUN_CPU: '1'
   EO_GCP_CLOUD_RUN_TIMEOUT: '300'
