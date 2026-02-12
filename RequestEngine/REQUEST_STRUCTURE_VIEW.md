@@ -62,7 +62,7 @@
 **意味**: バックエンドの出力を**クライアントが期待する形**に変換する。
 
 - **入力**: バックエンドの生の結果（status, headers, body size, ttfb 等）
-- **出力**: クライアント契約に合った形（例: フラットな `headers.general.status-code`, `eo.measure.Initial_Response_ms` など）
+- **出力**: クライアント契約に合った形（例: フラットな `headers.general.status-code`, `eo.meta.ttfb-ms` など）
 - **設計のポイント**:
   - クライアント（n8n / Aggregator）が「こういうキーで欲しい」という**契約**をここで満たす  
   - プロキシ統合に近い場合は「透過＋薄い整形」、そうでない場合は「マッピング」と割り切る  
@@ -89,7 +89,7 @@
 | メソッドリクエスト   | n8nからのリクエスト | 直下に記載 |
 | 統合リクエスト       | パース済み Body + 検証 | `targetUrl`, `headers`（Host 除外済み）、トークン OK |
 | バックエンド呼び出し | `fetch(url, { headers })` の引数 | `Response`（status, headers, body） |
-| 統合レスポンス       | `Response` + 計測値 | フラット JSON（`headers.*`, `eo.measure.*` 等） |
+| 統合レスポンス       | `Response` + 計測値 | フラット JSON（`headers.*`, `eo.meta.*`, `eo.security.*`） |
 | メソッドレスポンス   | 統合レスポンスの JSON | `200` + その JSON を Body にした HTTP レスポンス |
 
 「何が入力で何が出力か」をこの表で揃えておくと、プラットフォーム（Lambda / Worker / Cloud Run / Azure）が変わっても、**同じ表で設計を揃えられる**。

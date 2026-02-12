@@ -355,10 +355,8 @@ Terraform で作成した Cloud Run サービスにはプレースホルダー�
 1. GitHub リポジトリ > **Actions** タブ
 2. 左サイドバー > **Deploy GCP Cloud Run ane1**
 3. 「Run workflow」> ブランチ `main` を選択
-4. 以下の extension オプションは**選択しないことを推奨**（現状、開発が追いついていないため）:
-   - `Enable measure extension (eo.measure.*)`
-   - `Enable performance extension (eo.performance.*)`
-   - `Enable security extension (eo.security.*)`
+4. extension オプション:
+   - `Enable security extension (eo.security.*)` — デフォルトtrue（推奨）
 5. 「Run workflow」を実行
 6. ワークフローが完了するまで待機（約5〜10分）
 

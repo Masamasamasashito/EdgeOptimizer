@@ -278,8 +278,6 @@ classDiagram
         +headers.request-headers.*
         +headers.response-headers.*
         +eo.meta.*
-        +eo.measure.*
-        +eo.performance.*
         +eo.security.*
     }
 

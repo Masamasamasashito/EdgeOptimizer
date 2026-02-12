@@ -1557,8 +1557,8 @@ curl -X POST https://eo-re-d01-cloudrun-ane1-<hash>-an.a.run.app/requestengine_t
   "headers.general.status-message": "Invalid Request Secret",
   "headers.general.request-url": "https://sample.com",
   "headers.general.http-request-method": "GET",
-  "eo.meta.area": "ane1",
-  "eo.measure.duration-ms": 0.0,
+  "eo.meta.re-area": "ane1",
+  "eo.meta.duration-ms": 0.0,
   "eo.meta.http-request-number": null,
   "eo.meta.http-request-uuid": null,
   "eo.meta.http-request-round-id": null,
@@ -1713,7 +1713,7 @@ curl.exe -X POST $serviceUrl `
     - `eo.meta.http-request-round-id`: ラウンドID
     
     **実行環境・タイムスタンプ情報**:
-    - `eo.meta.area`: 実行エリア（ane1）
+    - `eo.meta.re-area`: 実行エリア（ane1）
     - `eo.meta.execution-id`: 実行環境識別子（Cloud Run実行ID、取得可能な場合）
     - `eo.meta.request-start-timestamp`: リクエスト開始時刻（UNIXタイムスタンプ、秒単位）
     - `eo.meta.request-end-timestamp`: レスポンス終了時刻（UNIXタイムスタンプ、秒単位）
@@ -1722,30 +1722,16 @@ curl.exe -X POST $serviceUrl `
     - `eo.meta.http-protocol-version`: HTTPプロトコルバージョン（HTTP/1.1, HTTP/2, HTTP/3など）
     - `eo.meta.tls-version`: TLSバージョン（TLSv1.2, TLSv1.3など）
     
-    **基本測定値**:
-    - `eo.measure.duration-ms`: 総処理時間（ミリ秒単位）
-    - `eo.measure.ttfb-ms`: TTFB（Time To First Byte、ミリ秒単位）
-    - `eo.measure.actual-content-length`: コンテンツサイズ（バイト単位）
-    
-    **リソース情報**:
-    - `eo.performance.resource_urltype`: リソースタイプ（main_document/asset/exception）
-    - `eo.performance.resource_extension`: リソース拡張子（例: "html", "css", "js", "woff2"）
-    - `eo.performance.resource_category`: リソース種別（html/image/css/js/font/video/other）
-    
-    **パフォーマンス指標（Core Web Vitals）**:
-    - `eo.performance.fcp_14kb_ms`: FCP近似値（最初の14KB読み込み時間、main_documentの場合）
-    - `eo.performance.fcp_50kb_ms`: FCP近似値（最初の50KB読み込み時間、main_documentの場合）
-    - `eo.performance.lcp_*`: LCP要素情報（main_documentの場合）
-    
-    **Critical Path（レンダリングブロッキングリソース）**（main_documentの場合）:
-    - `eo.performance.blocking_css`: レンダリングブロッキングCSS（URL、順序）
-    - `eo.performance.blocking_js`: レンダリングブロッキングJavaScript（URL、順序）
-    - `eo.performance.non_blocking_js`: 非ブロッキングJavaScript（defer/async付き、URL、属性）
-    - `eo.performance.preload_resources`: プリロードリソース（URL、as属性、順序）
-    - `eo.performance.blocking_css_count`: ブロッキングCSSの数
-    - `eo.performance.blocking_js_count`: ブロッキングJSの数
-    - `eo.performance.non_blocking_js_count`: 非ブロッキングJSの数
-    - `eo.performance.preload_resources_count`: プリロードリソースの数
+    **計測値**:
+    - `eo.meta.duration-ms`: 総処理時間（ミリ秒単位）
+    - `eo.meta.ttfb-ms`: TTFB（Time To First Byte、ミリ秒単位）
+    - `eo.meta.actual-content-length`: コンテンツサイズ（バイト単位）
+    - `eo.meta.redirect-count`: リダイレクト回数
+
+    **CDN検出情報**（CDN検出時のみ）:
+    - `eo.meta.cdn-header-name`: CDN検出に使用したヘッダー名
+    - `eo.meta.cdn-header-value`: CDN検出ヘッダーの値
+    - `eo.meta.cdn-cache-status`: CDNキャッシュステータス（HIT/MISS等）
     
     **セキュリティ情報**:
     - `eo.security.is_https`: HTTPS接続かどうか
@@ -1775,49 +1761,19 @@ curl.exe -X POST $serviceUrl `
   "eo.meta.http-request-number": 1,
   "eo.meta.http-request-uuid": "550e8400-e29b-41d4-a716-446655440000",
   "eo.meta.http-request-round-id": 1737123456,
-  "eo.meta.area": "ane1",
+  "eo.meta.re-area": "ane1",
   "eo.meta.execution-id": "<execution-id-if-available>",
   "eo.meta.request-start-timestamp": 1768679573.8576665,
   "eo.meta.request-end-timestamp": 1768679580.6783333,
   "eo.meta.http-protocol-version": "HTTP/1.1",
   "eo.meta.tls-version": "TLSv1.2",
-  "eo.measure.duration-ms": 820.67,
-  "eo.measure.ttfb-ms": 272.66,
-  "eo.measure.actual-content-length": 126823,
-  "eo.performance.resource_urltype": "main_document",
-  "eo.performance.resource_extension": null,
-  "eo.performance.resource_category": "html",
-  "eo.performance.ttfb_ms": 272.66407012939453,
-  "eo.performance.redirect_count": 0,
-  "eo.performance.fcp_14kb_ms": 285.12,
-  "eo.performance.fcp_14kb_bytes": 16384,
-  "eo.performance.fcp_50kb_ms": 312.45,
-  "eo.performance.fcp_50kb_bytes": 54183,
-  "eo.performance.lcp_image_count": 14,
-  "eo.performance.lcp_first_image_src": "https://sample.com/wp-content/uploads/2025/10/nishi_labo_logo_500120_background_transparent.webp",
-  "eo.performance.lcp_video_count": 0,
-  "eo.performance.lcp_bg_image_count": 0,
-  "eo.performance.lcp_text_block_count": 65,
-  "eo.performance.lcp_candidate_count": 79,
-  "eo.performance.blocking_css": [
-    {"url": "https://sample.com/style.css", "relative_url": "/style.css", "order": 0}
-  ],
-  "eo.performance.blocking_js": [
-    {"url": "https://sample.com/app.js", "relative_url": "/app.js", "order": 0}
-  ],
-  "eo.performance.non_blocking_js": [
-    {"url": "https://sample.com/analytics.js", "relative_url": "/analytics.js", "defer": true, "async": false, "type": null, "order": 0}
-  ],
-  "eo.performance.preload_resources": [
-    {"url": "https://sample.com/font.woff2", "relative_url": "/font.woff2", "as": "font", "order": 0}
-  ],
-  "eo.performance.blocking_css_count": 1,
-  "eo.performance.blocking_js_count": 1,
-  "eo.performance.non_blocking_js_count": 1,
-  "eo.performance.preload_resources_count": 1,
-  "eo.performance.content_size_bytes": 126823,
-  "eo.performance.content_encoding": "gzip",
-  "eo.performance.html_encoding": "utf-8",
+  "eo.meta.cdn-header-name": "cf-ray",
+  "eo.meta.cdn-header-value": "xxxxxxxx-NRT",
+  "eo.meta.cdn-cache-status": "HIT",
+  "eo.meta.duration-ms": 820.67,
+  "eo.meta.ttfb-ms": 272.66,
+  "eo.meta.actual-content-length": 126823,
+  "eo.meta.redirect-count": 0,
   "eo.security.is_https": true,
   "eo.security.hsts_present": true,
   "eo.security.hsts_value": "max-age=31536000; includeSubDomains; preload",
@@ -1832,8 +1788,7 @@ curl.exe -X POST $serviceUrl `
 
 **注意**: 
 - `httpRequestUUID`と`httpRequestRoundID`はオプショナルですが、n8nワークフローから送信される場合は含まれます
-- `urltype`はオプショナルですが、n8nワークフロー（210ノード）から送信される場合は含まれます（`main_document`, `asset`, `exception`）
-  - `urltype`に基づいて、FCP/LCP計測やアセット解析が最適化されます
+- `urltype`はオプショナルですが、n8nワークフロー（210ノード）から送信される場合は含まれます（`main_document`, `asset`, `exception`）。`eo.meta.urltype` としてレスポンスにパススルーされます
 
 ## リクエスト形式
 
@@ -1882,18 +1837,16 @@ token = hashlib.sha256(f"{url}{secret}".encode()).hexdigest()
   "headers.general.status-message": "OK",
   "headers.general.request-url": "https://sample.com",
   "headers.general.http-request-method": "GET",
-  "eo.meta.area": "ane1",
+  "eo.meta.re-area": "ane1",
   "eo.meta.http-request-number": 1,
   "eo.meta.http-request-uuid": "550e8400-e29b-41d4-a716-446655440000",
   "eo.meta.http-request-round-id": 1737123456,
   "eo.meta.http-protocol-version": "HTTP/1.1",
   "eo.meta.tls-version": "TLSv1.3",
-  "eo.measure.duration-ms": 123.45,
-  "eo.measure.ttfb-ms": 50.12,
-  "eo.measure.actual-content-length": 1234,
-  "eo.performance.resource_urltype": "main_document",
-  "eo.performance.fcp_14kb_ms": 52.34,
-  "eo.performance.lcp_candidate_count": 5,
+  "eo.meta.duration-ms": 123.45,
+  "eo.meta.ttfb-ms": 50.12,
+  "eo.meta.actual-content-length": 1234,
+  "eo.meta.redirect-count": 0,
   "headers.request-headers.x-eo-re": "gcp",
   "headers.response-headers.content-type": "text/html; charset=UTF-8",
   ...

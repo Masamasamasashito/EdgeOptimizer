@@ -333,7 +333,7 @@ EOのRequest Engineは、**EOのn8n以外からのすべてのリクエストを
 | **Request Engineサーバレス** | Warmup実行 | ターゲットURLへWarmupリクエスト | HTTP GET | **Request Headers Detail:**<br>1. **継承**: n8nで指定した `User-Agent`, `Accept-Language`, `type_area` 等<br>2. **識別**: `x-eo-re` (WAFバイパス用)<br>3. **自動**: `Accept-Encoding: gzip, br` 等 (ライブラリ自動付与)<br>4. **除外**: `Host`, `httpRequestNumber` 等 (送出前に除去) |
 | **Target Site** | リクエスト受信 | Warmupリクエストの着信と処理 | HTTP GET (Incoming) | **Received Headers Detail:**<br>1. **User-Agent**: デバイス偽装用（iPhone, Androidなどデバイス別の挙動確認）<br>2. **Accept-Language**: 地域/言語属性（多言語サイトの出し分け確認）<br>3. **type_area**: 環境識別（クラウド種別と地域によるオリジン/CDNの挙動特定）<br>4. **x-eo-re**: WAFバイパス（`azure`, `aws`, `gcp`, `cloudflare` のいずれか） |
 | **Target Site** | レスポンス返却 | Warmupリクエストに対する応答 | HTTP Response | **Response Data Detail:**<br>・`HTTP Status`<br>・`Response Headers`<br>・`Response Body`<br>・`Network Metrics` (TTFB, Duration, etc.) |
-| **Request Engineサーバレス** | 結果返却 | n8nへWarmupリクエスト結果をそのまま送信（リクエストエンジンではデータ処理しない様にする） | HTTP Response (JSON) | **Flat JSON:**<br>`headers.general.*`, `headers.request-headers.*`, `headers.response-headers.*`, `eo.meta.*`, `eo.measure.*`, `eo.performance.*`, `eo.security.*`, `error.*` |
+| **Request Engineサーバレス** | 結果返却 | n8nへWarmupリクエスト結果をそのまま送信（リクエストエンジンではデータ処理しない様にする） | HTTP Response (JSON) | **Flat JSON:**<br>`headers.general.*`, `headers.request-headers.*`, `headers.response-headers.*`, `eo.meta.*`, `eo.security.*`, `error.*` |
 | **n8nリクエストエンジンノード** | 結果受信 | 後続ノードでのデータ利用 | HTTP Response Parsing | 受け取った Flat JSON を各セルやシートへ展開 |
  
 ## 2. 主要な処理ロジックと信頼性設計
@@ -347,23 +347,18 @@ EOのRequest Engineは、**EOのn8n以外からのすべてのリクエストを
 - **通信タイムアウト管理**:
   - ターゲットへのリクエストは一律 10 秒で強制終了。ゾンビプロセスの発生とリソース占有を防止。
 - **メモリ保護 (5MB 制限)**:
-  - レスポンスボディが 5MB を超える場合、メモリ溢れ防止のため高度な HTML 解析（パース）を自動的にスキップ。基本メトリクス取得のみに限定して継続。
- 
-### 2.2 高度な解析・統計ロジック (Python系)
-- **パフォーマンス計測 (CWV 近似)**:
-  - 最初の 14KB（TCP初期ウィンドウ）到達時間を用いた FCP (First Contentful Paint) の近似値計測。
-  - プロトコル（HTTP/1.1~3）および TLS バージョンの精密な特定。
-- **リソース自動分類と抽出**:
-  - HTML パースによる LCP (Largest Contentful Paint) 候補要素の特定。
-  - レンダリングをブロックするクリティカルパス（CSS/JS）の自動抽出。
-  - 拡張子と MIME タイプに基づき、アセット（画像/フォント/動画等）を自動カテゴリ化。
- 
-### 2.3 n8n 側でのインテリジェントな後処理
+  - レスポンスボディが 5MB を超える場合、メモリ溢れ防止のためコンテンツ読み込みを自動的にスキップ。基本メトリクス取得のみに限定して継続。
+- **プロトコル・TLS 検出**:
+  - HTTP プロトコルバージョン（HTTP/1.1~3）および TLS バージョンの精密な特定。
+- **CDN 自動検出（16社対応）**:
+  - レスポンスヘッダーから CDN プロバイダーを自動検出。Cloudflare, CloudFront, Akamai, Azure Front Door, Fastly, Vercel, さくらウェブアクセラレータ, Bunny CDN, Alibaba Cloud CDN, CDNetworks, KeyCDN 等。
+
+### 2.2 n8n 側でのインテリジェントな後処理
 - **キャッシュ消失検知 (Eviction Detector)**:
   - リクエストエンジンが返却した `CF-Cache-Status` と `Age` ヘッダーを突き合わせ、「意図しないキャッシュ消失（Eviction）」を自動判定。
   - `HIT` かつ `Age` が極端に若い場合の警告表示など、CDN 挙動の統計分析をサポート。
  
-### 2.4 基盤設計とコスト最適化
+### 2.3 基盤設計とコスト最適化
 本システムは、高い解析・セキュリティ性能を維持しつつ、ランニングコストを最小化するための設計を採用しています。
 - **VPC 外実行 (Public Serverless)**:
   - AWS Lambda / GCP Cloud Run / Azure Functions のいずれも、VPC 内には配置せず「VPC 外（パブリック実行環境）」で動作させています。
@@ -376,23 +371,23 @@ EOのRequest Engineは、**EOのn8n以外からのすべてのリクエストを
  
  プラットフォーム固有の制約（イベント形式、シークレット取得）を除き、以下のロジックは全プラットフォームで統一可能です。
  
- ### 統一可能な要素
+ ### 統一済みの要素（Python版3プラットフォーム）
  1. **ヘッダー正規化 (Normalization)**:
     - 転送不要なヘッダー（Hostなど）の除外ルール。
     - キーの小文字統一、User-Agent の優先取得ロジック。
  2. **トークン算出 (Token Calculation)**:
     - `SHA-256(url + secret)` の算出アルゴリズム。
- 3. **リソース種別判定 (Resource Type Determination)**:
-    - 拡張子や `urltype` に基づく asset / main_document の判定基準。
- 4. **メタデータの完全同期 (Metadata Synchronization)**:
-    - Cloudflare Workers においても `httpRequestUUID` や `httpRequestRoundID` を抽出し、レスポンスの `eo.meta.*` に含めるように修正する。
- 5. **出力フォーマット (Flat JSON Mapping)**:
-    - n8n が受け取る JSON のキー名（`headers.general.*`, `eo.meta.*`, `eo.measure.*` 等）。
+ 3. **メタデータ出力 (Metadata Output)**:
+    - `httpRequestUUID`, `httpRequestRoundID`, `urltype` 等のパススルー。
+ 4. **出力フォーマット (Flat JSON Mapping)**:
+    - n8n が受け取る JSON のキー名（`headers.general.*`, `eo.meta.*`, `eo.security.*`）。
+    - CDN検出（`eo.meta.cdn-*`）を含む統一された3名前空間構造。
+
+ ### 未統一の要素（Cloudflare Workers）
+ - Cloudflare Workers（TypeScript版）はレスポンス構造の統一が未完了。Phase 1 として対応予定。
  
  ### 統一化のメリット
  - **デバッグの容易性**: プラットフォームに関わらず、n8n に返却されるデータの構造が完全に一致する。
- - **メンテナンス性の向上**: 今回のような User-Agent 取得ロジックの簡素化を、一つの「仕様」として全環境へ確実に見当・適用できる。
- - **機能の移植性**: Cloudflare Workers に Python 版と同等の HTML 解析ロジックを導入する際など、ロジック設計を流用しやすい。
- 
- ---
+ - **メンテナンス性の向上**: 共通コア (`request_engine_core.py`) への変更が全プラットフォームへ自動的に反映される。
+ - **3名前空間の明確な責務**: `headers.*`（生HTTP）、`eo.meta.*`（メタデータ+計測）、`eo.security.*`（セキュリティ分析）。
 

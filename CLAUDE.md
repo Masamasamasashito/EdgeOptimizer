@@ -110,7 +110,7 @@ n8n sends POST with:
 }
 ```
 
-Request Engines return flat JSON with keys: `headers.general.*`, `headers.request-headers.*`, `headers.response-headers.*`, `eo.meta.*`, `eo.measure.*`, `eo.performance.*`, `eo.security.*`, `error.*`
+Request Engines return flat JSON with 3 namespaces: `headers.*` (general/request-headers/response-headers), `eo.meta.*`, `eo.security.*`, `error.*`
 
 ## Request Engine Design Principles
 
@@ -118,17 +118,15 @@ Request Engine は生データの取得と計測に専念する。導出・分�
 
 **Core（必須出力）**: RE の実行時にしか得られないデータ
 - `headers.general.*` — HTTPステータス、リクエストURL、メソッド
-- `eo.meta.*` — 実行環境（area, execution-id, timestamps, protocol, tls）、リクエスト識別情報（パススルー）
+- `eo.meta.*` — 実行環境（re-area, execution-id, timestamps, protocol, tls）、リクエスト識別情報（パススルー）、計測値（duration-ms, ttfb-ms, actual-content-length, redirect-count, retry情報）、CDN検出（cdn-header-name, cdn-header-value, cdn-cache-status）
 - `headers.request-headers.*` / `headers.response-headers.*` — 生ヘッダー
-- `eo.measure.*` — 計測値（duration-ms, ttfb-ms, actual-content-length, redirect-count, retry情報）
 
 **Extension（暫定出力）**: レスポンスヘッダーやURLから導出可能なデータ。将来的に消費側へ移動する前提。
-- `eo.performance.*` — CDN検出, キャッシュ分析, リソース分類
 - `eo.security.*` — セキュリティヘッダー分析
 
 **新しいキーを追加する際の判断基準**:
-1. RE の実行時にしか取得できないか？ → Core
-2. `headers.response-headers.*` やURLから導出できるか？ → Extension（暫定）
+1. RE の実行時にしか取得できないか？ → Core (`eo.meta.*`)
+2. `headers.response-headers.*` やURLから導出できるか？ → Extension（暫定、`eo.security.*` 等）
 
 ## Important Conventions
 
