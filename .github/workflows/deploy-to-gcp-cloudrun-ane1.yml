@@ -35,6 +35,13 @@ env:
   EO_GCP_CLOUD_RUN_SERVICE_NAME: eo-re-d01-cloudrun-ane1
   EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL: ${{ secrets.EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL }}
   EO_CLOUDRUN_REQUEST_SECRET_NAME: eo-re-d01-secretmng
+  # Cloud Run スペック（variables.tf デフォルト値と同期）
+  EO_GCP_CLOUD_RUN_MEMORY: '512Mi'
+  EO_GCP_CLOUD_RUN_CPU: '1'
+  EO_GCP_CLOUD_RUN_TIMEOUT: '300'
+  EO_GCP_CLOUD_RUN_MAX_INSTANCES: '10'
+  EO_GCP_CLOUD_RUN_MIN_INSTANCES: '0'
+  EO_GCP_CLOUD_RUN_PORT: '8080'
 
 jobs:
   deploy:
@@ -235,12 +242,12 @@ jobs:
             --region ${{ env.EO_GCP_REGION }} \
             --platform managed \
             --set-env-vars "EO_GCP_PROJECT_ID=${{ env.EO_GCP_PROJECT_ID }},CLOUDRUN_REQUEST_SECRET_NAME=${{ env.EO_CLOUDRUN_REQUEST_SECRET_NAME }}" \
-            --memory 512Mi \
-            --cpu 1 \
-            --timeout 300 \
-            --max-instances 10 \
-            --min-instances 0 \
-            --port 8080 \
+            --memory ${{ env.EO_GCP_CLOUD_RUN_MEMORY }} \
+            --cpu ${{ env.EO_GCP_CLOUD_RUN_CPU }} \
+            --timeout ${{ env.EO_GCP_CLOUD_RUN_TIMEOUT }} \
+            --max-instances ${{ env.EO_GCP_CLOUD_RUN_MAX_INSTANCES }} \
+            --min-instances ${{ env.EO_GCP_CLOUD_RUN_MIN_INSTANCES }} \
+            --port ${{ env.EO_GCP_CLOUD_RUN_PORT }} \
             --project ${{ env.EO_GCP_PROJECT_ID }} \
             --service-account ${{ env.EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL }}
 
