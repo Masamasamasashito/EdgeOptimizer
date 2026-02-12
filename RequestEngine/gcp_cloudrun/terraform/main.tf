@@ -21,6 +21,11 @@
 terraform {
   required_version = ">= 1.5.0"
 
+  # -------------------------------------------------------
+  # Terraform プロバイダ (Cloud Provider Plugin)
+  #   Terraform がクラウド API を操作するためのプラグイン。
+  #   ※ wif.tf の WIF ID プロバイダ (IdP) とは別概念。
+  # -------------------------------------------------------
   required_providers {
     google = {
       source  = "hashicorp/google"
@@ -29,6 +34,7 @@ terraform {
   }
 }
 
+# Terraform プロバイダ設定 (hashicorp/google)
 provider "google" {
   project = var.gcp_project_id
   region  = var.gcp_region

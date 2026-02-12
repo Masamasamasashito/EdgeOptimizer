@@ -171,6 +171,8 @@ export EO_GCP_PROJECT_ID="<GCPプロジェクトID>"
 export EO_GCP_PROJECT_NUMBER="<GCPプロジェクト番号>"
 export EO_GCP_PROJECT_GITHUB_ORG_or_USER="<Github組織名orユーザー名>"
 export EO_GCP_PROJECT_GITHUB_REPO="<Githubリポジトリ名>"
+# 照合用リクエストシークレット（EO_Infra_Docker/.env の N8N_EO_REQUEST_SECRET と同じ値）
+export N8N_EO_REQUEST_SECRET="<N8N_EO_REQUEST_SECRETの値>"
 # 必要に応じて利用
 # export EO_GCP_PROJECT_CLOUDSHELL_ROOT_DIRECTORY="<プロジェクトCLOUDSHELLルートディレクトリ>"
 # export EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY="<プロジェクトローカルルートディレクトリ>"
@@ -593,12 +595,12 @@ Cloud Functions API を無効にして、再度有効にした場合、既存の
 
 ## 方法2: gcloud CLIで作成
 
-**注意**: `your-secret-value`は、`EO_Infra_Docker/.env`の`N8N_EO_REQUEST_SECRET`と同じ値に設定してください。リージョン無しで命名する。
+**注意**: 環境変数 `$N8N_EO_REQUEST_SECRET`（CloudShell環境変数設定で設定済み）を使用します。リージョン無しで命名する。
 
 **JSON形式シークレット**
 
 ```bash
-echo -n '{"CLOUDRUN_REQUEST_SECRET":"your-secret-value"}' | gcloud secrets create eo-re-d01-secretmng \
+printf '{"CLOUDRUN_REQUEST_SECRET":"%s"}' "$N8N_EO_REQUEST_SECRET" | gcloud secrets create eo-re-d01-secretmng \
   --data-file=- \
   --replication-policy="automatic" \
   --project=$EO_GCP_PROJECT_ID

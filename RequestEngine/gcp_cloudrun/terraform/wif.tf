@@ -4,8 +4,11 @@
 # Enables GitHub Actions to authenticate to GCP without static service account keys.
 # Reference: RUN_README.md "Workload Identity 連携による GitHub Actions の認証設定"
 #
+# ※ ここでの "Provider" は WIF ID プロバイダ (IdP) であり、
+#   main.tf の Terraform プロバイダ (hashicorp/google) とは別概念です。
+#
 # Pool naming: eo-gcp-pool-wif-d01 (4-32 chars, lowercase + digits + hyphens)
-# Provider naming: eo-gcp-idp-gh-oidc-wif-d01
+# IdP naming:  eo-gcp-idp-gh-oidc-wif-d01
 
 # ==============================================================================
 # Workload Identity Pool
@@ -20,7 +23,8 @@ resource "google_iam_workload_identity_pool" "github" {
 }
 
 # ==============================================================================
-# Workload Identity Provider (GitHub Actions OIDC)
+# WIF ID プロバイダ / IdP (GitHub Actions OIDC)
+# ※ Terraform プロバイダ (main.tf) とは別概念
 # ==============================================================================
 resource "google_iam_workload_identity_pool_provider" "github_oidc" {
   project                            = var.gcp_project_id

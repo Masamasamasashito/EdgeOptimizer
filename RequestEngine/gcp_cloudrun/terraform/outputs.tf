@@ -6,7 +6,7 @@
 # --- GitHub Secrets ---
 
 output "wif_provider_path" {
-  description = "WIF Provider full path (GitHub Secrets: EO_GCP_WIF_PROVIDER_PATH)"
+  description = "WIF IdP (ID Provider) full path (GitHub Secrets: EO_GCP_WIF_PROVIDER_PATH) ※Terraform プロバイダとは別概念"
   value       = "projects/${var.gcp_project_number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.github.workload_identity_pool_id}/providers/${google_iam_workload_identity_pool_provider.github_oidc.workload_identity_pool_provider_id}"
 }
 

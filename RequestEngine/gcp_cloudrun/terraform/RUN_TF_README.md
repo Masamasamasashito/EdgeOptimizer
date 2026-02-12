@@ -23,16 +23,25 @@ Terraform を使用した GCP Cloud Run Request Engine インフラストラク�
 
 このディレクトリの Terraform テンプレートは、Edge Optimizer の GCP Cloud Run Request Engine に必要な以下のリソースを一括作成します。
 
+### 「プロバイダ」の用語について
+
+本ドキュメントでは **2種類の「プロバイダ」** が登場します。混同しやすいため注意してください。
+
+| 用語 | 正式名称 | 役割 | 本文中の表記 |
+|------|---------|------|-------------|
+| **Terraform プロバイダ** | Terraform Cloud Provider Plugin | Terraform がクラウド API を操作するためのプラグイン（`hashicorp/google`） | 「Terraform プロバイダ」 |
+| **WIF ID プロバイダ (IdP)** | Workload Identity Federation Identity Provider | GitHub Actions OIDC トークンを GCP 認証に変換する ID 連携の窓口 | 「WIF IdP」「ID プロバイダ」 |
+
 ### Terraform ファイル構成
 
 | ファイル | 説明 |
 |---------|------|
-| `main.tf` | プロバイダー設定、ローカル変数（命名規則） |
+| `main.tf` | **Terraform プロバイダ**（`hashicorp/google`）設定、ローカル変数（命名規則） |
 | `variables.tf` | 全入力変数の定義（デフォルト値付き） |
 | `apis.tf` | 必要な GCP API の有効化（7件） |
 | `service_accounts.tf` | Service Account 3件 + 全ロール設定 |
 | `secret_manager.tf` | Secret Manager シークレット作成 |
-| `wif.tf` | Workload Identity Pool / Provider |
+| `wif.tf` | Workload Identity Pool / **WIF IdP**（GitHub Actions OIDC 認証） |
 | `artifact_registry.tf` | Artifact Registry リポジトリ |
 | `cloud_run.tf` | Cloud Run サービス（プレースホルダー） |
 | `outputs.tf` | GitHub Secrets 等に必要な出力値 |
@@ -58,7 +67,7 @@ Terraform を使用した GCP Cloud Run Request Engine インフラストラク�
 | IAM Bindings | 複数 | SA ごとのプロジェクトレベル / リソースレベルロール |
 | Secret Manager | `{pj}-{comp}-{env}-secretmng` | 照合用リクエストシークレット（プレースホルダー） |
 | WIF Pool | `{pj}-gcp-pool-wif-{env}` | Workload Identity Pool |
-| WIF Provider | `{pj}-gcp-idp-gh-oidc-wif-{env}` | GitHub Actions OIDC Provider |
+| WIF IdP | `{pj}-gcp-idp-gh-oidc-wif-{env}` | GitHub Actions OIDC ID プロバイダ（※Terraform プロバイダとは別物） |
 | Artifact Registry | `cloud-run-source-deploy` | Docker リポジトリ（ソースデプロイ用） |
 | Cloud Run Service | `{pj}-{comp}-{env}-cloudrun-{region}` | Request Engine サービス（プレースホルダーイメージ） |
 
@@ -69,24 +78,77 @@ Terraform を使用した GCP Cloud Run Request Engine インフラストラク�
 以下が完了していること:
 - GCP プロジェクトが作成済み
 - 課金が有効化済み
-- プロジェクトID と プロジェクト番号 を控えている
+
+### 0-2. 環境変数設定
+
+以降のコマンドで使用する変数を事前に設定します（[RUN_README.md](../ane1/RUN_README.md) と同じ変数名）。
+
+- EX) `export EO_GCP_PROJECT_ID="eo-re-d01-pr-ane1"`
+
+```bash
+# GCP プロジェクト
+export EO_GCP_PROJECT_ID="<GCPプロジェクトID>"              # 例: "eo-re-d01-pr-ane1"
+export EO_GCP_PROJECT_NUMBER="<GCPプロジェクト番号>"         # 例: "123456789012"
+
+# GCP 組織（組織配下のプロジェクトの場合）
+export GCP_ORGANIZATION_ID="<GCP組織ID>"                    # 例: "1234567890"
+
+# GitHub
+export EO_GCP_PROJECT_GITHUB_ORG_or_USER="<Github組織名orユーザー名>"  # 例: "Masamasamasashito"
+export EO_GCP_PROJECT_GITHUB_REPO="<Githubリポジトリ名>"               # 例: "EdgeOptimizer"
+
+# 照合用リクエストシークレット（EO_Infra_Docker/.env の N8N_EO_REQUEST_SECRET と同じ値）
+export N8N_EO_REQUEST_SECRET="<N8N_EO_REQUEST_SECRETの値>"
+```
 
 プロジェクト番号の確認:
 
 ```bash
-gcloud projects describe <GCPプロジェクトID> --format='value(projectNumber)'
+gcloud projects describe $EO_GCP_PROJECT_ID --format='value(projectNumber)'
 ```
 
-### 0-2. gcloud CLI 認証
+### 0-3. gcloud CLI 認証とプロジェクト設定
 
-Terraform が GCP API を呼び出すための認証:
+Terraform が GCP API を呼び出すための認証とプロジェクト設定:
 
 ```bash
+# 1. ADC（Application Default Credentials）認証
+#    Terraform 等のツールが GCP API を呼び出すための認証情報を取得
 gcloud auth application-default login
-gcloud config set project <GCPプロジェクトID>
+
+# 2. プロジェクト設定 + クォータプロジェクト統一（WARNING 防止）
+gcloud config set project $EO_GCP_PROJECT_ID
+gcloud auth application-default set-quota-project $EO_GCP_PROJECT_ID
+
+# 3. 環境タグキー設定（組織配下のプロジェクトの場合）
+#    組織 ID を確認
+gcloud organizations list
+
+#    タグキー「environment」を作成（組織に1回だけ）
+gcloud resource-manager tags keys create environment \
+  --parent=organizations/$GCP_ORGANIZATION_ID
+
+#    タグ値「development」を作成（タグキーに1回だけ）
+gcloud resource-manager tags values create development \
+  --parent=$GCP_ORGANIZATION_ID/environment
+
+#    プロジェクトにバインド
+gcloud resource-manager tags bindings create \
+  --tag-value=$GCP_ORGANIZATION_ID/environment/development \
+  --parent=//cloudresourcemanager.googleapis.com/projects/$EO_GCP_PROJECT_NUMBER \
+  --location=global
 ```
 
-### 0-3. Terraform インストール
+**GCP タグキーと EO ラベルの使い分け**
+
+GCP Resource Manager タグと EO の `common_labels` は意図的に異なる値を使用しています。命名が異なることで「どちらの環境識別か」が一目で区別できます。
+
+| レイヤー | キー | 値 | 管理場所 | 用途 |
+|---------|------|-----|---------|------|
+| GCP Resource Manager タグ | タグキー `environment` | タグ値 `Development` / `Production` 等（Google 固定4種） | 組織コンソール | 課金レポート・ポリシー適用 |
+| EO `common_labels` | ラベルキー `environment` | ラベル値 `d01` / `p01` 等（EO 独自命名） | `variables.tf` → `main.tf` | リソース命名・複数環境の区別 |
+
+### 0-4. Terraform インストール/更新
 
 **Windows (winget):**
 ```powershell
@@ -111,19 +173,20 @@ terraform --version
 
 ```bash
 cd RequestEngine/gcp_cloudrun/terraform/
-
-# テンプレートをコピー
-cp terraform.tfvars.example terraform.tfvars
 ```
 
-`terraform.tfvars` を編集し、必須値を設定:
+環境変数（STEP 0-2）から `terraform.tfvars` を生成:
 
-```hcl
-gcp_project_id     = "<GCPプロジェクトID>"         # 例: "eo-re-d01-pr-ane1"
-gcp_project_number = "<GCPプロジェクト番号>"        # 例: "123456789012"
-github_org         = "<Github組織名orユーザー名>"   # 例: "Masamasamasashito"
-github_repo        = "<Githubリポジトリ名>"         # 例: "EdgeOptimizer"
+```bash
+cat <<EOF > terraform.tfvars
+gcp_project_id     = "$EO_GCP_PROJECT_ID"
+gcp_project_number = "$EO_GCP_PROJECT_NUMBER"
+github_org         = "$EO_GCP_PROJECT_GITHUB_ORG_or_USER"
+github_repo        = "$EO_GCP_PROJECT_GITHUB_REPO"
+EOF
 ```
+
+> `terraform.tfvars.example` に記載されたパラメータ名と同一です。手動で編集する場合はテンプレートを参照してください。
 
 ### 1-2. Terraform 初期化
 
@@ -175,7 +238,7 @@ Terraform はプレースホルダー値でシークレットを作成してい�
 2. 「+ 新しいバージョン」をクリック
 3. `EO_Infra_Docker/.env` の `N8N_EO_REQUEST_SECRET` の値を JSON 形式で入力:
    ```json
-   {"CLOUDRUN_REQUEST_SECRET": "<N8N_EO_REQUEST_SECRET の値>"}
+   {"CLOUDRUN_REQUEST_SECRET": "<STEP 0-2 で設定した N8N_EO_REQUEST_SECRET の値>"}
    ```
 4. 「新しいバージョンを追加」
 5. 古いバージョン（プレースホルダー）を「無効」→「破棄」
@@ -184,13 +247,13 @@ Terraform はプレースホルダー値でシークレットを作成してい�
 
 Bash:
 ```bash
-echo -n '{"CLOUDRUN_REQUEST_SECRET":"<N8N_EO_REQUEST_SECRET の値>"}' | \
+printf '{"CLOUDRUN_REQUEST_SECRET":"%s"}' "$N8N_EO_REQUEST_SECRET" | \
   gcloud secrets versions add eo-re-d01-secretmng --data-file=-
 ```
 
 PowerShell:
 ```powershell
-echo -n '{"CLOUDRUN_REQUEST_SECRET":"<N8N_EO_REQUEST_SECRET の値>"}' | gcloud secrets versions add eo-re-d01-secretmng --data-file=-
+'{"CLOUDRUN_REQUEST_SECRET":"' + $env:N8N_EO_REQUEST_SECRET + '"}' | gcloud secrets versions add eo-re-d01-secretmng --data-file=-
 ```
 
 ### 3-2. OAuth2 Invoker SA の JSON キー発行
@@ -211,7 +274,7 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions に以下を
 | シークレット名 | 値の取得方法 | 説明 |
 |--------------|-------------|------|
 | `EO_GCP_PROJECT_ID` | `terraform output gcp_project_id` | GCP プロジェクト ID |
-| `EO_GCP_WIF_PROVIDER_PATH` | `terraform output wif_provider_path` | WIF プロバイダーの完全パス |
+| `EO_GCP_WIF_PROVIDER_PATH` | `terraform output wif_provider_path` | WIF IdP（ID プロバイダ）の完全パス |
 | `EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL` | `terraform output deploy_sa_email` | Deployer SA のメールアドレス |
 | `EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL` | `terraform output runtime_sa_email` | Runtime SA のメールアドレス |
 
@@ -331,7 +394,7 @@ GCP Cloud Run 固有の設定:
 **解決**:
 1. 既存リソースを Terraform 管理下に取り込む:
    ```bash
-   terraform import google_service_account.deployer projects/<PROJECT_ID>/serviceAccounts/<SA_EMAIL>
+   terraform import google_service_account.deployer projects/$EO_GCP_PROJECT_ID/serviceAccounts/<SA_EMAIL>
    ```
 2. または既存リソースを削除してから再実行（SA の即時再作成は避ける。RUN_README.md 参照）
 
@@ -353,7 +416,7 @@ GCP Cloud Run 固有の設定:
    ```bash
    gcloud run services add-iam-policy-binding eo-re-d01-cloudrun-ane1 \
      --region=asia-northeast1 \
-     --member="serviceAccount:eo-gcp-sa-d01-oa2be-inv-ane1@<PROJECT_ID>.iam.gserviceaccount.com" \
+     --member="serviceAccount:eo-gcp-sa-d01-oa2be-inv-ane1@$EO_GCP_PROJECT_ID.iam.gserviceaccount.com" \
      --role="roles/run.invoker"
    ```
 
