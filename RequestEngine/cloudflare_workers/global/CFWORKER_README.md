@@ -29,6 +29,8 @@ Cloudflare Github 連携(独自ドメインのサブドメインでWorker作る�
 8. 「ドメインを無効にする」をクリック
 9. 「無効にする」をクリック
 
+※ wrangler.toml で `workers_dev = false` を設定しているため、GitHub Actions デプロイ後は自動的に workers.dev ルートが無効化される。上記7〜9は初回手動セットアップ時のみ必要。
+
 ## 手順 3: サブドメインWorker作成の完了確認
 
 DNSレコードの画面で確認。
