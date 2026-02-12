@@ -9,16 +9,6 @@ on:
 #       - main
   workflow_dispatch:
     inputs:
-      ext_measure:
-        description: 'Enable measure extension (eo.measure.*)'
-        required: false
-        default: true
-        type: boolean
-      ext_performance:
-        description: 'Enable performance extension (eo.performance.*)'
-        required: false
-        default: true
-        type: boolean
       ext_security:
         description: 'Enable security extension (eo.security.*)'
         required: false
@@ -95,36 +85,12 @@ jobs:
           echo "# ======================================================================" >> deploy_package/main.py
 
           # Extension enable flags from workflow inputs
-          EXT_MEASURE="${{ inputs.ext_measure }}"
-          EXT_PERFORMANCE="${{ inputs.ext_performance }}"
           EXT_SECURITY="${{ inputs.ext_security }}"
 
           # Default to true if not specified (for manual runs without inputs)
-          EXT_MEASURE="${EXT_MEASURE:-true}"
-          EXT_PERFORMANCE="${EXT_PERFORMANCE:-true}"
           EXT_SECURITY="${EXT_SECURITY:-true}"
 
-          echo "Extension flags: measure=$EXT_MEASURE, performance=$EXT_PERFORMANCE, security=$EXT_SECURITY"
-
-          # Measure extension
-          if [ "$EXT_MEASURE" == "true" ]; then
-            echo "" >> deploy_package/main.py
-            echo "# --- Extension: _ext_measure.py ---" >> deploy_package/main.py
-            cat "$EXT_DIR/_ext_measure.py" >> deploy_package/main.py
-            echo "  [INCLUDED] _ext_measure.py"
-          else
-            echo "  [EXCLUDED] _ext_measure.py"
-          fi
-
-          # Performance extension
-          if [ "$EXT_PERFORMANCE" == "true" ]; then
-            echo "" >> deploy_package/main.py
-            echo "# --- Extension: _ext_performance.py ---" >> deploy_package/main.py
-            cat "$EXT_DIR/_ext_performance.py" >> deploy_package/main.py
-            echo "  [INCLUDED] _ext_performance.py"
-          else
-            echo "  [EXCLUDED] _ext_performance.py"
-          fi
+          echo "Extension flags: security=$EXT_SECURITY"
 
           # Security extension
           if [ "$EXT_SECURITY" == "true" ]; then

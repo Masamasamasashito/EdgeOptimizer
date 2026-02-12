@@ -263,17 +263,11 @@ def requestengine_tail():
         ua_from_request_headers = input_headers.get("User-Agent") or ""
 
         # ==================================================================
-        # Determine resource type based on URL type and extension
-        # ==================================================================
-        resource_info = _determine_resource_type(urltype, target_url)
-
-        # ==================================================================
         # URL Validation
         # ==================================================================
         if not target_url:
             end_time = time.time()
             duration_ms = (end_time - start_time) * 1000
-            error_resource_info = _determine_resource_type(urltype, "")
             result = _build_flat_result(
                 status_code=400,
                 status_message="MISSING_URL",
@@ -287,7 +281,7 @@ def requestengine_tail():
                 request_start_timestamp=start_time,
                 request_end_timestamp=end_time,
                 execution_id=None,
-                resource_info=error_resource_info,
+                urltype=urltype,
                 area=gcp_region_display,
             )
             return jsonify(result), 400
@@ -317,7 +311,7 @@ def requestengine_tail():
                     request_start_timestamp=start_time,
                     request_end_timestamp=end_time,
                     execution_id=None,
-                    resource_info=resource_info,
+                    urltype=urltype,
                     area=gcp_region_display,
                 )
                 return jsonify(result), 401
@@ -338,7 +332,7 @@ def requestengine_tail():
                 request_start_timestamp=start_time,
                 request_end_timestamp=end_time,
                 execution_id=None,
-                resource_info=resource_info,
+                urltype=urltype,
                 area=gcp_region_display,
             )
             return jsonify(result), 500
@@ -427,7 +421,7 @@ def requestengine_tail():
                     request_end_timestamp=end_time,
                     execution_id=None,
                     redirect_count=redirect_count,
-                    resource_info=resource_info,
+                    urltype=urltype,
                     retry_info=retry_info,
                     area=gcp_region_display,
                 )
@@ -439,7 +433,6 @@ def requestengine_tail():
         except requests.exceptions.RequestException as e:
             end_time = time.time()
             duration_ms = (end_time - start_time) * 1000
-            error_resource_info = resource_info if "resource_info" in locals() else _determine_resource_type(urltype if "urltype" in locals() else None, target_url)
             result = _build_flat_result(
                 status_code=500,
                 status_message=f"Request failed: {str(e)}",
@@ -454,7 +447,7 @@ def requestengine_tail():
                 request_end_timestamp=end_time,
                 execution_id=None,
                 redirect_count=0,
-                resource_info=error_resource_info,
+                urltype=urltype if "urltype" in locals() else None,
                 retry_info=retry_info if "retry_info" in locals() else None,
                 area=gcp_region_display,
             )
@@ -465,8 +458,6 @@ def requestengine_tail():
         end_time = time.time()
         duration_ms = (end_time - start_time) * 1000
         error_target_url = target_url if "target_url" in locals() else ""
-        error_urltype = urltype if "urltype" in locals() else None
-        error_resource_info = _determine_resource_type(error_urltype, error_target_url) if error_target_url else None
         result = _build_flat_result(
             status_code=500,
             status_message=f"Internal error: {str(e)}",
@@ -481,7 +472,7 @@ def requestengine_tail():
             request_end_timestamp=end_time,
             execution_id=None,
             redirect_count=0,
-            resource_info=error_resource_info,
+            urltype=urltype if "urltype" in locals() else None,
             retry_info=None,
             area=gcp_region_display,
         )

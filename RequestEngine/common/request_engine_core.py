@@ -19,10 +19,6 @@
 HTTP_REQUEST_TIMEOUT = 10  # HTTP request timeout (seconds)
 # 10 seconds is sufficient for warmup purposes (reduced from 30 seconds for cost optimization)
 
-MAX_CONTENT_SIZE_FOR_ANALYSIS = 5 * 1024 * 1024  # 5MB
-# Contents exceeding this size will skip analysis (memory protection)
-# Considering memory limits of serverless platforms
-
 # ======================================================================
 # Retry Configuration
 # ======================================================================
@@ -39,6 +35,50 @@ RETRY_BACKOFF_MULTIPLIER = 2.0  # Exponential backoff multiplier
 RETRYABLE_STATUS_CODES = {500, 502, 503, 504}  # HTTP status codes eligible for retry
 # 5xx server errors are likely temporary issues, so they are retry targets
 # 4xx client errors are not retry targets (retrying won't resolve them)
+
+
+# ======================================================================
+# CDN Detection Configuration
+# ======================================================================
+# Each entry: (detection_header, cache_status_header)
+# detection_header: Header that identifies the CDN
+# cache_status_header: Header that indicates cache HIT/MISS for that CDN
+_CDN_DETECTION_CONFIG = [
+    # Cloudflare
+    ("cf-ray", "cf-cache-status"),
+    # AWS CloudFront
+    ("x-amz-cf-id", "x-cache"),
+    # NitroCDN (NitroPack)
+    ("x-nitro-cache", "x-nitro-cache"),
+    ("x-nitro-cache-from", "x-nitro-cache"),
+    ("x-nitro-rev", "x-nitro-cache"),
+    # RabbitLoader
+    ("x-rl-cache", "x-rl-cache"),
+    ("x-rl-mode", "x-rl-cache"),
+    ("x-rl-modified", "x-rl-cache"),
+    ("x-rl-rule", "x-rl-cache"),
+    # Azure Front Door
+    ("x-azure-ref", "x-cache"),
+    ("x-azure-fdid", "x-cache"),
+    ("x-azure-clientip", "x-cache"),
+    ("x-azure-socketip", "x-cache"),
+    ("x-azure-requestchain", "x-cache"),
+    # Akamai
+    ("x-akamai-request-id", "x-cache"),
+    ("x-cache-remote", "x-cache"),
+    ("x-true-cache-key", "x-cache"),
+    ("x-cache-key", "x-cache"),
+    ("x-serial", "x-cache"),
+    ("x-akamai-edgescape", "x-cache"),
+    ("x-check-cacheable", "x-cache"),
+    # Vercel
+    ("x-vercel-cache", "x-vercel-cache"),
+    ("x-vercel-id", "x-vercel-cache"),
+    # General / Fastly
+    ("x-cache", "x-cache"),
+    ("x-served-by", "x-cache"),
+    ("x-fastly-request-id", "x-cache"),
+]
 
 
 # ======================================================================
@@ -81,8 +121,8 @@ def register_extension(
     拡張機能を登録する
 
     Args:
-        name: 拡張機能名 (例: "measure", "performance", "security")
-        prefix: 出力キーのプレフィックス (例: "eo.measure.")
+        name: 拡張機能名 (例: "security")
+        prefix: 出力キーのプレフィックス (例: "eo.security.")
         build_func: 出力を生成する関数 (context: dict) -> dict
         default_enabled: デフォルトで有効かどうか
     """
@@ -280,232 +320,74 @@ def _get_tls_version(response: requests.Response, target_url: str) -> Optional[s
 
 
 # ======================================================================
-# URL Extension Determination
+# CDN Detection (Core capability)
 # ======================================================================
-def _get_url_extension(url: str) -> Optional[str]:
+def _detect_cdn(res_headers: Dict[str, str]) -> Dict[str, Optional[str]]:
     """
-    Get extension from URL (removing query parameters and anchors)
-    """
-    try:
-        parsed = urlparse(url)
-        path = parsed.path
-        if not path:
-            return None
-        # Extract extension (after last .)
-        if '.' in path:
-            ext = path.rsplit('.', 1)[-1].lower()
-            # Check if extension is valid string (alphanumeric only)
-            if ext and ext.isalnum():
-                return ext
-        return None
-    except Exception:
-        return None
+    Detect CDN and cache status from response headers.
 
-
-# ======================================================================
-# Determine Resource Type Based on URL Type and Extension
-# ======================================================================
-def _determine_resource_type(urltype: Optional[str], url: str) -> Dict[str, Any]:
-    """
-    Determine resource type from urltype and URL extension
-
-    Maintains consistency with n8n workflow (160 node: Asset / MainDoc / Exception Classification)
-
-    Asset extensions:
-    - Images: jpg, jpeg, gif, png, webp, avif, svg, ico
-    - CSS: css
-    - JS: js
-    - Fonts: woff, woff2, ttf, otf, eot
-    - Videos: mp4, webm, ogg, mov
-
-    resource_category:
-    - "html", "image", "css", "js", "font", "video", "other"
-    """
-    resource_info = {
-        "urltype": urltype,
-        "url_extension": None,  # Extension (e.g., "woff2", "ttf", "css", "jpg")
-        "resource_category": None,  # "html", "image", "css", "js", "font", "video", "other"
-    }
-
-    # Get extension
-    ext = _get_url_extension(url)
-    resource_info["url_extension"] = ext
-
-    # Determination based on urltype
-    if urltype == "main_document":
-        # If extension is .html/.htm, it's definitely HTML
-        if ext in ["html", "htm"]:
-            resource_info["resource_category"] = "html"
-        else:
-            # Even without extension, likely HTML
-            resource_info["resource_category"] = "html"
-
-    elif urltype == "asset":
-        # Type determination based on extension
-        image_exts = ["jpg", "jpeg", "gif", "png", "webp", "avif", "svg", "ico"]
-        css_exts = ["css"]
-        js_exts = ["js"]
-        font_exts = ["woff", "woff2", "ttf", "otf", "eot"]
-        video_exts = ["mp4", "webm", "ogg", "mov"]
-
-        if ext in image_exts:
-            resource_info["resource_category"] = "image"
-        elif ext in css_exts:
-            resource_info["resource_category"] = "css"
-        elif ext in js_exts:
-            resource_info["resource_category"] = "js"
-        elif ext in font_exts:
-            resource_info["resource_category"] = "font"
-        elif ext in video_exts:
-            resource_info["resource_category"] = "video"
-        else:
-            resource_info["resource_category"] = "other"
-
-    elif urltype == "exception":
-        resource_info["resource_category"] = "exception"
-
-    return resource_info
-
-
-# ======================================================================
-# Performance Metrics Data Retrieval (CDN Detection Fully Preserved)
-# ======================================================================
-def _get_performance_metrics(
-    Initial_Response_ms: Optional[float],
-    content_length_bytes: Optional[int],
-    res_headers: Dict[str, str],
-    redirect_count: int = 0,
-    resource_info: Optional[Dict[str, Any]] = None,
-    retry_info: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
-    """
-    Get performance metrics data (Headers-only metrics)
-
-    Aggregate data related to infrastructure and delivery.
-    This version focuses on network-level metrics and header analysis.
+    Uses _CDN_DETECTION_CONFIG to identify the CDN serving the response,
+    then looks up the corresponding cache status header.
 
     Args:
-        Initial_Response_ms: Time To Initial Response (milliseconds)
-        content_length_bytes: Response body size (bytes)
         res_headers: Response headers
-        redirect_count: Number of redirects
-        resource_info: Resource information (urltype, resource_category, etc.)
-        retry_info: Retry information
 
     Returns:
-        Dict[str, Any]: Dictionary containing performance metrics
+        Dict with keys:
+            - "cdn-header-name": Detected CDN header name (or None)
+            - "cdn-header-value": Detected CDN header value (or None)
+            - "cdn-cache-status": Cache status value (or None)
     """
-    metrics = {}
-
-    # Initial_Response_ms (already measured)
-    if Initial_Response_ms is not None:
-        metrics["Initial_Response_ms"] = Initial_Response_ms
-
-    # Compression type
     headers_lower = {k.lower(): v for k, v in res_headers.items()}
-    content_encoding = headers_lower.get("content-encoding", "")
-    if content_encoding:
-        metrics["content_encoding"] = content_encoding
 
-    # Content-Length header value
-    content_length_header = headers_lower.get("content-length")
-    if content_length_header:
-        metrics["content_length_header"] = content_length_header
+    result = {
+        "cdn-header-name": None,
+        "cdn-header-value": None,
+        "cdn-cache-status": None,
+    }
 
-    # Actual content size
-    if content_length_bytes is not None:
-        metrics["content_size_bytes"] = content_length_bytes
-
-    # Cache-Control header value
-    cache_control = headers_lower.get("cache-control")
-    if cache_control:
-        metrics["cache_control"] = cache_control
-
-    # ETag header value
-    etag = headers_lower.get("etag")
-    if etag:
-        metrics["etag"] = etag
-
-    # Last-Modified header value
-    last_modified = headers_lower.get("last-modified")
-    if last_modified:
-        metrics["last_modified"] = last_modified
-
-    # Redirect count
-    metrics["redirect_count"] = redirect_count
-
-    # CDN detection (ORIGINAL LIST PRESERVED)
-    cdn_headers = [
-        "cf-ray",  # Cloudflare
-        "x-amz-cf-id",  # AWS CloudFront
-        "x-nitro-cache",  # NitroCDN (NitroPack)
-        "x-nitro-cache-from",  # NitroCDN (NitroPack)
-        "x-nitro-rev",  # NitroCDN (NitroPack)
-        "x-rl-cache",  # RabbitLoader
-        "x-rl-mode",  # RabbitLoader
-        "x-rl-modified",  # RabbitLoader
-        "x-rl-rule",  # RabbitLoader
-        "x-azure-ref",  # Azure Front Door
-        "x-azure-fdid",  # Azure Front Door
-        "x-azure-clientip",  # Azure Front Door
-        "x-azure-socketip",  # Azure Front Door
-        "x-azure-requestchain",  # Azure Front Door
-        "x-akamai-request-id",  # Akamai
-        "x-cache-remote",  # Akamai
-        "x-true-cache-key",  # Akamai
-        "x-cache-key",  # Akamai
-        "x-serial",  # Akamai
-        "x-akamai-edgescape",  # Akamai
-        "x-check-cacheable",  # Akamai
-        "x-vercel-cache",  # Vercel
-        "x-vercel-id",  # Vercel
-        "x-cache",  # General cache header (may also be used by Akamai)
-        "x-served-by",  # Fastly
-        "x-fastly-request-id",  # Fastly
-    ]
-    for header in cdn_headers:
-        if header in headers_lower:
-            metrics["cdn_header_name"] = header
-            metrics["cdn_header_value"] = headers_lower[header]
+    # Primary detection from _CDN_DETECTION_CONFIG
+    for detection_header, cache_status_header in _CDN_DETECTION_CONFIG:
+        if detection_header in headers_lower:
+            result["cdn-header-name"] = detection_header
+            result["cdn-header-value"] = headers_lower[detection_header]
+            if cache_status_header in headers_lower:
+                result["cdn-cache-status"] = headers_lower[cache_status_header]
             break
 
-    # GCP CDN (Cloud CDN / Media CDN) detection
+    # Secondary: Server header checks (may override primary detection)
     server_header = headers_lower.get("server", "")
+
+    # GCP CDN (Cloud CDN / Media CDN) detection
     if "google-edge-cache" in server_header.lower():
-        metrics["cdn_header_name"] = "server"
-        metrics["cdn_header_value"] = server_header
+        result["cdn-header-name"] = "server"
+        result["cdn-header-value"] = server_header
+        cache_status = headers_lower.get("cdn-cache-status") or headers_lower.get("cdn_cache_status")
+        if cache_status:
+            result["cdn-cache-status"] = cache_status
 
     # GCP CDN custom header
     if "cdn_cache_status" in headers_lower:
-        metrics["cdn_header_name"] = "cdn_cache_status"
-        metrics["cdn_header_value"] = headers_lower["cdn_cache_status"]
+        result["cdn-header-name"] = "cdn_cache_status"
+        result["cdn-header-value"] = headers_lower["cdn_cache_status"]
+        result["cdn-cache-status"] = headers_lower["cdn_cache_status"]
 
     # Vercel Server header detection
     if "vercel" in server_header.lower():
-        metrics["cdn_header_name"] = "server"
-        metrics["cdn_header_value"] = server_header
+        result["cdn-header-name"] = "server"
+        result["cdn-header-value"] = server_header
+        if "x-vercel-cache" in headers_lower:
+            result["cdn-cache-status"] = headers_lower["x-vercel-cache"]
 
     # Azure Front Door Via header detection
     via_header = headers_lower.get("via", "")
     if "azure" in via_header.lower():
-        metrics["cdn_header_name"] = "via"
-        metrics["cdn_header_value"] = via_header
+        result["cdn-header-name"] = "via"
+        result["cdn-header-value"] = via_header
+        if "x-cache" in headers_lower:
+            result["cdn-cache-status"] = headers_lower["x-cache"]
 
-    # Resource information
-    if resource_info:
-        metrics["resource_urltype"] = resource_info.get("urltype")
-        metrics["resource_extension"] = resource_info.get("url_extension")
-        metrics["resource_category"] = resource_info.get("resource_category")
-
-    # Retry information
-    if retry_info:
-        metrics["retry_attempts"] = retry_info.get("retry_attempts", 0)
-        if retry_info.get("retry_delays"):
-            metrics["retry_delays_ms"] = [round(d * 1000, 2) for d in retry_info.get("retry_delays", [])]
-        if retry_info.get("last_error"):
-            metrics["retry_last_error"] = retry_info.get("last_error")
-
-    return metrics
+    return result
 
 
 # ======================================================================
@@ -597,7 +479,7 @@ def _execute_http_request_with_retry(
 
 
 # ======================================================================
-# Build Flat Result (Renamed Param & Structure Maintained)
+# Build Flat Result
 # ======================================================================
 def _build_flat_result(
     *,
@@ -619,7 +501,7 @@ def _build_flat_result(
     execution_id: Optional[str] = None,
     area: Optional[str] = None,
     redirect_count: int = 0,
-    resource_info: Optional[Dict[str, Any]] = None,
+    urltype: Optional[str] = None,
     retry_info: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
@@ -651,6 +533,8 @@ def _build_flat_result(
         ordered_result["eo.meta.http-request-uuid"] = http_request_uuid
     if http_request_round_id is not None:
         ordered_result["eo.meta.http-request-round-id"] = http_request_round_id
+    if urltype is not None:
+        ordered_result["eo.meta.urltype"] = urltype
 
     # ==================================================================
     # 3. Execution Environment / Timestamp Information
@@ -670,17 +554,38 @@ def _build_flat_result(
     ordered_result["eo.meta.tls-version"] = tls_version_value
 
     # ==================================================================
-    # 5. Extensions
+    # 5. CDN Detection (Core capability)
+    # ==================================================================
+    cdn_info = _detect_cdn(res_headers)
+    if cdn_info["cdn-header-name"] is not None:
+        ordered_result["eo.meta.cdn-header-name"] = cdn_info["cdn-header-name"]
+        ordered_result["eo.meta.cdn-header-value"] = cdn_info["cdn-header-value"]
+    if cdn_info["cdn-cache-status"] is not None:
+        ordered_result["eo.meta.cdn-cache-status"] = cdn_info["cdn-cache-status"]
+
+    # ==================================================================
+    # 6. Measurements (eo.measure.*)
+    # ==================================================================
+    if duration_ms is not None:
+        ordered_result["eo.measure.duration-ms"] = round(duration_ms, 2)
+    if Initial_Response_ms is not None:
+        ordered_result["eo.measure.ttfb-ms"] = round(Initial_Response_ms, 2)
+    if content_length_bytes is not None:
+        ordered_result["eo.measure.actual-content-length"] = content_length_bytes
+    ordered_result["eo.measure.redirect-count"] = redirect_count
+    if retry_info:
+        ordered_result["eo.measure.retry-attempts"] = retry_info.get("retry_attempts", 0)
+        if retry_info.get("retry_delays"):
+            ordered_result["eo.measure.retry-delays-ms"] = [round(d * 1000, 2) for d in retry_info.get("retry_delays", [])]
+        if retry_info.get("last_error"):
+            ordered_result["eo.measure.retry-last-error"] = retry_info.get("last_error")
+
+    # ==================================================================
+    # 7. Extensions (eo.security.* etc.)
     # ==================================================================
     extension_context = {
-        "duration_ms": duration_ms,
-        "Initial_Response_ms": Initial_Response_ms,
-        "content_length_bytes": content_length_bytes,
         "target_url": target_url,
         "res_headers": res_headers,
-        "redirect_count": redirect_count,
-        "resource_info": resource_info,
-        "retry_info": retry_info,
     }
 
     for ext_name in _EXTENSION_REGISTRY:
@@ -688,23 +593,15 @@ def _build_flat_result(
         ordered_result.update(ext_output)
 
     # ==================================================================
-    # 9. Request Headers
+    # 8. Request Headers
     # ==================================================================
     for key in sorted(req_headers.keys()):
         ordered_result[f"headers.request-headers.{key.lower()}"] = req_headers[key]
 
     # ==================================================================
-    # 10. Response Headers
+    # 9. Response Headers
     # ==================================================================
     for key in sorted(res_headers.keys()):
         ordered_result[f"headers.response-headers.{key.lower()}"] = res_headers[key]
-
-    # ==================================================================
-    # 11. Complement content-length header
-    # ==================================================================
-    if content_length_bytes is not None:
-        cl_key = "headers.response-headers.content-length"
-        if cl_key not in ordered_result or not ordered_result[cl_key]:
-            ordered_result[cl_key] = str(content_length_bytes)
 
     return ordered_result

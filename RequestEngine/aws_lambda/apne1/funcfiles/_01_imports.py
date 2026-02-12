@@ -12,9 +12,7 @@ import time
 import hashlib
 import json
 import ssl
-import re
 import logging
 from typing import Any, Dict, Optional, Tuple
-from urllib.parse import urlparse, urljoin
 
 import requests

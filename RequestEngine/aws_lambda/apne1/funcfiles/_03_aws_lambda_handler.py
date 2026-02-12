@@ -273,17 +273,11 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     )
 
     # ==================================================================
-    # Determine resource type based on URL type and extension
-    # ==================================================================
-    resource_info = _determine_resource_type(urltype, target_url)
-
-    # ==================================================================
     # URL Validation
     # ==================================================================
     if not target_url:
         end_time = time.time()
         duration_ms = (end_time - start_time) * 1000
-        error_resource_info = _determine_resource_type(urltype, "")
         return _build_flat_result(
             status_code=400,
             status_message="MISSING_URL",
@@ -297,7 +291,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             request_start_timestamp=start_time,
             request_end_timestamp=end_time,
             execution_id=context.aws_request_id if context else None,
-            resource_info=error_resource_info,
+            urltype=urltype,
             area=aws_region,
         )
 
@@ -328,7 +322,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 request_start_timestamp=start_time,
                 request_end_timestamp=end_time,
                 execution_id=context.aws_request_id if context else None,
-                resource_info=resource_info,
+                urltype=urltype,
                 area=aws_region,
             )
     except Exception as e:
@@ -348,7 +342,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             request_start_timestamp=start_time,
             request_end_timestamp=end_time,
             execution_id=context.aws_request_id if context else None,
-            resource_info=resource_info,
+            urltype=urltype,
             area=aws_region,
         )
 
@@ -441,7 +435,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 request_end_timestamp=end_time,
                 execution_id=context.aws_request_id if context else None,
                 redirect_count=redirect_count,
-                resource_info=resource_info,
+                urltype=urltype,
                 retry_info=retry_info,
                 area=aws_region,
             )
@@ -452,8 +446,6 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     except requests.exceptions.RequestException as e:
             end_time = time.time()
             duration_ms = (end_time - start_time) * 1000
-            # Get resource_info even on error (if possible)
-            error_resource_info = resource_info if "resource_info" in locals() else _determine_resource_type(urltype if "urltype" in locals() else None, target_url)
             return _build_flat_result(
                 status_code=500,
                 status_message=f"Request failed: {str(e)}",
@@ -468,7 +460,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 request_end_timestamp=end_time,
                 execution_id=context.aws_request_id if context else None,
                 redirect_count=0,
-                resource_info=error_resource_info,
+                urltype=urltype if "urltype" in locals() else None,
                 retry_info=retry_info if "retry_info" in locals() else None,
                 area=aws_region,
             )
@@ -477,10 +469,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
         logging.error(f"Unexpected error: {str(e)}")
         end_time = time.time()
         duration_ms = (end_time - start_time) * 1000
-        # Get resource_info even on error (if possible)
         error_target_url = target_url if "target_url" in locals() else ""
-        error_urltype = urltype if "urltype" in locals() else None
-        error_resource_info = _determine_resource_type(error_urltype, error_target_url) if error_target_url else None
         return _build_flat_result(
             status_code=500,
             status_message=f"Internal error: {str(e)}",
@@ -495,7 +484,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             request_end_timestamp=end_time,
             execution_id=context.aws_request_id if context else None,
             redirect_count=0,
-            resource_info=error_resource_info,
+            urltype=urltype if "urltype" in locals() else None,
             retry_info=None,  # No retry info for unexpected errors
             area=aws_region,
         )
