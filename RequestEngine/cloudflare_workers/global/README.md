@@ -55,6 +55,25 @@ Deploy the worker to the Cloudflare network:
 npm run deploy
 ```
 
+## File Structure
+
+Python版 Request Engine の `common/` + プラットフォーム固有ハンドラー構造を TypeScript で再現。
+
+```
+RequestEngine/cloudflare_workers/common/                ← CF Workers共通
+├── request_engine_core.ts                              ← 共通コアロジック
+└── extensions/
+    └── _ext_security.ts                                ← security 拡張
+
+RequestEngine/cloudflare_workers/global/funcfiles/src/  ← プラットフォーム固有
+├── _01_types.ts                                        ← 型定義・インターフェース
+├── _02_extensions.ts                                   ← ワークフローで動的生成（.gitignore対象）
+├── _03_cf_worker_handler.ts                            ← メインハンドラー
+└── worker.ts                                           ← エントリポイント（re-export のみ）
+```
+
+esbuild（`RequestEngine/cloudflare_workers/global/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。
+
 ## Usage API
 
 The worker accepts JSON payloads compatible with the EO ecosystem.
@@ -155,7 +174,7 @@ The JSON keys follow a specific convention for clarity and standardization:
 This repository works with GitHub Actions for automated deployment.
 
 ### 1. Prerequisites
-Ensure the `.github/workflows/deploy.yml` exists.
+Ensure `.github/workflows/deploy-to-cf-worker-global.yml` exists.
 
 ### 2. GitHub Secrets Configuration
 Set the following secrets in your GitHub Repository settings (Settings > Secrets and variables > Actions):
@@ -170,5 +189,9 @@ Please make sure to register CFWORKER_REQUEST_SECRET (N8N_EO_REQUEST_SECRET) as 
 Likewise, register any GitHub secrets in GitHub Secrets.
 
 ### 3. Trigger
-Push changes to the `funcfiles/src/` directory, `funcfiles/package.json`, or `funcfiles/tsconfig.json` on the `main` branch to trigger the deployment.
+GitHub Actions > Run workflow から手動実行（`workflow_dispatch`）。
+
+| 入力名 | 型 | デフォルト | 説明 |
+|--------|------|-----------|------|
+| `ext_security` | boolean | `true` | Security Extension（`eo.security.*`）の有効/無効 |
 

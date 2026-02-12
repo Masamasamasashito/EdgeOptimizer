@@ -170,4 +170,4 @@ Critical variables in `EO_Infra_Docker/.env`:
    - 命名提案時は「初見で意味が通るか」を最優先基準とする。技術的正確さだけでは不十分。コードを読まずとも名前だけで意図が伝わること。
 6. **File Path References:** When referencing files in code comments, documentation, or any text, always use the full path from the repository root directory. Never use bare filenames.
    - コメント・ドキュメント等でファイルを参照する際は、リポジトリルートからのフルパスで記載すること。ファイル名単体での記載は禁止。
-
+7. **button names or UI labels:** 人間が手作業で確認した手順のクリックボタン名やラベル名などは変更しないこと。心配なときは確認を求めること。
