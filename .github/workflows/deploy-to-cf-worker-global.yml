@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  prod_deploy: # ジョブ名（任意）。実行単位の論理名
+  d01_deploy: # ジョブ名（任意）。実行単位の論理名
     # GitHub-hosted Runner(JOB実行するマシン(コンテナ))の実行環境が割り当てられる(送信元IPアドレス固定できない)
     runs-on: ubuntu-latest
     timeout-minutes: 10 # ジョブ全体の実行上限時間。ハング防止
@@ -53,7 +53,7 @@ jobs:
           # シークレットから取得したドメインを設定
           workers_dev = false
           routes = [
-            { pattern = "${{ secrets.EO_CF_WORKER_DOMAIN }}", zone_confirm = true }
+            "${{ secrets.EO_CF_WORKER_DOMAIN }}"
           ]
 
           [observability]
