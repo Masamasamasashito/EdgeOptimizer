@@ -1,0 +1,53 @@
+version: 2
+updates:
+  # npm: Cloudflare Workers
+  - package-ecosystem: "npm"
+    directory: "/RequestEngine/cloudflare_workers/global/funcfiles"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: ":update:"
+
+  # pip: Azure Functions
+  - package-ecosystem: "pip"
+    directory: "/RequestEngine/azure_functions/jpeast/funcfiles"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: ":update:"
+
+  # pip: GCP Cloud Run
+  - package-ecosystem: "pip"
+    directory: "/RequestEngine/gcp_cloudrun/ane1/funcfiles"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: ":update:"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: ":update:"
