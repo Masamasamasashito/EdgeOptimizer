@@ -140,7 +140,7 @@
     },
     {
       "parameters": {
-        "content": "# 設定8 RequestEngineのURL設定\n \nRequest EngineにCache Warmup  ( Fetch / GETリクエスト ) 実行命令をn8nからhttpリクエスト\n\n- 280AWSはLambda関数名とクレデンシャル等を設定\n- 280CFは、ParametersのURLにRequest Engine の WorkerのURLを設定\n- User-Agent を 175 Assign UserAgents By UrlTypeで付与しているため Parameters で Send Headers の Header Parameters に User-Agent を JSONで、Expressionとして {{ $json.data.headers[\"User-Agent\"] }} を追加している\n- Accept-Language を 180 Request Engine Settingsノードで付与した場合、Parameters で Send Headers の Header Parameters に Accept-Language を JSONで、Expressionとして {{ $json.data.headers[\"Accept-Language\"] }} を追加する\n- Parameters で Send Body の options の timeoutが短いと途中で止まる場合有り\n- RequestEngineを地域別やクラウド別で増やす場合、280として追加\n\n## クラウド別基盤認証まとめ\n- AWS Lambda\n    - IAMユーザーのアクセスキーによる認証\n- Azure Functions\n    - 関数キーによる x-functions-key ヘッダーの認証\n- Google CloudRun(第3世代)\n    - Oauth2 BearerトークンによるヘッダーのAuthorizationによる認証\n- Clodfare Worker\n    - Cloudflare Access サービストークンによる Header Auth(Custom Auth)認証",
+        "content": "# 設定8 RequestEngineのURL設定\n \nRequest EngineにCache Warmup  ( Fetch / GETリクエスト ) 実行命令をn8nからhttpリクエスト\n\n- 280AWSはLambda関数名とクレデンシャル等を設定\n- 280CFは、ParametersのURLにRequest Engine の WorkerのURLを設定\n- User-Agent を 175 Assign UserAgents By UrlTypeで付与しているため Parameters で Send Headers の Header Parameters に User-Agent を JSONで、Expressionとして {{ $json.data.headersForTargetUrl[\"User-Agent\"] }} を追加している\n- Accept-Language を 180 Request Engine Settingsノードで付与した場合、Parameters で Send Headers の Header Parameters に Accept-Language を JSONで、Expressionとして {{ $json.data.headersForTargetUrl[\"Accept-Language\"] }} を追加する\n- Parameters で Send Body の options の timeoutが短いと途中で止まる場合有り\n- RequestEngineを地域別やクラウド別で増やす場合、280として追加\n\n## クラウド別基盤認証まとめ\n- AWS Lambda\n    - IAMユーザーのアクセスキーによる認証\n- Azure Functions\n    - 関数キーによる x-functions-key ヘッダーの認証\n- Google CloudRun(第3世代)\n    - Oauth2 BearerトークンによるヘッダーのAuthorizationによる認証\n- Clodfare Worker\n    - Cloudflare Access サービストークンによる Header Auth(Custom Auth)認証",
         "height": 592,
         "width": 1184,
         "color": 3
@@ -768,7 +768,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\n// URLタイプごとに適用するユーザーエージェント一覧\nconst mainDocumentUserAgentList = [\n  { label: 'ios_safari_17', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_chrome_pixel', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_chrome_galaxy', ua: 'Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_go', ua: 'Mozilla/5.0 (Linux; Android 12; Android Go) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.60 Mobile Safari/537.36' },\n  //{ label: 'ios_safari_16', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_webview', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/118.0.0.0 Mobile Safari/537.36' },\n];\n\nconst assetUserAgentList = [\n  { label: 'ios_safari_17', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_chrome_pixel', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_chrome_galaxy', ua: 'Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_go', ua: 'Mozilla/5.0 (Linux; Android 12; Android Go) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.60 Mobile Safari/537.36' },\n  //{ label: 'ios_safari_16', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_webview', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/118.0.0.0 Mobile Safari/537.36' },\n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const urlData = item.json ?? item;\n  if (!urlData.targetUrl || !urlData.tokenCalculatedByN8n) continue;\n\n  const urlCategory = urlData.urltype;\n\n  // exception は破棄\n  if (urlCategory === 'exception') {\n    continue;\n  }\n\n  let selectedUserAgents;\n  if (urlCategory === 'asset') {\n    selectedUserAgents = assetUserAgentList;\n  } else if (urlCategory === 'main_document') {\n    selectedUserAgents = mainDocumentUserAgentList;\n  } else {\n    // 指定以外の urltype は出力しない\n    continue;\n  }\n\n  for (const userAgent of selectedUserAgents) {\n    out.push({\n      json: {\n        ...urlData,\n        headers: { 'User-Agent': userAgent.ua },\n        userAgentLabel: userAgent.label,\n      },\n    });\n  }\n}\n\nreturn out;"
+        "jsCode": "const items = $input.all();\n\n// URLタイプごとに適用するユーザーエージェント一覧\nconst mainDocumentUserAgentList = [\n  { label: 'ios_safari_17', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_chrome_pixel', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_chrome_galaxy', ua: 'Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_go', ua: 'Mozilla/5.0 (Linux; Android 12; Android Go) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.60 Mobile Safari/537.36' },\n  //{ label: 'ios_safari_16', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_webview', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/118.0.0.0 Mobile Safari/537.36' },\n];\n\nconst assetUserAgentList = [\n  { label: 'ios_safari_17', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_chrome_pixel', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_chrome_galaxy', ua: 'Mozilla/5.0 (Linux; Android 13; SM-G998B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Mobile Safari/537.36' },\n  //{ label: 'android_go', ua: 'Mozilla/5.0 (Linux; Android 12; Android Go) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.60 Mobile Safari/537.36' },\n  //{ label: 'ios_safari_16', ua: 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1' },\n  //{ label: 'android_webview', ua: 'Mozilla/5.0 (Linux; Android 13; Pixel 6) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/118.0.0.0 Mobile Safari/537.36' },\n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const urlData = item.json ?? item;\n  if (!urlData.targetUrl || !urlData.tokenCalculatedByN8n) continue;\n\n  const urlCategory = urlData.urltype;\n\n  // exception は破棄\n  if (urlCategory === 'exception') {\n    continue;\n  }\n\n  let selectedUserAgents;\n  if (urlCategory === 'asset') {\n    selectedUserAgents = assetUserAgentList;\n  } else if (urlCategory === 'main_document') {\n    selectedUserAgents = mainDocumentUserAgentList;\n  } else {\n    // 指定以外の urltype は出力しない\n    continue;\n  }\n\n  for (const userAgent of selectedUserAgents) {\n    out.push({\n      json: {\n        ...urlData,\n        headersForTargetUrl: { 'User-Agent': userAgent.ua },\n        userAgentLabel: userAgent.label,\n      },\n    });\n  }\n}\n\nreturn out;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -781,7 +781,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 入力: [{ json: { targetUrl, tokenCalculatedByN8n, headers, userAgentLabel } }, ...]\nconst items = $input.all();\n\nreturn items.map((item, i) => ({\n  json: {\n    ...item.json,\n    httpRequestNumber: i + 1, // 1始まり\n  },\n}));"
+        "jsCode": "// 入力: [{ json: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, userAgentLabel } }, ...]\nconst items = $input.all();\n\nreturn items.map((item, i) => ({\n  json: {\n    ...item.json,\n    httpRequestNumber: i + 1, // 1始まり\n  },\n}));"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -794,7 +794,7 @@
     },
     {
       "parameters": {
-        "jsCode": "const items = $input.all();\n\n// EO Request Engine として利用する Serverless Proxy Fetcher と 言語(Accept-Language)の一覧\n// （主にクラウド種別のサーバレスサービスとエリア）\nconst requestEngineList = [\n\n  { \n    type_area: 'AwsLambda_ap-northeast-1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'AzureFunctions_japan-east',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n/*\n  { \n    type_area: 'CloudflareWorker_global',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'GcpCloudFunctions_asia-northeast1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n*/\n  // Example\n  // { \n  //   type_area: 'DirectRequest',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AwsLambda_ap-northeast-1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AzureFunctions_japan-east',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'CloudflareWorker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'GcpCloudFunctions_asia-northeast1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n\n  // { \n  //   type_area: 'AkamaiEdgeworker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  \n  // ※ accept_language無しの場合\n  // { \n  //   type_area: 'CloudflareWorker_global' ,\n  //   accept_language: 'nothing',\n  // },  \n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const baseData = item.json ?? item;\n\n  // targetUrl / tokenCalculatedByN8n が無い行はスキップ\n  if (!baseData.targetUrl || !baseData.tokenCalculatedByN8n) continue;\n\n  // 1件の入力に対し、requestEngineList 全エンジンを展開\n  for (const requestEngine of requestEngineList) {\n    // 既存 headers（User-Agent 等）を壊さないようにコピー\n    const headers = { ...(baseData.headers || {}) };\n\n    if (\n      requestEngine.accept_language &&\n      requestEngine.accept_language !== 'nothing'\n    ) {\n      // Accept-Language を付与するパターン\n      headers['Accept-Language'] = requestEngine.accept_language;\n    } else {\n      // “nothing” の場合は Accept-Language ヘッダを付けない（存在していれば削除）\n      delete headers['Accept-Language'];\n    }\n\n    out.push({\n      json: {\n        // 元データ引き継ぎ\n        ...baseData,\n\n        // Request Engine 情報\n        cloud_type_area: requestEngine.type_area,\n\n        // User-Agent など既存ヘッダ + Accept-Language を反映\n        headers,\n      },\n    });\n  }\n}\n\nreturn out;"
+        "jsCode": "const items = $input.all();\n\n// EO Request Engine として利用する Serverless Proxy Fetcher と 言語(Accept-Language)の一覧\n// （主にクラウド種別のサーバレスサービスとエリア）\nconst requestEngineList = [\n\n  { \n    type_area: 'AwsLambda_ap-northeast-1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'AzureFunctions_japan-east',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n/*\n  { \n    type_area: 'CloudflareWorker_global',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n  { \n    type_area: 'GcpCloudFunctions_asia-northeast1',\n    accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  },\n*/\n  // Example\n  // { \n  //   type_area: 'DirectRequest',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AwsLambda_ap-northeast-1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'AzureFunctions_japan-east',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'CloudflareWorker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  // { \n  //   type_area: 'GcpCloudFunctions_asia-northeast1',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n\n  // { \n  //   type_area: 'AkamaiEdgeworker_global',\n  //   accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',\n  // },\n  \n  // ※ accept_language無しの場合\n  // { \n  //   type_area: 'CloudflareWorker_global' ,\n  //   accept_language: 'nothing',\n  // },  \n];\n\n// 出力用配列\nconst out = [];\n\nfor (const item of items) {\n  const baseData = item.json ?? item;\n\n  // targetUrl / tokenCalculatedByN8n が無い行はスキップ\n  if (!baseData.targetUrl || !baseData.tokenCalculatedByN8n) continue;\n\n  // 1件の入力に対し、requestEngineList 全エンジンを展開\n  for (const requestEngine of requestEngineList) {\n    // 既存 headersForTargetUrl（User-Agent 等）を壊さないようにコピー\n    const headers = { ...(baseData.headersForTargetUrl || {}) };\n\n    if (\n      requestEngine.accept_language &&\n      requestEngine.accept_language !== 'nothing'\n    ) {\n      // Accept-Language を付与するパターン\n      headers['Accept-Language'] = requestEngine.accept_language;\n    } else {\n      // “nothing” の場合は Accept-Language ヘッダを付けない（存在していれば削除）\n      delete headers['Accept-Language'];\n    }\n\n    out.push({\n      json: {\n        // 元データ引き継ぎ\n        ...baseData,\n\n        // Request Engine 情報\n        cloud_type_area: requestEngine.type_area,\n\n        // User-Agent など既存ヘッダ + Accept-Language を反映\n        headersForTargetUrl: headers,\n      },\n    });\n  }\n}\n\nreturn out;"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -1414,11 +1414,11 @@
           "parameters": [
             {
               "name": "User-Agent",
-              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"User-Agent\"] }}"
             },
             {
               "name": "Accept-Language",
-              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"Accept-Language\"] }}"
             }
           ]
         },
@@ -1482,11 +1482,11 @@
           "parameters": [
             {
               "name": "User-Agent",
-              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"User-Agent\"] }}"
             },
             {
               "name": "Accept-Language",
-              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"Accept-Language\"] }}"
             }
           ]
         },
@@ -1524,11 +1524,11 @@
           "parameters": [
             {
               "name": "User-Agent",
-              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"User-Agent\"] }}"
             },
             {
               "name": "Accept-Language",
-              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"Accept-Language\"] }}"
             },
             {
               "name": "Authorization",
@@ -1542,7 +1542,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n  \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n  \"headers\": \"{{ $json.data.headers }}\",\n  \"httpRequestNumber\": \"{{ $json.data.httpRequestNumber }}\",\n  \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n  \"httpRequestRoundID\": \"{{ $json.data.httpRequestRoundID }}\",\n  \"urltype\": \"{{ $json.data.urltype }}\"\n}",
+        "jsonBody": "={\n  \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n  \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n  \"headersForTargetUrl\": \"{{ $json.data.headersForTargetUrl }}\",\n  \"httpRequestNumber\": \"{{ $json.data.httpRequestNumber }}\",\n  \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n  \"httpRequestRoundID\": \"{{ $json.data.httpRequestRoundID }}\",\n  \"urltype\": \"{{ $json.data.urltype }}\"\n}",
         "options": {
           "redirect": {
             "redirect": {
@@ -1597,17 +1597,17 @@
           "parameters": [
             {
               "name": "User-Agent",
-              "value": "={{ $json.data.headers[\"User-Agent\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"User-Agent\"] }}"
             },
             {
               "name": "Accept-Language",
-              "value": "={{ $json.data.headers[\"Accept-Language\"] }}"
+              "value": "={{ $json.data.headersForTargetUrl[\"Accept-Language\"] }}"
             }
           ]
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"data\": {\n    \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n    \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n    \"headers\": {\n      \"User-Agent\": \"{{ $json.data.headers['User-Agent'] }}\",\n      \"Accept-Language\": \"{{ $json.data.headers['Accept-Language'] }}\"\n    },\n    \"httpRequestNumber\": {{ $json.data.httpRequestNumber }},\n    \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n    \"httpRequestRoundID\": {{ $json.data.httpRequestRoundID }},\n    \"urltype\": \"{{ $json.data.urltype }}\"\n  }\n}",
+        "jsonBody": "={\n  \"data\": {\n    \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n    \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n    \"headersForTargetUrl\": {\n      \"User-Agent\": \"{{ $json.data.headersForTargetUrl['User-Agent'] }}\",\n      \"Accept-Language\": \"{{ $json.data.headersForTargetUrl['Accept-Language'] }}\"\n    },\n    \"httpRequestNumber\": {{ $json.data.httpRequestNumber }},\n    \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n    \"httpRequestRoundID\": {{ $json.data.httpRequestRoundID }},\n    \"urltype\": \"{{ $json.data.urltype }}\"\n  }\n}",
         "options": {
           "redirect": {
             "redirect": {

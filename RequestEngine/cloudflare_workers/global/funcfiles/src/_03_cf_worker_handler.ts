@@ -13,7 +13,7 @@
  * Returns results in a flat JSON structure (supporting TTFB/BodySize measurements).
  *
  * Input:
- * - JSON Body: { data: { targetUrl, tokenCalculatedByN8n, headers, ... } }
+ * - JSON Body: { data: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, ... } }
  * - GET Query: ?targetUrl=...&tokenCalculatedByN8n=...
  *
  * Dependencies:
@@ -105,7 +105,7 @@ async function parseRequestInput(request: Request): Promise<WarmupRequest> {
       targetUrl: urlObj.searchParams.get("targetUrl"),
       tokenCalculatedByN8n: urlObj.searchParams.get("tokenCalculatedByN8n"),
       httpRequestNumber: urlObj.searchParams.get("httpRequestNumber"),
-      headers: headers,
+      headersForTargetUrl: headers,
     };
   }
 
@@ -139,8 +139,8 @@ async function parseRequestInput(request: Request): Promise<WarmupRequest> {
         : null,
     // Extract urltype for resource type determination
     urltype: typeof input.urltype === "string" ? input.urltype : null,
-    // httprequestnumber contained in headers is excluded by prepareRequestHeaders
-    headers: prepareRequestHeaders(input.headers),
+    // httprequestnumber contained in headersForTargetUrl is excluded by prepareRequestHeaders
+    headers: prepareRequestHeaders(input.headersForTargetUrl),
   };
 }
 

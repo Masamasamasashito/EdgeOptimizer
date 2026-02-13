@@ -11,10 +11,10 @@
 #
 # * Input:
 # - HTTP Method: POST (GET is not implemented)
-# - JSON Body: { data: { targetUrl, tokenCalculatedByN8n, headers, httpRequestNumber, httpRequestUUID, httpRequestRoundID } }
+# - JSON Body: { data: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, httpRequestNumber, httpRequestUUID, httpRequestRoundID } }
 #   * targetUrl: Target URL to warm up (required)
 #   * tokenCalculatedByN8n: SHA-256(url + request secret) calculated in n8n using EO_Infra_Docker/.env N8N_EO_REQUEST_SECRET (required)
-#   * headers: Optional custom headers (object)
+#   * headersForTargetUrl: Optional custom headers for target URL request (object)
 #   * httpRequestNumber: Optional request sequence number
 #   * httpRequestUUID: Optional UUID for each request (created by n8n)
 #   * httpRequestRoundID: Optional UNIX timestamp when the first request of a round reaches 215 Add httpRequestRoundID (created by n8n)
@@ -168,7 +168,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             - Object format: {"data": {...}} or direct request data
             - data.url: Target URL (required)
             - data.token: Authentication token (required, SHA-256(url + secret))
-            - data.headers: Request headers (optional)
+            - data.headersForTargetUrl: Request headers for target URL (optional)
             - data.httpRequestNumber: Request number (optional)
             - data.httpRequestUUID: Request UUID (optional)
             - data.httpRequestRoundID: Request round ID (optional)
@@ -265,7 +265,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
     http_request_uuid = data.get("httpRequestUUID")
     http_request_round_id = data.get("httpRequestRoundID")
     urltype = data.get("urltype")
-    input_headers = data.get("headers") if isinstance(data.get("headers"), dict) else {}
+    input_headers = data.get("headersForTargetUrl") if isinstance(data.get("headersForTargetUrl"), dict) else {}
 
     # Get User-Agent header
     ua_from_request_headers = (

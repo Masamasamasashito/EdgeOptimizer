@@ -24,7 +24,7 @@
 **意味**: クライアントが Gateway に送るものの**契約**。
 
 - **入力**: クライアントから見た「送っていい形」
-- **例**: `POST /warmup`、Body は `{ "data": { "url", "token", "headers", ... } }`
+- **例**: `POST /warmup`、Body は `{ "data": { "url", "token", "headersForTargetUrl", ... } }`
 - **設計のポイント**: クライアント（n8n など）が本当に送れる形になっているか。必須・オプション・名前をここで確定させる。
 
 → ここを曖昧にすると、後段の「統合」で余計な変換や if が増える。
@@ -87,7 +87,7 @@
 | ステージ             | 入力の形 | 出力の形 |
 |----------------------|----------|----------|
 | メソッドリクエスト   | n8nからのリクエスト | 直下に記載 |
-| 統合リクエスト       | パース済み Body + 検証 | `targetUrl`, `headers`（Host 除外済み）、トークン OK |
+| 統合リクエスト       | パース済み Body + 検証 | `targetUrl`, `headersForTargetUrl`（Host 除外済み）、トークン OK |
 | バックエンド呼び出し | `fetch(url, { headers })` の引数 | `Response`（status, headers, body） |
 | 統合レスポンス       | `Response` + 計測値 | フラット JSON（`headers.*`, `eo.meta.*`, `eo.security.*`） |
 | メソッドレスポンス   | 統合レスポンスの JSON | `200` + その JSON を Body にした HTTP レスポンス |
@@ -102,7 +102,7 @@
       "targetUrl": "https://sample.com/wp-content/uploads/2026/01/category-img-ai-development-300x158.png",
       "urltype": "asset",
       "tokenCalculatedByN8n": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-      "headers": {
+      "headersForTargetUrl": {
           "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1",
           "Accept-Language": "ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7"
       },
