@@ -11,7 +11,7 @@
 #
 # * Input:
 # - HTTP Method: POST (GET is not implemented)
-# - JSON Body: { data: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, httpRequestNumber, httpRequestUUID, httpRequestRoundID } }
+# - JSON Body: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, httpRequestNumber, httpRequestUUID, httpRequestRoundID }
 #   * targetUrl: Target URL to warm up (required)
 #   * tokenCalculatedByN8n: SHA-256(url + request secret) calculated in n8n using EO_Infra_Docker/.env N8N_EO_REQUEST_SECRET (required)
 #   * headersForTargetUrl: Optional custom headers for target URL request (object)
@@ -164,15 +164,15 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
 
     Args:
         event: Lambda event (JSON Body or Lambda event structure)
-            - Array format: [{"data": {...}}] - uses first element
-            - Object format: {"data": {...}} or direct request data
-            - data.url: Target URL (required)
-            - data.token: Authentication token (required, SHA-256(url + secret))
-            - data.headersForTargetUrl: Request headers for target URL (optional)
-            - data.httpRequestNumber: Request number (optional)
-            - data.httpRequestUUID: Request UUID (optional)
-            - data.httpRequestRoundID: Request round ID (optional)
-            - data.urltype: URL type (optional, "main_document", "asset", "exception")
+            - Array format: [{...}] - uses first element
+            - Object format: {targetUrl, tokenCalculatedByN8n, ...}
+            - targetUrl: Target URL (required)
+            - tokenCalculatedByN8n: Authentication token (required, SHA-256(url + secret))
+            - headersForTargetUrl: Request headers for target URL (optional)
+            - httpRequestNumber: Request number (optional)
+            - httpRequestUUID: Request UUID (optional)
+            - httpRequestRoundID: Request round ID (optional)
+            - urltype: URL type (optional, "main_document", "asset", "exception")
         context: Lambda context (used to get execution ID, etc.)
 
     Returns:
@@ -247,14 +247,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             area=aws_region,
         )
 
-    # ==================================================================
-    # Normalize data structure (same as Azure Functions version)
-    # ==================================================================
-    # Use event.data if exists, otherwise use event itself
-    # This supports different event formats
-    data = event.get("data") if isinstance(event, dict) else None
-    if not isinstance(data, dict) or not data:
-        data = event
+    data = event
 
     # ==================================================================
     # Extract request data

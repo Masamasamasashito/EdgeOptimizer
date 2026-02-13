@@ -13,8 +13,8 @@
  * Returns results in a flat JSON structure (supporting TTFB/BodySize measurements).
  *
  * Input:
- * - JSON Body: { data: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, ... } }
- * - GET Query: ?targetUrl=...&tokenCalculatedByN8n=...
+ * - JSON Body: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, ... }
+ * - GET Query: ?targetUrl=...&tokenCalculatedByN8n=... (legacy fallback)
  *
  * Dependencies:
  * - Header pass-through from n8n No.280 nodes (Host header excluded)
@@ -58,21 +58,12 @@ import "./_02_extensions";
  * Helper to extract parameters from Body or Query
  */
 function extractRawData(body: unknown): unknown {
-  // Normalize Event format (Handle array head, presence of 'data' property)
-  let target = body;
-
-  // If array, extract the first element (Standard behavior for n8n)
+  // Normalize Event format (Handle array head)
   if (Array.isArray(body)) {
     if (body.length === 0) throw new Error("EMPTY_EVENT_LIST");
-    target = body[0];
+    return body[0];
   }
-
-  // If structure is { "data": { ... } }, extract contents of 'data'
-  if (target && typeof target === "object" && "data" in target) {
-    return (target as { data: unknown }).data;
-  }
-
-  return target;
+  return body;
 }
 
 /**

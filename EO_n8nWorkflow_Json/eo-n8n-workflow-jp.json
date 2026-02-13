@@ -1449,34 +1449,10 @@
     },
     {
       "parameters": {
+        "method": "POST",
         "url": "<CF WorkersリクエストエンジンのカスタムドメインURL>",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpCustomAuth",
-        "sendQuery": true,
-        "queryParameters": {
-          "parameters": [
-            {
-              "name": "targetUrl",
-              "value": "={{ $json.data.targetUrl }}"
-            },
-            {
-              "name": "tokenCalculatedByN8n",
-              "value": "={{ $json.data.tokenCalculatedByN8n }}"
-            },
-            {
-              "name": "httpRequestNumber",
-              "value": "={{ $json.data.httpRequestNumber }}"
-            },
-            {
-              "name": "httpRequestUUID",
-              "value": "={{ $json.data.httpRequestUUID }}"
-            },
-            {
-              "name": "httpRequestRoundID",
-              "value": "={{ $json.httpRequestRoundID }}"
-            }
-          ]
-        },
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
@@ -1490,6 +1466,9 @@
             }
           ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n  \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n  \"headersForTargetUrl\": \"{{ $json.data.headersForTargetUrl }}\",\n  \"httpRequestNumber\": {{ $json.data.httpRequestNumber }},\n  \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n  \"httpRequestRoundID\": {{ $json.data.httpRequestRoundID }},\n  \"urltype\": \"{{ $json.data.urltype }}\"\n}",
         "options": {
           "redirect": {
             "redirect": {
@@ -1551,7 +1530,8 @@
           },
           "response": {
             "response": {
-              "fullResponse": true
+              "fullResponse": true,
+              "neverError": true
             }
           },
           "timeout": 180000
@@ -1607,7 +1587,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"data\": {\n    \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n    \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n    \"headersForTargetUrl\": {\n      \"User-Agent\": \"{{ $json.data.headersForTargetUrl['User-Agent'] }}\",\n      \"Accept-Language\": \"{{ $json.data.headersForTargetUrl['Accept-Language'] }}\"\n    },\n    \"httpRequestNumber\": {{ $json.data.httpRequestNumber }},\n    \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n    \"httpRequestRoundID\": {{ $json.data.httpRequestRoundID }},\n    \"urltype\": \"{{ $json.data.urltype }}\"\n  }\n}",
+        "jsonBody": "={\n  \"targetUrl\": \"{{ $json.data.targetUrl }}\",\n  \"tokenCalculatedByN8n\": \"{{ $json.data.tokenCalculatedByN8n }}\",\n  \"headersForTargetUrl\": \"{{ $json.data.headersForTargetUrl }}\",\n  \"httpRequestNumber\": {{ $json.data.httpRequestNumber }},\n  \"httpRequestUUID\": \"{{ $json.data.httpRequestUUID }}\",\n  \"httpRequestRoundID\": {{ $json.data.httpRequestRoundID }},\n  \"urltype\": \"{{ $json.data.urltype }}\"\n}",
         "options": {
           "redirect": {
             "redirect": {

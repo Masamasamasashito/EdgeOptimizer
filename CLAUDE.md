@@ -171,4 +171,4 @@ Critical variables in `EO_Infra_Docker/.env`:
 6. **File Path References:** When referencing files in code comments, documentation, or any text, always use the full path from the repository root directory. Never use bare filenames.
    - コメント・ドキュメント等でファイルを参照する際は、リポジトリルートからのフルパスで記載すること。ファイル名単体での記載は禁止。
 7. **button names or UI labels:** 人間が手作業で確認した手順のクリックボタン名やラベル名などは変更しないこと。心配なときは確認を求めること。
-8. **Timeline Chat Visualization:** 西暦年月日時分を会話の最後に「UTC + 9時間」で書くこと。
+8. **Timeline Chat Visualization:** 西暦年月日時分を会話の最後に「UTC+9(JST)」の時制で書くこと。
