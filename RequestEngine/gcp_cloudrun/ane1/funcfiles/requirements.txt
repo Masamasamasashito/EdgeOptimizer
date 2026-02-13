@@ -1,4 +1,4 @@
 google-cloud-secret-manager==2.*
 requests==2.*
-gunicorn==21.*
+gunicorn==25.*
 flask==3.*
