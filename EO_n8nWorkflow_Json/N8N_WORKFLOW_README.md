@@ -8,6 +8,7 @@
 |---------|------|
 | `eo-n8n-workflow-jp.json` | Edge Optimizer メインワークフロー（日本語） |
 | `n8n構成図.jpg` | ワークフロー構成図 |
+| `N8N_NODE_SETUP.md` | ノード設定ガイド（設定①〜⑩の手順） |
 | `NODE175_USERAGENT_README.md` | #175 User-Agent設定ガイド（一覧・サンプル） |
 | `NODE180_REQUESTENGINE_README.md` | #180 Request Engine設定ガイド（type_area・accept_language一覧） |
 
@@ -48,10 +49,10 @@ n8n を初めて起動した場合、ユーザー登録が必要です。
 
 ### Step.0: メインドキュメントURL抽出
 
-| ノード番号 | ノード名 | 設定内容 |
-|----------|---------|---------|
-| #010 | Step.0 Starter by XML sitemap | XMLサイトマップURLを設定 |
-| #015-020 | DNS認証ノード | DNS TXTレコードによるドメイン所有権検証（下記参照） |
+| 設定番号 | ノード番号 | ノード名 | 設定内容 |
+|---------|----------|---------|---------|
+| 設定① | #010 | Step.0 Starter by XML sitemap | XMLサイトマップURLを設定 |
+| 設定② | #015-020 | DNS認証ノード | DNS TXTレコードによるドメイン所有権検証（下記参照） |
 
 #### DNS認証ノード（#015-020）の詳細設定
 
@@ -131,14 +132,15 @@ DNS認証に失敗すると、以下のエラーが表示されます:
 - n8n #020ノードの `DNSTXT_TOKEN` 値がDNS TXTレコードと一致しているか
 - DNSの伝播に時間がかかっている場合は、数分〜数時間待ってから再試行
 
-### Step.1: アセット抽出・フィルタリング
+### Step.1: アセット抽出・フィルタリング・バリアント設定
 
-| ノード番号 | ノード名 | 設定内容 | 詳細ガイド |
-|----------|---------|---------|-----------|
-| #140 | Extract Warmup Page Assets | Warmup対象ドメインを設定 | - |
-| #155 | Unwanted URL Patterns Filter | 除外URLパターンを設定 | - |
-| #175 | Assign UserAgents By UrlType | User-Agentリストを設定 | [NODE175_USERAGENT_README.md](NODE175_USERAGENT_README.md) |
-| #180 | RequestEngine Settings | クラウド・リージョン・言語を設定 | [NODE180_REQUESTENGINE_README.md](NODE180_REQUESTENGINE_README.md) |
+| 設定番号 | ノード番号 | ノード名 | 設定内容 | 詳細ガイド |
+|---------|----------|---------|---------|-----------|
+| 設定③ | #125 | HTTP Req to MainDoc URL locs | Playwright利用の有無を選択 | - |
+| 設定④ | #140 | Resource URLs Discovery from DOM | Warmup対象ドメインを設定 | - |
+| 設定⑤ | #155 | Excluded Patterns Filter | 除外URLパターンを設定 | - |
+| 設定⑥ | #175 | Assign UserAgents | User-Agentリストを設定 | [NODE175_USERAGENT_README.md](NODE175_USERAGENT_README.md) |
+| 設定⑦ | #180 | RequestEngine Settings | クラウド・リージョン・言語を設定 | [NODE180_REQUESTENGINE_README.md](NODE180_REQUESTENGINE_README.md) |
 
 #### #175 User-Agent設定の概要
 
@@ -170,19 +172,21 @@ const requestEngineList = [
 
 ### Step.2: GEO分散リクエスト
 
-| ノード番号 | ノード名 | 設定内容 |
-|----------|---------|---------|
-| #280AWS | AWS-apne1 RequestEngine | Lambda関数名を設定 |
-| #280AZ | AZ-japan-east RequestEngine | Azure Functions URLを設定 |
-| #280CF | CF-global RequestEngine | Cloudflare Workers URLを設定 |
-| #280GCP | GCP-asia-northeast1 RequestEngine | Cloud Run URLを設定 |
-| #340 | Random Sleep (ms) | スリープ時間を調整（デフォルト: 1000-3999ms） |
+| 設定番号 | ノード番号 | ノード名 | 設定内容 |
+|---------|----------|---------|---------|
+| 設定⑧ | #225 | RequestEngine Switcher | クラウド別ルーティング設定 |
+| 設定⑨ | #235 | Get IDtoken From GCP Service Account | GCP Cloud Run 使用時のみ |
+| 設定⑩ | #280AWS | AWS-apne1 RequestEngine | Lambda関数名を設定 |
+| 設定⑩ | #280AZ | AZ-japan-east RequestEngine | Azure Functions URLを設定 |
+| 設定⑩ | #280CF | CF-global RequestEngine | Cloudflare Workers URLを設定 |
+| 設定⑩ | #280GCP | GCP-asia-northeast1 RequestEngine | Cloud Run URLを設定 |
+| - | #340 | Random Sleep (ms) | スリープ時間を調整（デフォルト: 1000-3999ms） |
 
 ### Step.3: 結果出力
 
 | ノード番号 | ノード名 | 設定内容 |
 |----------|---------|---------|
-| #420 | JSON to WarmupHistoryCSV | CSV出力パスを設定 |
+| #420 | JSON to RequestResultsCSV | CSV出力パスを設定 |
 
 ## 4. ワークフロー構成概要
 

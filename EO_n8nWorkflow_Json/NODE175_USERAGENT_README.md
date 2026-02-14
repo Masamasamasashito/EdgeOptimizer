@@ -1,13 +1,13 @@
-# #175 Assign UserAgents By UrlType 設定ガイド
+# #175 Assign UserAgents 設定ガイド
 
-このノードでは、URLタイプ（`main_document` / `asset`）ごとに適用するUser-Agent一覧を設定します。
+実際のユーザーによるリクエストになるべく近づけるため、URLタイプ（`main_document` / `asset`）ごとに適用する User-Agent 一覧を設定します。
 
 ## 概要
 
 | 項目 | 説明 |
 |-----|------|
 | ノード番号 | #175 |
-| ノード名 | Assign UserAgents By UrlType |
+| ノード名 | Assign UserAgents |
 | ノードタイプ | Code（JavaScript） |
 | 目的 | URLタイプ別にUser-Agentバリアントを展開 |
 
