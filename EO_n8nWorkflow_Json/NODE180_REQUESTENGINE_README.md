@@ -60,20 +60,20 @@ const requestEngineList = [
 
 | type_area | リージョン | 地理的位置 |
 |-----------|-----------|-----------|
-| `GcpCloudFunctions_asia-northeast1` | 東京 | 日本 |
-| `GcpCloudFunctions_asia-northeast2` | 大阪 | 日本 |
-| `GcpCloudFunctions_asia-northeast3` | ソウル | 韓国 |
-| `GcpCloudFunctions_asia-east1` | 台湾 | 台湾 |
-| `GcpCloudFunctions_asia-southeast1` | シンガポール | 東南アジア |
-| `GcpCloudFunctions_us-central1` | アイオワ | アメリカ中部 |
-| `GcpCloudFunctions_us-east1` | サウスカロライナ | アメリカ東海岸 |
-| `GcpCloudFunctions_europe-west1` | ベルギー | ヨーロッパ西部 |
+| `GcpCloudRun_asia-northeast1` | 東京 | 日本 |
+| `GcpCloudRun_asia-northeast2` | 大阪 | 日本 |
+| `GcpCloudRun_asia-northeast3` | ソウル | 韓国 |
+| `GcpCloudRun_asia-east1` | 台湾 | 台湾 |
+| `GcpCloudRun_asia-southeast1` | シンガポール | 東南アジア |
+| `GcpCloudRun_us-central1` | アイオワ | アメリカ中部 |
+| `GcpCloudRun_us-east1` | サウスカロライナ | アメリカ東海岸 |
+| `GcpCloudRun_europe-west1` | ベルギー | ヨーロッパ西部 |
 
 ### Cloudflare Workers
 
 | type_area | リージョン | 地理的位置 |
 |-----------|-----------|-----------|
-| `CloudflareWorker_global` | グローバル | エッジロケーション自動選択 |
+| `CloudflareWorkers_global` | グローバル | エッジロケーション自動選択 |
 
 ### その他
 
@@ -154,7 +154,7 @@ const requestEngineList = [
     accept_language: 'ja,ja-JP;q=0.9,en-US;q=0.8,en;q=0.7',
   },
   {
-    type_area: 'GcpCloudFunctions_asia-southeast1',
+    type_area: 'GcpCloudRun_asia-southeast1',
     accept_language: 'en-US,en;q=0.9',
   },
   // アメリカ
@@ -169,7 +169,7 @@ const requestEngineList = [
   },
   // グローバルエッジ
   {
-    type_area: 'CloudflareWorker_global',
+    type_area: 'CloudflareWorkers_global',
     accept_language: 'en-US,en;q=0.9',
   },
 ];
@@ -235,7 +235,7 @@ const requestEngineList = [
     ├→ AwsLambda_*          → #280AWS
     ├→ AzureFunctions_*     → #280AZ
     ├→ CloudflareWorker_*   → #280CF
-    └→ GcpCloudFunctions_*  → #280GCP（#235経由）
+    └→ GcpCloudRun_*  → #280GCP（#235経由）
 ```
 
 ### デフォルトの分岐条件
@@ -245,8 +245,8 @@ const requestEngineList = [
 | 0 | `DirectRequest` | #280DirectRequest |
 | 1 | `AwsLambda_ap-northeast-1` | #280AWS |
 | 2 | `AzureFunctions_japan-east` | #280AZ |
-| 3 | `CloudflareWorker_global` | #280CF |
-| 4 | `GcpCloudFunctions_asia-northeast1` | #280GCP（#235経由） |
+| 3 | `CloudflareWorkers_global` | #280CF |
+| 4 | `GcpCloudRun_asia-northeast1` | #280GCP（#235経由） |
 
 ### 新しいリージョンを追加する場合
 
