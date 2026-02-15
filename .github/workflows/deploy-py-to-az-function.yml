@@ -3,8 +3,8 @@ name: Deploy Azure Functions jpeast
 on:
 #   push:
 #     paths:
-#       - 'RequestEngine/azure_functions/jpeast/funcfiles/**'
-#       - 'RequestEngine/common/**'
+#       - 'RequestEngine/azure_functions/py/funcfiles/**'
+#       - 'RequestEngine/common/py/**'
 #     branches:
 #       - main
   workflow_dispatch:
@@ -36,9 +36,9 @@ jobs:
       - name: Merge Azure Function Files
         run: |
           mkdir -p deploy_package
-          SRC_DIR="RequestEngine/azure_functions/jpeast/funcfiles"
-          COMMON_DIR="RequestEngine/common"
-          EXT_DIR="RequestEngine/common/extensions"
+          SRC_DIR="RequestEngine/azure_functions/py/funcfiles"
+          COMMON_DIR="RequestEngine/common/py"
+          EXT_DIR="RequestEngine/common/py/extensions"
 
           # Create header comment
           {

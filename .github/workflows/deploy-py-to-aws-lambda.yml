@@ -3,7 +3,7 @@ name: Deploy AWS Lambda apne1
 on:
 #   push:
 #     paths:
-#       - 'RequestEngine/aws_lambda/apne1/funcfiles/lambda_function.py'
+#       - 'RequestEngine/aws_lambda/py/funcfiles/**'
 #     branches:
 #       - snapshot/pre-directory-restructuring-20260128
   workflow_dispatch:
@@ -33,9 +33,9 @@ jobs:
       - name: Merge Lambda Function Files
         run: |
           mkdir -p deploy_package
-          SRC_DIR="RequestEngine/aws_lambda/apne1/funcfiles"
-          COMMON_DIR="RequestEngine/common"
-          EXT_DIR="RequestEngine/common/extensions"
+          SRC_DIR="RequestEngine/aws_lambda/py/funcfiles"
+          COMMON_DIR="RequestEngine/common/py"
+          EXT_DIR="RequestEngine/common/py/extensions"
 
           # Create header comment
           {

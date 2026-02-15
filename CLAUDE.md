@@ -51,14 +51,14 @@ docker compose run --rm terraform apply
 ### Request Engine Deployment
 
 Deployments are triggered via GitHub Actions (manual `workflow_dispatch`):
-- `.github/workflows/deploy-to-aws-lambda-apne1.yml`
-- `.github/workflows/deploy-to-az-function-jpeast.yml`
-- `.github/workflows/deploy-to-gcp-cloudrun-ane1.yml`
-- `.github/workflows/deploy-to-cf-worker-global.yml`
+- `.github/workflows/deploy-py-to-aws-lambda.yml`
+- `.github/workflows/deploy-py-to-az-function.yml`
+- `.github/workflows/deploy-py-to-gcp-cloudrun.yml`
+- `.github/workflows/deploy-ts-to-cf-worker.yml`
 
 For Cloudflare Workers local development:
 ```bash
-cd RequestEngine/cloudflare_workers/global/funcfiles
+cd RequestEngine/cloudflare_workers/ts/funcfiles
 npm install
 npx wrangler dev                        # Local dev server
 npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
@@ -68,7 +68,8 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 
 - `EO_Infra_Docker/` - Docker Compose for local n8n, PostgreSQL, Redis, Playwright, SearXNG
 - `RequestEngine/` - Serverless function implementations per platform
-  - `*/funcfiles/` - Actual function code
+  - `*/{py,ts}/funcfiles/` - Actual function code
+  - `*/instances/*.yml` - Instance definitions (region, resource name)
 - `terraform/` - Infrastructure as Code modules
 - `EOn8nWorkflowJson/` - n8n workflow definitions for import
 - `test/` - **OSS公開を避けるファイルの置き場。このディレクトリ内のファイルを他のディレクトリへ移動禁止。**
@@ -76,23 +77,23 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 ## Docs
 
 - `RequestEngine\RE_README.md` - n8n Credentals and HTTP Request Node setup
-    - `RequestEngine\aws_lambda\apne1\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
-- `RequestEngine\aws_lambda\apne1\LAMBDA_README.md` - AWS Lambda specific setup
-- `RequestEngine\azure_functions\jpeast\AZFUNC_README.md` - Azure Functions specific setup
-- `RequestEngine\gcp_cloudrun\ane1\RUN_README.md` - GCP Cloud Run specific setup
-- `RequestEngine\cloudflare_workers\global\CFWORKER_README.md` - Cloudflare Workers specific setup
+    - `RequestEngine\aws_lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
+- `RequestEngine\aws_lambda\py\LAMBDA_README.md` - AWS Lambda specific setup
+- `RequestEngine\azure_functions\py\AZFUNC_README.md` - Azure Functions specific setup
+- `RequestEngine\gcp_cloudrun\py\RUN_README.md` - GCP Cloud Run specific setup
+- `RequestEngine\cloudflare_workers\ts\CFWORKER_README.md` - Cloudflare Workers specific setup
 
 ### Refactoring Strategy: Common Parts Extraction
 
 EX) AWS Lambda
 
-- RequestEngine\aws_lambda\apne1\funcfiles\lambda_function.py
+- RequestEngine\aws_lambda\py\funcfiles\lambda_function.py
     - Before: Monolithic code with all logic in a single file
-    - After: `RequestEngine\aws_lambda\apne1\funcfiles\_03_aws_lambda_handler.py` for AWS Lambda specific handler , Verify n8n secret and cloudsecret
-    - After: `RequestEngine\aws_lambda\apne1\funcfiles\_01_imports.py` for imports
-    - After: `RequestEngine\common\request_engine_core.py` for shared core logic
-    - After: `RequestEngine\common\extensions` directory for shared utilities (`_ext_mesure.py`, `_ext_peformance.py`, `_ext_security.py`)
-    - After: `RequestEngine\aws_lambda\apne1\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
+    - After: `RequestEngine\aws_lambda\py\funcfiles\_03_aws_lambda_handler.py` for AWS Lambda specific handler , Verify n8n secret and cloudsecret
+    - After: `RequestEngine\aws_lambda\py\funcfiles\_01_imports.py` for imports
+    - After: `RequestEngine\common\py\request_engine_core.py` for shared core logic
+    - After: `RequestEngine\common\py\extensions` directory for shared utilities (`_ext_security.py`)
+    - After: `RequestEngine\aws_lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
 
 ## Request Engine Data Flow
 

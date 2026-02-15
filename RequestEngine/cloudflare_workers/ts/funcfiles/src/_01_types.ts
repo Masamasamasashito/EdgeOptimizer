@@ -17,7 +17,7 @@ export interface Env {
 }
 
 // Resource information (from URL type and extension analysis)
-// Matches RequestEngine/common/request_engine_core.py _determine_resource_type() output
+// Matches RequestEngine/common/py/request_engine_core.py _determine_resource_type() output
 export interface ResourceInfo {
   urltype: string | null;
   url_extension: string | null;
@@ -36,7 +36,7 @@ export interface WarmupRequest {
 }
 
 // Parameters for building flat JSON result
-// Matches RequestEngine/common/request_engine_core.py _build_flat_result() signature
+// Matches RequestEngine/common/py/request_engine_core.py _build_flat_result() signature
 export interface ExecutionResultParams {
   statusCode: number;
   statusMessage: string;
