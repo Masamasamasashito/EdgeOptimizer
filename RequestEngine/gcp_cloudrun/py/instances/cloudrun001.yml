@@ -1,7 +1,7 @@
 # Referenced by (この定義値を使用するファイル):
 #   ../../../../.github/workflows/deploy-py-to-gcp-cloudrun.yml (EO_GCP_CLOUD_RUN_SERVICE_NAME, EO_GCP_REGION)
 #   ../terraform/cloud_run.tf (locals から構築)
-#   ../terraform/main.tf (name_prefix + region_short)
-instance_number: "001"
-region: "asia-northeast1"
-region_short: "ane1"
+#   ../terraform/main.tf (name_prefix + re_region_short)
+re_instance_number: "001"
+re_region: "asia-northeast1"
+re_region_short: "ane1"
