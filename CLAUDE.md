@@ -172,5 +172,5 @@ Critical variables in `EO_Infra_Docker/.env`:
 6. **File Path References:** When referencing files in code comments, documentation, or any text, always use the full path from the repository root directory. Never use bare filenames.
    - コメント・ドキュメント等でファイルを参照する際は、リポジトリルートからのフルパスで記載すること。ファイル名単体での記載は禁止。
 7. **button names or UI labels:** 人間が手作業で確認した手順のクリックボタン名やラベル名などは変更しないこと。心配なときは確認を求めること。
-8. **Timeline Chat Visualization:** 会話の最後に「UTC+9(JST)」時制で、曜日計算を正確に行い「yyyy-MM-dd(ddd)HH:mm」を書くこと。
+8. **Timeline Chat Visualization:** 会話の最後にシステムコマンド `powershell -NoProfile -Command "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Date -Format 'yyyy-MM-dd(ddd)HH:mm' ([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId((Get-Date), 'Tokyo Standard Time'))"` で取得した時刻を自動追記して。
 9. **Command Execution Priority :** PowerShellコマンドで試してもだめな場合にpythonやnpmコマンドを実行すること。

@@ -101,3 +101,6 @@ RequestEngine/cloudflare_workers/global/funcfiles/src/_02_extensions.ts
 
 # test
 test/
+
+# Claude Code (AI assistant local data - plans, session files)
+.claude/
