@@ -2,7 +2,7 @@
 
 GCP Cloud Run上で動作するRequest Engineの実装です。他の実装（Cloudflare Workers、AWS Lambda、Azure Functions）と同じレスポンス形式で動作し、マルチクラウド環境での一貫した動作を実現します。
 
-**重要**: CloudRunリクエストエンジン接続認証と照合用リクエストシークレットによるトークン検証に関する命名や設定の詳細は、[RequestEngine\RE_README.md](../RE_README.md) を参照してください。
+**重要**: CloudRunリクエストエンジン接続認証と照合用リクエストシークレットによるトークン検証に関する命名や設定の詳細は、[EO_Documents\Manuals\RE_README.md](../RE_README.md) を参照してください。
 
 # 概要
 
@@ -242,7 +242,7 @@ gcloud iam service-accounts get-iam-policy ${TARGET_SA_EMAIL} --project=$EO_GCP_
 2. プロジェクトディレクトリに移動:
    ```bash
    export EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY="<プロジェクトローカルルートディレクトリ>"
-   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp_cloudrun/ane1
+   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp_cloudrun/py
    ```
 3. gcloud CLIがインストールされていることを確認:
    ```bash
@@ -265,7 +265,7 @@ gcloud iam service-accounts get-iam-policy ${TARGET_SA_EMAIL} --project=$EO_GCP_
 2. プロジェクトディレクトリに移動:
    ```bash
    export EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY="<プロジェクトローカルルートディレクトリ>"
-   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp_cloudrun/ane1
+   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp_cloudrun/py
    ```
 3. 認証とプロジェクト設定:
    ```bash
@@ -308,7 +308,7 @@ gcloud projects get-iam-policy $env:EO_GCP_PROJECT_ID `
 5. Runtime SA のリソースレベルロール（Cloud Build & Deployer SAからの借用権限）
 6. OAuth2_Invoker SA の Cloud Run Invokerロール（サービス起動権限）
 
-**注意**: このスクリプトは、RUN_README.mdに記載されている期待される権限と実機の設定を比較します。差分が見つかった場合は、エラーメッセージと共に修正コマンドが表示されます。
+**注意**: このスクリプトは、CloudRun_README.mdに記載されている期待される権限と実機の設定を比較します。差分が見つかった場合は、エラーメッセージと共に修正コマンドが表示されます。
 
 ## GCPプロジェクトの箱だけ作成後デフォルトで有効化されているAPI 2026/1/19時点
 
@@ -713,7 +713,7 @@ SA作成後、jsonキーのダウンロードが必要。
   - `Google Service Account API` 認証情報を作成し、JSONの内容を転記します。
       - Credentialの名前：`EO_RE_GCP_RUN_ane1_OAuth2_Invoker_SA`
   - **重要**: `private_key` フィールドの改行文字（`\n`）を含めた**そのままの形式**で貼り付けてください。
-  - 詳細は RequestEngine\RE_README.md を参照。
+  - 詳細は EO_Documents\Manuals\RE_README.md を参照。
 
 ### 2. Cloud Shell からのキー・ファイル管理
 - **ダウンロード**: 
@@ -1110,7 +1110,7 @@ flowchart LR
 ローカル環境からも同じコマンドでデプロイ可能です（`gcloud`コマンドと適切な認証が必要）:
 
 ```bash
-cd RequestEngine/gcp_cloudrun/ane1
+cd RequestEngine/gcp_cloudrun/py
 gcloud run deploy eo-re-d01-cloudrun-ane1 \
   --source ./funcfiles \
   --region asia-northeast1 \
@@ -1385,7 +1385,7 @@ OAuth2 Bearer認証を使用するには、n8nワークフローでID Tokenを�
 **注意**: 
 - OAuth2 Bearer認証を使用する場合は、ステップ4で作成したService AccountのJSONキーをn8n Credentialsに設定する必要があります
 - n8nワークフローでService AccountのID Tokenを取得して、リクエストヘッダーに`Authorization: Bearer <idToken>`を設定してください
-- `RequestEngine\RE_README.md` も参照してください
+- `EO_Documents\Manuals\RE_README.md` も参照してください
 
 ## ローカル開発
 
@@ -1395,7 +1395,7 @@ OAuth2 Bearer認証を使用するには、n8nワークフローでID Tokenを�
 
 ```bash
 # プロジェクトルートから実行
-cd RequestEngine/gcp_cloudrun/ane1
+cd RequestEngine/gcp_cloudrun/py
 
 # .envファイルを作成（初回のみ）
 cp env.example .env
@@ -1853,7 +1853,7 @@ token = hashlib.sha256(f"{url}{secret}".encode()).hexdigest()
 }
 ```
 
-詳細なレスポンス形式については、[RequestEngine\RE_README.md](../RE_README.md)を参照してください。
+詳細なレスポンス形式については、[EO_Documents\Manuals\RE_README.md](../RE_README.md)を参照してください。
 
 ## シークレット設定の詳細
 
@@ -2051,7 +2051,7 @@ PERMISSION_DENIED: Permission 'artifactregistry.repositories.create' denied on r
 - **原因1**: Dockerイメージのビルドエラー
   - **解決**: ローカルで`docker build`を実行してエラーを確認
     ```bash
-    cd RequestEngine/gcp_cloudrun/ane1
+    cd RequestEngine/gcp_cloudrun/py
     docker build -f Dockerfile -t test-image .
     ```
 - **原因2**: ポート設定が間違っている
@@ -2329,5 +2329,5 @@ severity<="INFO"
 - [GCP Cloud Run公式ドキュメント](https://cloud.google.com/run/docs)
 - [GCP Secret Manager公式ドキュメント](https://cloud.google.com/secret-manager/docs)
 - [GCP Workload Identity Federation公式ドキュメント](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
-- [RequestEngine\RE_README.md](../RE_README.md) - 命名規則とセキュリティ設定の詳細
+- [EO_Documents\Manuals\RE_README.md](../RE_README.md) - 命名規則とセキュリティ設定の詳細
 

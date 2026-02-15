@@ -2,7 +2,7 @@
 
 `eo-re-d01-azure-funcapp.bicep`と`eo-re-d01-azure-mgmt-group.bicep` を使用した Azure Functions Request Engine インフラストラクチャの構築手順です。
 
-※bicepやjsonのテンプレートでうまくできない場合、お手数ですが[AZFUNC_README.md](../jpeast/AZFUNC_README.md) の手動手順を参照してください。特にSTEP 0は、個人契約だと権限不足でazure cliがエラーになります。
+※bicepやjsonのテンプレートでうまくできない場合、お手数ですが[AZFUNC_README.md](AZFUNC_README.md) の手動手順を参照してください。特にSTEP 0は、個人契約だと権限不足でazure cliがエラーになります。
 
 ## 目次
 
@@ -107,7 +107,7 @@ Edge Optimizer の Azure Functions Request Engine に必要な以下のリソー
 
 サブスクリプションに対するポリシー制限を Bicep で設定します。GitHub Secrets にサブスクリプションIDを登録する際のセキュリティリスクを軽減として行います。
 
-**手動で設定する場合**: [AZFUNC_README.md](../jpeast/AZFUNC_README.md) の「Azure管理グループ作成」セクションを参照
+**手動で設定する場合**: [AZFUNC_README.md](AZFUNC_README.md) の「Azure管理グループ作成」セクションを参照
 
 ### 0-1. 前提条件
 
@@ -177,7 +177,7 @@ az deployment mg create --location japaneast --management-group-id eo-re-d01-azu
 
 Azure Portal のテンプレートデプロイはテナントスコープに対応していないため、**手動で設定**する必要があります。
 
-👉 **[AZFUNC_README.md](../jpeast/AZFUNC_README.md)** の「Azure管理グループ作成」セクションを参照してください。
+👉 **[AZFUNC_README.md](AZFUNC_README.md)** の「Azure管理グループ作成」セクションを参照してください。
 
 ### 0-3. パラメータ
 
@@ -649,12 +649,12 @@ az ad sp create --id <APPLICATION_ID>
 2. n8n の URL に `?code=...` が含まれているか確認
 3. または Header Auth で `x-functions-key` ヘッダーが設定されているか確認
 
-詳細: [AZFUNC_README.md](../jpeast/AZFUNC_README.md) の「トラブルシューティング」セクション参照
+詳細: [AZFUNC_README.md](AZFUNC_README.md) の「トラブルシューティング」セクション参照
 
 ---
 
 ## 関連ドキュメント
 
-- [AZFUNC_README.md](../jpeast/AZFUNC_README.md) - Azure Functions 詳細セットアップ手順
-- [RE_README.md](../../RE_README.md) - Request Engine 全体のセキュリティ設定
-- [LAMBDA_CFN_README.md](../../aws_lambda/CFn/LAMBDA_CFN_README.md) - AWS Lambda CloudFormation 構築手順
+- [AZFUNC_README.md](AZFUNC_README.md) - Azure Functions 詳細セットアップ手順
+- [RE_README.md](../RE_README.md) - Request Engine 全体のセキュリティ設定
+- [LAMBDA_CFN_README.md](LAMBDA_CFN_README.md) - AWS Lambda CloudFormation 構築手順

@@ -12,7 +12,7 @@ Cloudflare Github 連携(独自ドメインのサブドメインでWorker作る�
   - 例: `eo-re-d01-cfworker-global`を入力、「デプロイ (Deploy)」 をクリック
 	- この時点では xxx.<Cloudflareアカウント名>.workers.dev という仮のドメインが割り当てられる
 
-`.github/workflows/deploy-to-cf-worker-global.yml`とgithub上のシークレットが設定して有れば、WorkerがCloudflare上に無くても、新規Workerが**カスタムドメイン無し**で作成される。
+`.github/workflows/deploy-ts-to-cf-worker.yml`とgithub上のシークレットが設定して有れば、WorkerがCloudflare上に無くても、新規Workerが**カスタムドメイン無し**で作成される。
 
 ## 手順 2: サブドメインを設定
 
@@ -67,17 +67,17 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
         1. `EO_CF_WORKER_USER_API_TOKEN_FOR_GITHUB`,手順4でコピーしたユーザーAPIトークン,wranglerデプロイ認証用
         2. `EO_CF_ACCOUNT_ID`,手順4で確認したアカウントID,アカウント識別用
 
-- wrangler.toml は `.github/workflows/deploy-to-cf-worker-global.yml` の中で EOF により動的生成している
+- wrangler.toml は `.github/workflows/deploy-ts-to-cf-worker.yml` の中で EOF により動的生成している
 - ルーティングは手順2で設定したカスタムドメインで行うため、wrangler.toml に routes 設定は不要
 
 ## 手順 6: Workflowファイルの作成
 
 1. プロジェクトのルートディレクトリに、GitHub Actions用の設定ファイルを作成
-    - ファイルパス: `.github/workflows/deploy-to-cf-worker-global.yml`
+    - ファイルパス: `.github/workflows/deploy-ts-to-cf-worker.yml`
 2. 以下を参照。
     - Cloudflare公式のアクション cloudflare/wrangler-action を使用するのが最も簡単で推奨される方法
 
-[.github\workflows\deploy-to-cf-worker-global.yml](.github\workflows\deploy-to-cf-worker-global.yml)
+[.github\workflows\deploy-ts-to-cf-worker.yml](.github\workflows\deploy-ts-to-cf-worker.yml)
 
 ## 手順 7: Cloudflare WorkerでGithubリポジトリを登録（GitHub Actions運用時は不要）
 
@@ -92,16 +92,16 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 9. `main`などのブランチ選ぶ
 10. 非本番ブランチのビルド:`無効`
     - 有効にすると、githubリポジトリ上に`cloudflare-workers-and-pages[bot]`によってブランチ作成される。
-11. ルート ディレクトリ:`/RequestEngine/cloudflare_workers/global/funcfiles/`
+11. ルート ディレクトリ:`/RequestEngine/cloudflare_workers/ts/funcfiles/`
 	- 重要。githubリポジトリ上でWorkerのビルド/デプロイに必要なディレクトリのパスを指定
 12. 接続
 13. ビルドに Gitリポジトリが表示され、`Git リポジトリにコミットをプッシュして最初のビルドを開始できるようになりました`とでたらOK
-14. 監視パスを構築する > `RequestEngine/cloudflare_workers/global/funcfiles/*`を追加
+14. 監視パスを構築する > `RequestEngine/cloudflare_workers/ts/funcfiles/*`を追加
 
 ## 手順 8: npm install 実行
 
 1. ローカルのgitリポジトリで `docker compose run --rm cfworker_npm_installer`を実行（ 初期は`node:24-slim`をつかっていた ）。
-    - `/RequestEngine/cloudflare_workers/global/funcfiles/`でnode_modulesフォルダの必要なライブラリをnpm installするため。package.jsonと同じ階層で実施する。
+    - `/RequestEngine/cloudflare_workers/ts/funcfiles/`でnode_modulesフォルダの必要なライブラリをnpm installするため。package.jsonと同じ階層で実施する。
     - package-lock.jsonも作成される
     - package-lock.jsonはgitリポジトリにコミットする
     - node_modulesはgitリポジトリにはコミットしない
@@ -109,7 +109,7 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 
 ## 手順 9: 動作確認
 
-1. 作成した .github/workflows/deploy-to-cf-worker-global.yml を含めて、変更をコミットし、GitHubの main ブランチへプッシュ
+1. 作成した .github/workflows/deploy-ts-to-cf-worker.yml を含めて、変更をコミットし、GitHubの main ブランチへプッシュ
 2. GitHubリポジトリの 「Actions」 タブを開く
 3. 「Deploy to Cloudflare Workers」というワークフローが実行されていることを確認する
 4. 緑色のチェックマーク（Success）がつけばデプロイ完了
@@ -246,7 +246,7 @@ RequestEngine/common/                          ← 全プラットフォーム�
 └── extensions/
     └── _ext_security.py                       ← security 拡張
 
-RequestEngine/gcp_cloudrun/ane1/funcfiles/     ← プラットフォーム固有（例: GCP）
+RequestEngine/gcp_cloudrun/py/funcfiles/     ← プラットフォーム固有（例: GCP）
 ├── _01_imports.py                             ← imports
 └── _03_gcp_cloudrun_handler.py                ← ハンドラー
 ```
@@ -256,27 +256,27 @@ Python版はワークフローで `cat` コマンドにより `_ext_*.py` を直
 ## CF Workers版
 
 ```
-RequestEngine/cloudflare_workers/common/                ← CF Workers共通
+RequestEngine/common/ts/                                ← CF Workers共通
 ├── request_engine_core.ts                              ← 共通コアロジック（Python版 request_engine_core.py 相当）
 └── extensions/
     └── _ext_security.ts                                ← security 拡張（Python版 _ext_security.py 相当）
 
-RequestEngine/cloudflare_workers/global/funcfiles/src/  ← プラットフォーム固有
+RequestEngine/cloudflare_workers/ts/funcfiles/src/  ← プラットフォーム固有
 ├── _01_types.ts                                        ← 型定義・インターフェース
 ├── _02_extensions.ts                                   ← ワークフローで動的生成（.gitignore対象）
 ├── _03_cf_worker_handler.ts                            ← メインハンドラー
 └── worker.ts                                           ← エントリポイント（re-export のみ）
 ```
 
-**ビルドの仕組み**: esbuild（`RequestEngine/cloudflare_workers/global/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。Python版の `cat` 結合と同等の最終成果物。
+**ビルドの仕組み**: esbuild（`RequestEngine/cloudflare_workers/ts/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。Python版の `cat` 結合と同等の最終成果物。
 
 ## `_02_extensions.ts` の動的生成
 
-`_02_extensions.ts` はリポジトリに含まれず（`.gitignore` 対象）、`.github/workflows/deploy-to-cf-worker-global.yml` のデプロイ時に動的生成される。Python版のワークフローにおける `_ext_*.py` の条件付き cat 結合と同等。
+`_02_extensions.ts` はリポジトリに含まれず（`.gitignore` 対象）、`.github/workflows/deploy-ts-to-cf-worker.yml` のデプロイ時に動的生成される。Python版のワークフローにおける `_ext_*.py` の条件付き cat 結合と同等。
 
 生成例（`ext_security=true` の場合）:
 ```typescript
-// Auto-generated by deploy-to-cf-worker-global.yml
+// Auto-generated by deploy-ts-to-cf-worker.yml
 // Extension imports that register themselves with the extension registry.
 // Matches Python: GitHub Actions cat-merge of extensions/_ext_*.py
 
@@ -285,15 +285,15 @@ import "../../../common/extensions/_ext_security";
 
 ## Extension の追加方法
 
-1. `RequestEngine/cloudflare_workers/common/extensions/_ext_<name>.ts` を作成
+1. `RequestEngine/common/ts/extensions/_ext_<name>.ts` を作成
 2. ファイル内で `registerExtension()` を呼び出す（自己登録パターン）
-3. `.github/workflows/deploy-to-cf-worker-global.yml` に以下を追加:
+3. `.github/workflows/deploy-ts-to-cf-worker.yml` に以下を追加:
    - `workflow_dispatch.inputs` に `ext_<name>` ブール入力を追加
    - `Generate _02_extensions.ts` ステップに条件付き import 行を追加
 
 # デプロイワークフロー入力パラメータ
 
-`.github/workflows/deploy-to-cf-worker-global.yml` の `workflow_dispatch` 入力:
+`.github/workflows/deploy-ts-to-cf-worker.yml` の `workflow_dispatch` 入力:
 
 | 入力名 | 型 | デフォルト | 説明 |
 |--------|------|-----------|------|

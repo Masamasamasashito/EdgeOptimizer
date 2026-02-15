@@ -3,7 +3,7 @@
 # ==============================================================================
 # GitHub Actions `gcloud run deploy --source` uses Cloud Build to build container images.
 # The built images are stored in this Artifact Registry repository.
-# Reference: RUN_README.md "Github Actionsからデプロイする際の保存先となるリポジトリを先に作成する"
+# Reference: EO_Documents/Manuals/py/CloudRun_README.md "Github Actionsからデプロイする際の保存先となるリポジトリを先に作成する"
 
 resource "google_artifact_registry_repository" "cloud_run_source_deploy" {
   project       = var.gcp_project_id

@@ -225,7 +225,7 @@ GCP Cloud Run を Request Engine として使用する場合、ID トークン�
 
 > ⚠️ GCP Cloud Run を使用しない場合、この設定は不要です。
 >
-> 詳細は [RUN_README.md](../RequestEngine/gcp_cloudrun/ane1/RUN_README.md)、[RE_README.md](../RequestEngine/RE_README.md) を参照。
+> 詳細は [CloudRun_README.md](../EO_Documents/Manuals/py/CloudRun_README.md)、[RE_README.md](../EO_Documents/Manuals/RE_README.md) を参照。
 
 ### 設定⑩: #280系 Request Engine URL・Credential設定
 
@@ -300,4 +300,4 @@ const targetPages = [
 - [N8N_WORKFLOW_README.md](N8N_WORKFLOW_README.md) - ワークフロー全体設定
 - [NODE180_REQUESTENGINE_README.md](NODE180_REQUESTENGINE_README.md) - Request Engine設定ガイド（type_area・accept_language一覧）
 - [NODE175_USERAGENT_README.md](NODE175_USERAGENT_README.md) - User-Agent設定ガイド
-- [RE_README.md](../RequestEngine/RE_README.md) - Request Engine 全体のセキュリティ設定
+- [RE_README.md](../EO_Documents/Manuals/RE_README.md) - Request Engine 全体のセキュリティ設定

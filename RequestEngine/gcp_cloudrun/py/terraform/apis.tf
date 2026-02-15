@@ -2,7 +2,7 @@
 # GCP API Enablement
 # ==============================================================================
 # Enable required GCP APIs for Cloud Run Request Engine.
-# Reference: RUN_README.md "必要なAPIの有効化" section
+# Reference: EO_Documents/Manuals/py/CloudRun_README.md "必要なAPIの有効化" section
 
 resource "google_project_service" "cloud_functions" {
   project            = var.gcp_project_id

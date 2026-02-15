@@ -509,7 +509,7 @@
     },
     {
       "parameters": {
-        "content": "# 設定⑨ 235 Get IDtoken From GCP Service Account Access Token\n\nGCPサービスアカウントのJSON Keyをn8n Credentialsで`Google Service Account API`を使って登録。Authenticationで`Google Service Account API`の該当のCredentialを設定する\n\nGithubリポジトリ\n\nhttps://github.com/Masamasamasashito/EdgeOptimizer\n\nで\nRequestEngine/gcp_cloudrun/ane1/RUN_README.md\nRequestEngine/RE_README.md\nなどを参照",
+        "content": "# 設定⑨ 235 Get IDtoken From GCP Service Account Access Token\n\nGCPサービスアカウントのJSON Keyをn8n Credentialsで`Google Service Account API`を使って登録。Authenticationで`Google Service Account API`の該当のCredentialを設定する\n\nGithubリポジトリ\n\nhttps://github.com/Masamasamasashito/EdgeOptimizer\n\nで\nEO_Documents/Manuals/py/CloudRun_README.md\nEO_Documents/Manuals/RE_README.md\nなどを参照",
         "height": 432,
         "width": 672,
         "color": 3

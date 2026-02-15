@@ -1,6 +1,6 @@
 #!/bin/bash
 # GCP Service Account権限チェックスクリプト
-# RUN_README.mdに記載されている権限設定と実機の設定を比較します
+# EO_Documents/Manuals/py/CloudRun_README.mdに記載されている権限設定と実機の設定を比較します
 
 set -e
 

@@ -92,15 +92,15 @@ n8nのダッシュボードが表示されたら、Edge Optimizerのワークフ
 
 CloudFormation テンプレートで Lambda + IAM + Secrets Manager を**ワンクリック一括作成**できます。初めての方はこちらから始めてください。
 
-**👉 [LAMBDA_CFN_README.md](./RequestEngine/aws_lambda/CFn/LAMBDA_CFN_README.md)**
+**👉 [LAMBDA_CFN_README.md](./EO_Documents/Manuals/py/LAMBDA_CFN_README.md)**
 
 ### その他の Request Engine
 
-- **AWS Lambda（手動セットアップ）** → [LAMBDA_README.md](./RequestEngine/aws_lambda/apne1/LAMBDA_README.md)
-- **Azure Functions** → [AZFUNC_README.md](./RequestEngine/azure_functions/jpeast/AZFUNC_README.md)
-- **Cloudflare Workers** → [CFWORKER_README.md](./RequestEngine/cloudflare_workers/global/CFWORKER_README.md)
-- **GCP Cloud Run** → [RUN_README.md](./RequestEngine/gcp_cloudrun/ane1/RUN_README.md)
-- **Request Engine 全体のセキュリティ設定** → [RE_README.md](./RequestEngine/RE_README.md)
+- **AWS Lambda（手動セットアップ）** → [LAMBDA_README.md](./EO_Documents/Manuals/py/LAMBDA_README.md)
+- **Azure Functions** → [AZFUNC_README.md](./EO_Documents/Manuals/py/AZFUNC_README.md)
+- **Cloudflare Workers** → [CFWORKER_README.md](./EO_Documents/Manuals/ts/CFWORKER_README.md)
+- **GCP Cloud Run** → [CloudRun_README.md](./EO_Documents/Manuals/py/CloudRun_README.md)
+- **Request Engine 全体のセキュリティ設定** → [RE_README.md](./EO_Documents/Manuals/RE_README.md)
 
 ### ワークフロー詳細設定
 

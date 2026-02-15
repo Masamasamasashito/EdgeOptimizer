@@ -689,7 +689,7 @@ GitHub ActionsからOIDC認証でログインするため、サービスプリ�
 
 ### 初回デプロイ
 
-1. `RequestEngine/azure_functions/jpeast/funcfiles/function_app.py`、`requirements.txt`、または`host.json`を変更
+1. `RequestEngine/azure_functions/py/funcfiles/function_app.py`、`requirements.txt`、または`host.json`を変更
 2. `main`ブランチにプッシュ
 3. GitHubリポジトリの「Actions」タブを開く
 4. 「Deploy Azure Functions」ワークフローが実行されていることを確認
@@ -700,7 +700,7 @@ GitHub ActionsからOIDC認証でログインするため、サービスプリ�
 
 ### 通常のデプロイ（コード変更時）
 
-1. `RequestEngine/azure_functions/jpeast/funcfiles/` ディレクトリ内のファイルを変更
+1. `RequestEngine/azure_functions/py/funcfiles/` ディレクトリ内のファイルを変更
 2. `main`ブランチにプッシュ
 3. GitHub Actionsが自動的にデプロイを実行
 4. デプロイ完了後、Azure Portalで関数が更新されていることを確認
@@ -763,7 +763,7 @@ Function AppのマネージドIDがKey Vaultにアクセスできるか確認：
 ローカルでコードをテスト：
 
 ```bash
-cd RequestEngine/azure_functions/jpeast/funcfiles
+cd RequestEngine/azure_functions/py/funcfiles
 python -m py_compile function_app.py
 ```
 
@@ -780,7 +780,7 @@ python -m py_compile function_app.py
 GitHub Actionsでのデプロイが失敗する場合のトラブルシューティングとして、ローカルから直接デプロイ：
 
 ```bash
-cd RequestEngine/azure_functions/jpeast/funcfiles
+cd RequestEngine/azure_functions/py/funcfiles
 func azure functionapp publish eo-re-d01-funcapp-jpeast
 ```
 

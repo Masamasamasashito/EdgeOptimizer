@@ -58,13 +58,13 @@ Lambda Layer は CloudFormation デプロイ**前**に手動で作成する必�
 > **💡 WSL2 / Docker 環境が無い場合:**
 > Lambda Layer の zip ファイルはリポジトリに同梱されています。Docker でビルドせずに、以下のファイルをそのまま AWS コンソールからアップロードできます：
 >
-> 📦 [`RequestEngine/aws_lambda/apne1/funcfiles/requests-py314-slim-layer.zip`](../apne1/funcfiles/requests-py314-slim-layer.zip)
+> 📦 [`RequestEngine/aws_lambda/py/funcfiles/requests-py314-slim-layer.zip`](../../../RequestEngine/aws_lambda/py/funcfiles/requests-py314-slim-layer.zip)
 >
 > この場合、以下の Docker 手順（# 1〜# 4）をスキップし、「AWS コンソールで Layer を作成」の手順から進めてください。
 
 ```bash
 # 1. ディレクトリ移動
-cd RequestEngine/aws_lambda/apne1
+cd RequestEngine/aws_lambda/py
 
 # 2. WSL2 Ubuntu 起動
 wsl -d Ubuntu
@@ -87,7 +87,7 @@ exit
 5. 「作成」をクリック
 6. **ARN をメモ**（例: `arn:aws:lambda:ap-northeast-1:123456789012:layer:eo-re-d01-lambda-py314-slim-layer:1`）
 
-詳細手順: [LAMBDA_README.md](../apne1/LAMBDA_README.md) の Section 8-9 参照
+詳細手順: [LAMBDA_README.md](LAMBDA_README.md) の Section 8-9 参照
 
 ### 1-2. GitHub OIDC Provider の確認
 
@@ -224,7 +224,7 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 
 `.github/workflows/deploy-to-aws-lambda-apne1.yml` が設定済みであることを確認してください。
 
-詳細: [LAMBDA_README.md](../apne1/LAMBDA_README.md) の「github workflow AWS Lambda自動デプロイ」セクション参照
+詳細: [LAMBDA_README.md](LAMBDA_README.md) の「github workflow AWS Lambda自動デプロイ」セクション参照
 
 ---
 
@@ -310,8 +310,8 @@ Resource handler returned message: "Role/Policy with name ... already exists"
 ## 関連ドキュメント
 
 - [N8N_NODE_SETUP.md](../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - n8nワークフローノード設定ガイド（#010/DNS認証/#180/動作確認）
-- [LAMBDA_README.md](../apne1/LAMBDA_README.md) - Lambda 詳細セットアップ手順
-- [RE_README.md](../../RE_README.md) - Request Engine 全体のセキュリティ設定
+- [LAMBDA_README.md](LAMBDA_README.md) - Lambda 詳細セットアップ手順
+- [RE_README.md](../RE_README.md) - Request Engine 全体のセキュリティ設定
 - [N8N_WORKFLOW_README.md](../../../EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) - n8nワークフロー設定ガイド
 - [NODE180_REQUESTENGINE_README.md](../../../EO_n8nWorkflow_Json/NODE180_REQUESTENGINE_README.md) - Request Engine設定ガイド（type_area・accept_language一覧）
 - [NODE175_USERAGENT_README.md](../../../EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md) - User-Agent設定ガイド

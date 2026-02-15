@@ -75,7 +75,7 @@ resource "google_cloud_run_v2_service" "request_engine" {
 # ==============================================================================
 # Allow OAuth2 Invoker SA to invoke this Cloud Run service.
 # Without this binding, n8n requests will receive 401 Unauthorized.
-# Reference: RUN_README.md "Cloud Run サービス起動元ロールを付与"
+# Reference: EO_Documents/Manuals/py/CloudRun_README.md "Cloud Run サービス起動元ロールを付与"
 resource "google_cloud_run_v2_service_iam_member" "oauth2_invoker" {
   project  = google_cloud_run_v2_service.request_engine.project
   location = google_cloud_run_v2_service.request_engine.location

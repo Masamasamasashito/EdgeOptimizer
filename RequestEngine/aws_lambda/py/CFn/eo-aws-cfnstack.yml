@@ -11,7 +11,7 @@ Description: >
 #    Create the Lambda Layer manually before deploying this stack.
 #    Layer ARN format: arn:aws:lambda:{AWSRegion}:{AWSAccountId}:layer:{ProjectPrefix}-{Component}-{Environment}-lambda-py314-slim-layer:{Version}
 #    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:eo-re-d01-lambda-py314-slim-layer:1
-#    See: RequestEngine/aws_lambda/apne1/LAMBDA_README.md (Section 8-9) for layer creation steps.
+#    See: EO_Documents/Manuals/py/LAMBDA_README.md (Section 8-9) for layer creation steps.
 #
 # 2. GitHub OIDC Provider (IMPORTANT):
 #    If your AWS account already has a GitHub OIDC Provider (token.actions.githubusercontent.com),
@@ -430,7 +430,7 @@ Resources:
                   'body': json.dumps({'message': 'Hello World from Edge Optimizer!'})
               }
       # PREREQUISITE: Create this layer before deploying the stack
-      # See: RequestEngine/aws_lambda/apne1/LAMBDA_README.md
+      # See: EO_Documents/Manuals/py/LAMBDA_README.md
       Layers:
         - !Sub "arn:aws:lambda:${AWSRegion}:${AWSAccountId}:layer:${LambdaLayerName}:${LambdaLayerVersion}"
       LoggingConfig:

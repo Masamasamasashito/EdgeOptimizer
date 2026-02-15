@@ -15,14 +15,14 @@
 >
 > 手動セットアップは 11 ステップあり、IAM ポリシー・ロール・Secrets Manager など多くの AWS リソースを個別に作成する必要があります。
 >
-> **[CloudFormation 版](../CFn/LAMBDA_CFN_README.md)** を使えば、Lambda Layehr 作成以外のリソースを **ワンクリックで一括作成** できます。
+> **[CloudFormation 版](LAMBDA_CFN_README.md)** を使えば、Lambda Layehr 作成以外のリソースを **ワンクリックで一括作成** できます。
 >
 > - ✅ IAM ユーザー・ポリシー・ロールを自動作成
 > - ✅ Secrets Manager を自動作成
 > - ✅ GitHub Actions OIDC 連携を自動設定
 > - ✅ 命名規則の統一を自動保証
 >
-> 👉 **初めての方は [CloudFormation 版の手順](../CFn/LAMBDA_CFN_README.md) を使ってください。**
+> 👉 **初めての方は [CloudFormation 版の手順](LAMBDA_CFN_README.md) を使ってください。**
 
 ---
 
@@ -39,7 +39,7 @@
 
 ---
 
-**重要**: リクエストエンジン接続認証と照合用リクエストシークレットによるトークン検証に関する命名や設定の詳細は、[RE_README.md](../../RE_README.md) を参照してください。
+**重要**: リクエストエンジン接続認証と照合用リクエストシークレットによるトークン検証に関する命名や設定の詳細は、[RE_README.md](../RE_README.md) を参照してください。
 
 ---
 
@@ -61,7 +61,7 @@
 
 ## 1. Lambda作る
 
-> 💡 **CFn版の場合**: この手順は CloudFormation が自動で実行します。[CFn版 STEP 2](../CFn/LAMBDA_CFN_README.md) を参照。
+> 💡 **CFn版の場合**: この手順は CloudFormation が自動で実行します。[CFn版 STEP 2](LAMBDA_CFN_README.md) を参照。
 
 - IAMポリシーにLambdaのARNが必要だからLambdaを先に作る必要あり
 - 付随して作られるCWLogsロググループの保持期間とIAMポリシーに注意が必要
@@ -111,7 +111,7 @@ eo-re-d01-lambda-apne1-access-key-iamp
 
 ## 4. IAM User（n8n HTTPリクエストノードからLambdaへのリクエストの認証用） 作成 → アクセスキー発行
 
-> 💡 **CFn版の場合**: IAM ユーザーは CloudFormation が自動作成します。アクセスキーのみ手動発行が必要です（[CFn版 STEP 3-2](../CFn/LAMBDA_CFN_README.md)）。
+> 💡 **CFn版の場合**: IAM ユーザーは CloudFormation が自動作成します。アクセスキーのみ手動発行が必要です（[CFn版 STEP 3-2](LAMBDA_CFN_README.md)）。
 
 1. IAMユーザー
     - eo-re-d01-lambda-apne1-iamu
@@ -131,7 +131,7 @@ eo-re-d01-lambda-apne1-access-key-iamp
 
 ## 5. n8n 280系リクエストエンジンLambdaノード用Credential設定
 
-> 💡 **CFn版の場合**: この手順は手動・CFn版共通です。[CFn版 STEP 4](../CFn/LAMBDA_CFN_README.md) を参照。
+> 💡 **CFn版の場合**: この手順は手動・CFn版共通です。[CFn版 STEP 4](LAMBDA_CFN_README.md) を参照。
 
 n8nの280系のリクエストエンジンLambdaノードで使うCredentialを作成
 
@@ -155,7 +155,7 @@ n8nの280系のリクエストエンジンLambdaノードにCredentialを設定
 
 ## 6. AWS Secrets Manager 設定
 
-> 💡 **CFn版の場合**: Secrets Manager シークレットは CloudFormation が自動作成します。値の更新のみ手動で行います（[CFn版 STEP 3-1](../CFn/LAMBDA_CFN_README.md)）。
+> 💡 **CFn版の場合**: Secrets Manager シークレットは CloudFormation が自動作成します。値の更新のみ手動で行います（[CFn版 STEP 3-1](LAMBDA_CFN_README.md)）。
 
 AWS Secrets ManagerでSecretを作成
 
@@ -222,7 +222,7 @@ eo-re-d01-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作�
 
 ```bash
 # 1. ディレクトリ移動
-cd RequestEngine/aws_lambda/apne1
+cd RequestEngine/aws_lambda/py
 
 # 2. WSL2 Ubuntu起動(slimのバージョンを調べて、zip名称を変更する)
 wsl -d Ubuntu
@@ -317,7 +317,7 @@ Cloudflareダッシュボード > ドメインを選択 > Security > セキュ�
 
 ## 参考: GitHub Actions による自動デプロイ
 
-> 💡 **CFn版の場合**: OIDC プロバイダーと IAM ロールは CloudFormation が自動作成します。GitHub Secrets の設定のみ手動で行います（[CFn版 STEP 5](../CFn/LAMBDA_CFN_README.md)）。
+> 💡 **CFn版の場合**: OIDC プロバイダーと IAM ロールは CloudFormation が自動作成します。GitHub Secrets の設定のみ手動で行います（[CFn版 STEP 5](LAMBDA_CFN_README.md)）。
 
 GitHubへのPushをトリガーに、OIDC（ID連携）を利用して一時的な認証トークンを取得し、Lambdaコードを自動更新する設定です。
 
@@ -412,6 +412,6 @@ GitHub Actionsが使用する専用ロールを作成します。
 
 ## 関連ドキュメント
 
-- [CloudFormation 版セットアップ手順（推奨）](../CFn/LAMBDA_CFN_README.md)
-- [Request Engine セキュリティ設定](../../RE_README.md)
+- [CloudFormation 版セットアップ手順（推奨）](LAMBDA_CFN_README.md)
+- [Request Engine セキュリティ設定](../RE_README.md)
 - [QUICK_START.md（全体の導入ガイド）](../../../QUICK_START.md)

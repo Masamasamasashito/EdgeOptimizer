@@ -2,7 +2,7 @@
 # Workload Identity Federation - GitHub Actions OIDC Authentication
 # ==============================================================================
 # Enables GitHub Actions to authenticate to GCP without static service account keys.
-# Reference: RUN_README.md "Workload Identity 連携による GitHub Actions の認証設定"
+# Reference: EO_Documents/Manuals/py/CloudRun_README.md "Workload Identity 連携による GitHub Actions の認証設定"
 #
 # ※ ここでの "Provider" は WIF ID プロバイダ (IdP) であり、
 #   main.tf の Terraform プロバイダ (hashicorp/google) とは別概念です。

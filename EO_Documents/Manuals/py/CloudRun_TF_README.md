@@ -2,7 +2,7 @@
 
 Terraform を使用した GCP Cloud Run Request Engine インフラストラクチャの構築手順です。
 
-※Terraform でうまくできない場合、お手数ですが [RUN_README.md](../ane1/RUN_README.md) の手動手順（gcloud CLI / GUIコンソール）を参照してください。
+※Terraform でうまくできない場合、お手数ですが [CloudRun_README.md](CloudRun_README.md) の手動手順（gcloud CLI / GUIコンソール）を参照してください。
 
 ## 目次
 
@@ -112,7 +112,7 @@ eo_gcp_resource_labels
 
 ### 0-2. 環境変数設定
 
-以降のコマンドで使用する変数を事前に設定します（[RUN_README.md](../ane1/RUN_README.md) と同じ変数名）。
+以降のコマンドで使用する変数を事前に設定します（[CloudRun_README.md](CloudRun_README.md) と同じ変数名）。
 
 - EX) `export EO_GCP_PROJECT_ID="eo-re-d01-pr-ane1"`
 
@@ -457,7 +457,7 @@ GCP Cloud Run 固有の設定:
   - Max Redirects: `5`
   - Full Response: `true`（ヘッダー含む完全レスポンスを取得）
 
-詳細は [RUN_README.md](../ane1/RUN_README.md) の「OAuth2 Bearerトークン認証を使用する」セクションを参照してください。
+詳細は [CloudRun_README.md](CloudRun_README.md) の「OAuth2 Bearerトークン認証を使用する」セクションを参照してください。
 
 ## パラメータ一覧
 
@@ -503,7 +503,7 @@ GCP Cloud Run 固有の設定:
    ```bash
    terraform import google_service_account.deployer projects/$EO_GCP_PROJECT_ID/serviceAccounts/<SA_EMAIL>
    ```
-2. または既存リソースを削除してから再実行（SA の即時再作成は避ける。RUN_README.md 参照）
+2. または既存リソースを削除してから再実行（SA の即時再作成は避ける。CloudRun_README.md 参照）
 
 ### terraform apply エラー: WIF Pool "Permission denied"
 
@@ -548,8 +548,8 @@ terraform {
 
 ## 関連ドキュメント
 
-- [RUN_README.md](../ane1/RUN_README.md) - GCP Cloud Run 手動セットアップ手順
-- [RE_README.md](../../RE_README.md) - Request Engine 全体のセキュリティ設定
-- [N8N_NODE_SETUP.md](../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - n8n ワークフローノード設定ガイド
-- [AZFUNC_BICEP_README.md](../../azure_functions/bicep/AZFUNC_BICEP_README.md) - Azure Functions Bicep 構築手順
-- [LAMBDA_CFN_README.md](../../aws_lambda/CFn/LAMBDA_CFN_README.md) - AWS Lambda CloudFormation 構築手順
+- [CloudRun_README.md](CloudRun_README.md) - GCP Cloud Run 手動セットアップ手順
+- [RE_README.md](../RE_README.md) - Request Engine 全体のセキュリティ設定
+- [N8N_NODE_SETUP.md](../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - n8n ワークフローノード設定ガイド
+- [AZFUNC_BICEP_README.md](AZFUNC_BICEP_README.md) - Azure Functions Bicep 構築手順
+- [LAMBDA_CFN_README.md](LAMBDA_CFN_README.md) - AWS Lambda CloudFormation 構築手順

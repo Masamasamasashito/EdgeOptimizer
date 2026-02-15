@@ -5,7 +5,7 @@
 # POST-DEPLOYMENT: Update the secret value with N8N_EO_REQUEST_SECRET from EO_Infra_Docker/.env
 #
 # Secret name must match code constant: CLOUDRUN_REQUEST_SECRET_NAME = "eo-re-d01-secretmng"
-# Reference: RUN_README.md "Secret Manager による照合用リクエストシークレットの管理"
+# Reference: EO_Documents/Manuals/py/CloudRun_README.md "Secret Manager による照合用リクエストシークレットの管理"
 
 resource "google_secret_manager_secret" "request_secret" {
   project   = var.gcp_project_id

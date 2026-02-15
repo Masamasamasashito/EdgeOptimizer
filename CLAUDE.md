@@ -76,12 +76,12 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 
 ## Docs
 
-- `RequestEngine\RE_README.md` - n8n Credentals and HTTP Request Node setup
+- `EO_Documents\Manuals\RE_README.md` - n8n Credentals and HTTP Request Node setup
     - `RequestEngine\aws_lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
-- `RequestEngine\aws_lambda\py\LAMBDA_README.md` - AWS Lambda specific setup
-- `RequestEngine\azure_functions\py\AZFUNC_README.md` - Azure Functions specific setup
-- `RequestEngine\gcp_cloudrun\py\RUN_README.md` - GCP Cloud Run specific setup
-- `RequestEngine\cloudflare_workers\ts\CFWORKER_README.md` - Cloudflare Workers specific setup
+- `EO_Documents\Manuals\py\LAMBDA_README.md` - AWS Lambda specific setup
+- `EO_Documents\Manuals\py\AZFUNC_README.md` - Azure Functions specific setup
+- `EO_Documents\Manuals\py\CloudRun_README.md` - GCP Cloud Run specific setup
+- `EO_Documents\Manuals\ts\CFWORKER_README.md` - Cloudflare Workers specific setup
 
 ### Refactoring Strategy: Common Parts Extraction
 

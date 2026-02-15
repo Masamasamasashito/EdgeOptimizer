@@ -43,7 +43,7 @@ n8n を初めて起動した場合、ユーザー登録が必要です。
 | GCP Service Account | GCP Cloud Run呼び出し | Service Account JSON Key |
 | Cloudflare Access | Cloudflare Workers呼び出し | CF-Access-Client-Id / Secret |
 
-詳細は [RequestEngine/RE_README.md](../RequestEngine/RE_README.md) を参照してください。
+詳細は [EO_Documents/Manuals/RE_README.md](../EO_Documents/Manuals/RE_README.md) を参照してください。
 
 ## 3. 設定が必要なノード
 
@@ -212,11 +212,11 @@ Step.3 (#400-):    結果をCSV/JSON出力
 
 ## 6. 関連ドキュメント
 
-- [RE_README.md](../RequestEngine/RE_README.md) - Request Engineセキュリティ設定
-- [LAMBDA_CFN_README.md](../RequestEngine/aws_lambda/CFn/LAMBDA_CFN_README.md) - AWS Lambda CFn
-- [AZFUNC_BICEP_README.md](../RequestEngine/azure_functions/bicep/AZFUNC_BICEP_README.md) - Azure Bicep
-- [RUN_README.md](../RequestEngine/gcp_cloudrun/ane1/RUN_README.md) - GCP Cloud Run
-- [CFWORKER_README.md](../RequestEngine/cloudflare_workers/global/CFWORKER_README.md) - Cloudflare Workers
+- [RE_README.md](../EO_Documents/Manuals/RE_README.md) - Request Engineセキュリティ設定
+- [LAMBDA_CFN_README.md](../EO_Documents/Manuals/py/LAMBDA_CFN_README.md) - AWS Lambda CFn
+- [AZFUNC_BICEP_README.md](../EO_Documents/Manuals/py/AZFUNC_BICEP_README.md) - Azure Bicep
+- [CloudRun_README.md](../EO_Documents/Manuals/py/CloudRun_README.md) - GCP Cloud Run
+- [CFWORKER_README.md](../EO_Documents/Manuals/ts/CFWORKER_README.md) - Cloudflare Workers
 
 ## 7. トラブルシューティング
 
@@ -230,4 +230,4 @@ Step.3 (#400-):    結果をCSV/JSON出力
 
 - `EO_Infra_Docker/.env`の`N8N_EO_REQUEST_SECRET`と各クラウドのシークレット値が一致しているか確認
 
-詳細は [RE_README.md](../RequestEngine/RE_README.md) のトラブルシューティングセクションを参照。
+詳細は [RE_README.md](../EO_Documents/Manuals/RE_README.md) のトラブルシューティングセクションを参照。

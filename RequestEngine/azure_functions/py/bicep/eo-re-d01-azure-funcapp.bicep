@@ -8,7 +8,7 @@
 // 1. Entra ID Application (Service Principal) for GitHub Actions:
 //    Create manually via Azure Portal: Microsoft Entra ID > App registrations > New registration
 //    Name: eo-ghactions-deploy-entra-app-azfunc-{regionShort}
-//    See: AZFUNC_BICEP_README.md for detailed steps
+//    See: EO_Documents/Manuals/py/AZFUNC_BICEP_README.md for detailed steps
 //
 // 2. Federated Credentials for OIDC:
 //    Configure on the Entra ID Application for GitHub Actions authentication

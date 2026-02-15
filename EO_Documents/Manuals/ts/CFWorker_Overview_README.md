@@ -12,7 +12,7 @@ A high-performance, lightweight Request Engine for the Edge Optimizer (EO) by n8
 
 1. **Clone the repository** and navigate to the directory:
    ```bash
-   cd RequestEngine/cloudflare_workers/global/funcfiles
+   cd RequestEngine/cloudflare_workers/ts/funcfiles
    ```
 
 2. **Install dependencies**:
@@ -22,7 +22,7 @@ A high-performance, lightweight Request Engine for the Edge Optimizer (EO) by n8
 
 3. **Configure `wrangler.toml`**:
 
-- RequestEngine\cloudflare_workers\global\CFWORKER_README.md
+- EO_Documents\Manuals\ts\CFWORKER_README.md
 
 ## Secrets Configuration
 
@@ -60,19 +60,19 @@ npm run deploy
 Python版 Request Engine の `common/` + プラットフォーム固有ハンドラー構造を TypeScript で再現。
 
 ```
-RequestEngine/cloudflare_workers/common/                ← CF Workers共通
+RequestEngine/common/ts/                                ← CF Workers共通
 ├── request_engine_core.ts                              ← 共通コアロジック
 └── extensions/
     └── _ext_security.ts                                ← security 拡張
 
-RequestEngine/cloudflare_workers/global/funcfiles/src/  ← プラットフォーム固有
+RequestEngine/cloudflare_workers/ts/funcfiles/src/  ← プラットフォーム固有
 ├── _01_types.ts                                        ← 型定義・インターフェース
 ├── _02_extensions.ts                                   ← ワークフローで動的生成（.gitignore対象）
 ├── _03_cf_worker_handler.ts                            ← メインハンドラー
 └── worker.ts                                           ← エントリポイント（re-export のみ）
 ```
 
-esbuild（`RequestEngine/cloudflare_workers/global/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。
+esbuild（`RequestEngine/cloudflare_workers/ts/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。
 
 ## Usage API
 
@@ -174,7 +174,7 @@ The JSON keys follow a specific convention for clarity and standardization:
 This repository works with GitHub Actions for automated deployment.
 
 ### 1. Prerequisites
-Ensure `.github/workflows/deploy-to-cf-worker-global.yml` exists.
+Ensure `.github/workflows/deploy-ts-to-cf-worker.yml` exists.
 
 ### 2. GitHub Secrets Configuration
 Set the following secrets in your GitHub Repository settings (Settings > Secrets and variables > Actions):

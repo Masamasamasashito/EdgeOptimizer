@@ -525,7 +525,7 @@ Content-Type: application/json
 | Cloudflare Workers | HTTP Custom Auth | `CF-Access-Client-Id` / `CF-Access-Client-Secret` |
 | GCP Cloud Run | Google API (Service Account) | Service Account JSON Key |
 
-詳細は [RE_README.md](../RequestEngine/RE_README.md) を参照。
+詳細は [RE_README.md](../EO_Documents/Manuals/RE_README.md) を参照。
 
 ### 280ノード作成後のチェックリスト
 
@@ -540,4 +540,4 @@ Content-Type: application/json
 
 - [N8N_WORKFLOW_README.md](N8N_WORKFLOW_README.md) - ワークフロー全体設定
 - [NODE175_USERAGENT_README.md](NODE175_USERAGENT_README.md) - User-Agent設定
-- [RE_README.md](../RequestEngine/RE_README.md) - Request Engineデプロイ
+- [RE_README.md](../EO_Documents/Manuals/RE_README.md) - Request Engineデプロイ

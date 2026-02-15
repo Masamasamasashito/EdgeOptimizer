@@ -105,7 +105,7 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 **EO_RE_GCP_RUN_ane1_OAuth2_Invoker_SA**
 
-- **権限の参照**: GCP Cloud Run のサービスアカウント（Deployer / Compute Engine Default / Runtime / OAuth2 Invoker）のロール・権限一覧と設定手順は [RequestEngine/gcp_cloudrun/ane1/RUN_README.md](gcp_cloudrun/ane1/RUN_README.md) を参照。
+- **権限の参照**: GCP Cloud Run のサービスアカウント（Deployer / Compute Engine Default / Runtime / OAuth2 Invoker）のロール・権限一覧と設定手順は [EO_Documents/Manuals/py/CloudRun_README.md](py/CloudRun_README.md) を参照。
 
 個人GCPメール > IAMと管理 > サービスアカウント > `eo-gcp-sa-d01-oa2be-inv-ane1`を選択 > 鍵
 
@@ -261,10 +261,10 @@ EOのRequest Engineは、**EOのn8n以外からのすべてのリクエストを
 
 各プラットフォームの詳細なセットアップ手順やトラブルシューティングについては、以下のドキュメントを参照してください：
 
-- **AWS Lambda**: [`RequestEngine/aws_lambda/apne1/LAMBDA_README.md`](aws_lambda/apne1/LAMBDA_README.md)
-- **Azure Functions**: [`RequestEngine/azure_functions/jpeast/AZFUNC_README.md`](azure_functions/jpeast/AZFUNC_README.md)
-- **GCP Cloud Run**: [`RequestEngine/gcp_cloudrun/ane1/RUN_README.md`](gcp_cloudrun/ane1/RUN_README.md) — サービスアカウント（Deployer / Compute Engine Default / Runtime / OAuth2 Invoker）の各種権限・ロールの詳細はここを参照
-- **Cloudflare Workers**: [`RequestEngine/cloudflare_workers/global/README.md`](cloudflare_workers/global/README.md)
+- **AWS Lambda**: [`EO_Documents/Manuals/py/LAMBDA_README.md`](py/LAMBDA_README.md)
+- **Azure Functions**: [`EO_Documents/Manuals/py/AZFUNC_README.md`](py/AZFUNC_README.md)
+- **GCP Cloud Run**: [`EO_Documents/Manuals/py/CloudRun_README.md`](py/CloudRun_README.md) — サービスアカウント（Deployer / Compute Engine Default / Runtime / OAuth2 Invoker）の各種権限・ロールの詳細はここを参照
+- **Cloudflare Workers**: [`EO_Documents/Manuals/ts/CFWorker_Overview_README.md`](ts/CFWorker_Overview_README.md)
 
 ## トラブルシューティング
 
@@ -303,7 +303,7 @@ EOのRequest Engineは、**EOのn8n以外からのすべてのリクエストを
 - **Azure Functions**: Function App Key (`x-functions-key` ヘッダー) が正しく設定されているか確認
 - **GCP Cloud Run**: 
   - Service AccountのJSONキーと認証トークンが正しく生成されているか確認
-  - n8n で `PERMISSION_DENIED: Permission 'iam.serviceAccounts.getOpenIdToken' denied` が発生する場合、そのサービスアカウント自身に対して `roles/iam.serviceAccountTokenCreator` (SA トークン作成者) が付与されているか確認（詳細は [RUN_README.md](gcp_cloudrun/ane1/RUN_README.md) 参照）
+  - n8n で `PERMISSION_DENIED: Permission 'iam.serviceAccounts.getOpenIdToken' denied` が発生する場合、そのサービスアカウント自身に対して `roles/iam.serviceAccountTokenCreator` (SA トークン作成者) が付与されているか確認（詳細は [CloudRun_README.md](py/CloudRun_README.md) 参照）
 - **Cloudflare Workers**: Cloudflare AccessのService Token（`CF-Access-Client-Id` と `CF-Access-Client-Secret`）が正しく設定されているか確認
 
 #### 4. シークレットキャッシュの問題

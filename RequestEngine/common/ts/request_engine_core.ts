@@ -21,7 +21,7 @@ import type {
   ExtensionContext,
   ExtensionBuildFunc,
   ExtensionConfig,
-} from "../global/funcfiles/src/_01_types";
+} from "../../cloudflare_workers/ts/funcfiles/src/_01_types";
 
 // ======================================================================
 // Constants
@@ -110,9 +110,9 @@ const CDN_DETECTION_CONFIG: ReadonlyArray<readonly [string, string]> = [
 // Matches RequestEngine/common/request_engine_core.py _EXTENSION_REGISTRY
 //
 // 拡張機能の追加方法:
-// 1. RequestEngine/cloudflare_workers/common/extensions/_ext_<name>.ts を作成
+// 1. RequestEngine/common/ts/extensions/_ext_<name>.ts を作成
 // 2. ファイル内で registerExtension() を呼び出す
-// 3. deploy-to-cf-worker-global.yml の _02_extensions.ts 生成ステップに import を追加
+// 3. deploy-ts-to-cf-worker.yml の _02_extensions.ts 生成ステップに import を追加
 //    (_02_extensions.ts はワークフローで動的生成。Python版のcat条件結合と同等)
 
 const _EXTENSION_REGISTRY: Map<string, ExtensionConfig> = new Map();

@@ -2,7 +2,7 @@
 # Service Accounts and IAM Role Bindings
 # ==============================================================================
 # Creates 3 Service Accounts with least-privilege IAM configuration.
-# Reference: RUN_README.md "Service Account合計5件の用途と権限" table
+# Reference: EO_Documents/Manuals/py/CloudRun_README.md "Service Account合計5件の用途と権限" table
 #
 # SA naming: eo-gcp-sa-{env}-{role}-{region_short}
 # Constraint: SA ID must be 6-30 chars, lowercase alphanumeric + hyphens

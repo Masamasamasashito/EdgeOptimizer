@@ -45,7 +45,7 @@
 wsl
 
 # プロジェクトディレクトリに移動
-cd /<プロジェクトルートディレクトリ>/RequestEngine/gcp_cloudrun/ane1
+cd /<プロジェクトルートディレクトリ>/RequestEngine/gcp_cloudrun/py
 
 # gcloud CLIがインストールされていることを確認
 gcloud --version
@@ -65,7 +65,7 @@ chmod +x check_service_account_permissions.sh
 # Git Bashを起動
 
 # プロジェクトディレクトリに移動
-cd /<プロジェクトルートディレクトリ>/RequestEngine/gcp_cloudrun/ane1
+cd /<プロジェクトルートディレクトリ>/RequestEngine/gcp_cloudrun/py
 
 # 認証（初回のみ）
 gcloud auth login

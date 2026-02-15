@@ -15,7 +15,7 @@
 # 3. Set GitHub Secrets (see outputs)
 # 4. Deploy application code via GitHub Actions
 #
-# See: RUN_TF_README.md for detailed step-by-step instructions
+# See: EO_Documents/Manuals/py/CloudRun_TF_README.md for detailed step-by-step instructions
 # ==============================================================================
 
 terraform {

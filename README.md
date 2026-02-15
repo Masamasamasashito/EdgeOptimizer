@@ -95,32 +95,32 @@ Edge Optimizerはキャッシュウォーマーだけではありません。GEO
 
 ### Infrastructure
 
-- [EO_Infra_Docker/README.md](EO_Infra_Docker/README.md) - Docker Image 更新
+- [EO_Documents/Manuals/EO_Infra_Docker_README.md](EO_Documents/Manuals/EO_Infra_Docker_README.md) - Docker Image 更新
 
 ### Request Engine
 
-- [RequestEngine/RE_README.md](RequestEngine/RE_README.md) - リクエストエンジン実行セキュリティ設定
+- [EO_Documents/Manuals/RE_README.md](EO_Documents/Manuals/RE_README.md) - リクエストエンジン実行セキュリティ設定
 
 **AWS Lambda**
 
-- [RequestEngine/aws_lambda/apne1/LAMBDA_README.md](RequestEngine/aws_lambda/apne1/LAMBDA_README.md) - 手動セットアップ
-- [RequestEngine/aws_lambda/CFn/LAMBDA_CFN_README.md](RequestEngine/aws_lambda/CFn/LAMBDA_CFN_README.md) - CloudFormation 構築 👈 Recommend!
+- [EO_Documents/Manuals/py/LAMBDA_README.md](EO_Documents/Manuals/py/LAMBDA_README.md) - 手動セットアップ
+- [EO_Documents/Manuals/py/LAMBDA_CFN_README.md](EO_Documents/Manuals/py/LAMBDA_CFN_README.md) - CloudFormation 構築 👈 Recommend!
 
 **Azure Functions**
 
-- [RequestEngine/azure_functions/jpeast/AZFUNC_README.md](RequestEngine/azure_functions/jpeast/AZFUNC_README.md) - 手動セットアップ
-- [RequestEngine/azure_functions/bicep/AZFUNC_BICEP_README.md](RequestEngine/azure_functions/bicep/AZFUNC_BICEP_README.md) - Bicep 構築
+- [EO_Documents/Manuals/py/AZFUNC_README.md](EO_Documents/Manuals/py/AZFUNC_README.md) - 手動セットアップ
+- [EO_Documents/Manuals/py/AZFUNC_BICEP_README.md](EO_Documents/Manuals/py/AZFUNC_BICEP_README.md) - Bicep 構築
 
 **GCP Cloud Run**
 
-- [RequestEngine/gcp_cloudrun/ane1/RUN_README.md](RequestEngine/gcp_cloudrun/ane1/RUN_README.md) - 手動セットアップ
-- [RequestEngine/gcp_cloudrun/terraform/RUN_TF_README.md](RequestEngine/gcp_cloudrun/terraform/RUN_TF_README.md) - Terraform 構築
-- [RequestEngine/gcp_cloudrun/ane1/how_to_check_permissions.md](RequestEngine/gcp_cloudrun/ane1/how_to_check_permissions.md) - 権限チェック
+- [EO_Documents/Manuals/py/CloudRun_README.md](EO_Documents/Manuals/py/CloudRun_README.md) - 手動セットアップ
+- [EO_Documents/Manuals/py/CloudRun_TF_README.md](EO_Documents/Manuals/py/CloudRun_TF_README.md) - Terraform 構築
+- [EO_Documents/Manuals/py/CloudRun_check_permissions.md](EO_Documents/Manuals/py/CloudRun_check_permissions.md) - 権限チェック
 
 **Cloudflare Workers**
 
-- [RequestEngine/cloudflare_workers/global/CFWORKER_README.md](RequestEngine/cloudflare_workers/global/CFWORKER_README.md) - 手動セットアップ
-- [RequestEngine/cloudflare_workers/global/README.md](RequestEngine/cloudflare_workers/global/README.md) - 概要
+- [EO_Documents/Manuals/ts/CFWORKER_README.md](EO_Documents/Manuals/ts/CFWORKER_README.md) - 手動セットアップ
+- [EO_Documents/Manuals/ts/CFWorker_Overview_README.md](EO_Documents/Manuals/ts/CFWorker_Overview_README.md) - 概要
 
 ### n8n Workflow
 
