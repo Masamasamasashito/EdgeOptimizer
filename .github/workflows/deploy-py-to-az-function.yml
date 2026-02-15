@@ -22,7 +22,6 @@ permissions:
 # Request Engine Instance config: ../../RequestEngine/azure_functions/py/instances/funcapp001.yml
 # Resource name pattern: eo-re-d01-funcapp-{region_short}
 env:
-  PYTHON_VERSION: "3.13"
   FUNCTION_APP_NAME: eo-re-d01-funcapp-jpeast
   RESOURCE_GROUP: eo-re-d01-resource-group-jpeast
 
@@ -115,32 +114,6 @@ jobs:
           grep -E "^EXTENSION_NAME\s*=" "$EXT_DIR"/_ext_*.py 2>/dev/null || echo "No extensions found"
           echo ""
           head -60 deploy_package/function_app.py
-
-      - name: Setup Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install dependencies
-        working-directory: ./deploy_package
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-
-      # Create local.settings.json with EO_AZ_RE_KEYVAULT_URL
-      - name: Create local.settings.json
-        working-directory: ./deploy_package
-        run: |
-          cat > local.settings.json << 'EOF'
-          {
-            "IsEncrypted": false,
-            "Values": {
-              "FUNCTIONS_WORKER_RUNTIME": "python",
-              "AzureWebJobsStorage": "UseDevelopmentStorage=true",
-              "EO_AZ_RE_KEYVAULT_URL": "${{ secrets.EO_AZ_RE_KEYVAULT_URL }}"
-            }
-          }
-          EOF
 
       # Install Azure Functions Core Tools (required for Python v2 model)
       - name: Install Azure Functions Core Tools
