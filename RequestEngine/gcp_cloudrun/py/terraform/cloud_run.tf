@@ -4,7 +4,7 @@
 # Creates the Cloud Run service with placeholder image.
 # Actual application code is deployed via GitHub Actions (gcloud run deploy --source).
 #
-# Request Engine Instance config: ../instances/ane1.yml
+# Request Engine Instance config: ../instances/cloudrun001.yml
 # Service name: eo-re-d01-cloudrun-ane1
 # Authentication: OAuth2 Bearer (no allUsers IAM binding - requires valid ID token)
 # Reference: ../../../../.github/workflows/deploy-py-to-gcp-cloudrun.yml for deployment configuration

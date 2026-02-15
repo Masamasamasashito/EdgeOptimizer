@@ -1,4 +1,4 @@
-# Request Engine Instance config: ../instances/apne1.yml
+# Request Engine Instance config: ../instances/lambda001.yml
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >
   Edge Optimizer - AWS Lambda Request Engine Infrastructure
