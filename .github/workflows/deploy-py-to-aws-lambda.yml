@@ -4,8 +4,9 @@ on:
 #   push:
 #     paths:
 #       - 'RequestEngine/aws_lambda/py/funcfiles/**'
+#       - 'RequestEngine/common/py/**'
 #     branches:
-#       - snapshot/pre-directory-restructuring-20260128
+#       - main
   workflow_dispatch:
     inputs:
       ext_security:
@@ -27,6 +28,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

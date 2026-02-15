@@ -14,6 +14,11 @@ on:
         required: false
         default: true
         type: boolean
+      debug:
+        description: 'Enable verbose debug output (gcloud auth/config dump, --verbosity=debug)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   id-token: write # OIDC認証に必須
@@ -137,6 +142,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v3
 
       - name: Debug gcloud auth and config
+        if: ${{ inputs.debug }}
         run: |
           set -x
           echo "=== gcloud version ==="
@@ -170,14 +176,13 @@ jobs:
         run: |
           set -x
 
-          # ============================================================================
-          # デバッグコード（削除可能）
-          # ============================================================================
-          echo "=== Before deploy: gcloud auth list ==="
-          gcloud auth list
-
-          echo "=== Before deploy: gcloud config list ==="
-          gcloud config list
+          # デバッグ出力（debug=true の場合のみ）
+          if [ "${{ inputs.debug }}" == "true" ]; then
+            echo "=== Before deploy: gcloud auth list ==="
+            gcloud auth list
+            echo "=== Before deploy: gcloud config list ==="
+            gcloud config list
+          fi
 
           # ============================================================================
           # 【絶対削除禁止】シークレット参照削除処理
@@ -204,8 +209,14 @@ jobs:
           # 【絶対削除禁止】セクション終了
           # ============================================================================
 
+          # debug=true: --verbosity=debug --log-http / false: 通常出力
+          VERBOSITY_FLAGS=""
+          if [ "${{ inputs.debug }}" == "true" ]; then
+            VERBOSITY_FLAGS="--verbosity=debug --log-http"
+          fi
+
           echo "=== Step 2: Deploy to Cloud Run with new env vars ==="
-          gcloud --verbosity=debug --log-http run deploy ${{ env.EO_GCP_CLOUD_RUN_SERVICE_NAME }} \
+          gcloud $VERBOSITY_FLAGS run deploy ${{ env.EO_GCP_CLOUD_RUN_SERVICE_NAME }} \
             --source ./deploy_package \
             --region ${{ env.EO_GCP_REGION }} \
             --platform managed \
