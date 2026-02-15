@@ -1,3 +1,6 @@
+# Referenced by (この定義値を使用するファイル):
+#   ../../../../.github/workflows/deploy-py-to-az-function.yml (FUNCTION_APP_NAME, RESOURCE_GROUP)
+#   ../bicep/eo-re-d01-azure-funcapp.bicep (パラメータ化済み)
 instance_id: "jpeast"
 resource_name: "eo-re-d01-funcapp-jpeast"
 region: "japaneast"

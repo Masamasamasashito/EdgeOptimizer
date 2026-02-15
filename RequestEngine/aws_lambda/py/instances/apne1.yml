@@ -1,3 +1,6 @@
+# Referenced by (この定義値を使用するファイル):
+#   ../../../../.github/workflows/deploy-py-to-aws-lambda.yml (LAMBDA_FUNCTION_NAME, aws-region)
+#   ../CFn/eo-aws-cfnstack.yml (パラメータ化済み)
 instance_id: "apne1"
 resource_name: "eo-re-d01-lambda-apne1"
 region: "ap-northeast-1"

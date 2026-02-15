@@ -19,6 +19,7 @@ permissions:
   id-token: write # OIDC認証に必須
   contents: read  # リポジトリの読み取りに必須
 
+# Request Engine Instance config: ../../RequestEngine/azure_functions/py/instances/jpeast.yml
 env:
   PYTHON_VERSION: "3.13"
   FUNCTION_APP_NAME: eo-re-d01-funcapp-jpeast

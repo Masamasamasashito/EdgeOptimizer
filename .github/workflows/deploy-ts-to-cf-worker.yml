@@ -21,6 +21,7 @@ on:
         default: true
         type: boolean
 
+# Request Engine Instance config: ../../RequestEngine/cloudflare_workers/ts/instances/global.yml
 jobs:
   cf_worker_deploy: # ジョブ名（任意）。実行単位の論理名
     # GitHub-hosted Runner(JOB実行するマシン(コンテナ))の実行環境が割り当てられる(送信元IPアドレス固定できない)
