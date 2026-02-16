@@ -2,6 +2,6 @@
 #   ../../../../.github/workflows/deploy-py-to-az-function.yml (FUNCTION_APP_NAME, RESOURCE_GROUP)
 #   ../bicep/eo-re-d01-azure-funcapp.bicep (パラメータ化済み)
 re_instance_type: "funcapp"
-re_instance_number: "001"
+re_instance_id: "001"
 re_region: "japaneast"
 re_region_short: "jpeast"

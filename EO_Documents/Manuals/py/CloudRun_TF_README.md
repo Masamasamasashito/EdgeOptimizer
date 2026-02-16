@@ -392,7 +392,7 @@ terraform output cloud_run_service_url
 
 ### 6-2. n8n ワークフローノードの設定
 
-共通のノード設定手順は [N8N_NODE_SETUP.md](../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) を参照してください。
+共通のノード設定手順は [N8N_NODE_SETUP.md](../n8n/N8N_NODE_SETUP.md) を参照してください。
 
 GCP Cloud Run 固有の設定:
 
@@ -550,6 +550,6 @@ terraform {
 
 - [CloudRun_README.md](CloudRun_README.md) - GCP Cloud Run 手動セットアップ手順
 - [RE_README.md](../RE_README.md) - Request Engine 全体のセキュリティ設定
-- [N8N_NODE_SETUP.md](../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - n8n ワークフローノード設定ガイド
+- [N8N_NODE_SETUP.md](../n8n/N8N_NODE_SETUP.md) - n8n ワークフローノード設定ガイド
 - [AZFUNC_BICEP_README.md](AZFUNC_BICEP_README.md) - Azure Functions Bicep 構築手順
 - [LAMBDA_CFN_README.md](LAMBDA_CFN_README.md) - AWS Lambda CloudFormation 構築手順

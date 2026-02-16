@@ -170,8 +170,8 @@ Critical variables in `EO_Infra_Docker/.env`:
 5. **Naming Readability:** When proposing names for variables, functions, files, or any identifiers, prioritize "first-glance comprehension" over technical precision alone. A name must be understandable to someone seeing it for the first time without reading the source code.
    - 命名提案時は「初見で意味が通るか」を最優先基準とする。技術的正確さだけでは不十分。コードを読まずとも名前だけで意図が伝わること。
 6. **File Path References:** When referencing files in code comments, documentation, or any text, always use the full path from the repository root directory. Never use bare filenames.
-   - コメント・ドキュメント等でファイルを参照する際は、リポジトリルートからのフルパスで記載すること。ファイル名単体での記載は禁止。
+   - ファイル名単体で記載すると迷子になるため、コメント・ドキュメント等でファイルを参照する際は、リポジトリルートディレクトリからのフルパスで記載する。
 7. **button names or UI labels:** 人間が手作業で確認した手順のクリックボタン名やラベル名などは変更しないこと。心配なときは確認を求めること。
-8. **Timeline Chat Visualization:** 毎回の返信末尾に `yyyy-MM-dd(ddd)HH:mm UTC+9(JST)` 形式のタイムスタンプを付与する。時刻取得コマンドは返信中の他のツール呼び出しと並列でバックグラウンド実行（`run_in_background: true`）し、独立した可視ステップにしないこと。他にツール呼び出しがない返信でも同様にバックグラウンドで実行する。
-   - 取得コマンド: `powershell -NoProfile -Command "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Get-Date -Format 'yyyy-MM-dd(ddd)HH:mm' ([System.TimeZoneInfo]::ConvertTimeBySystemTimeZoneId((Get-Date), 'Tokyo Standard Time'))"`
+8. **Timeline Chat Visualization:** 毎回の返信末尾に日時取得コマンドを実行し `yyyy-MM-dd(ddd)HH:mm` 形式のタイムスタンプを自動付与する。
+   - 取得コマンド: `Get-Date -Format "yyyy/MM/dd(ddd)HH:mm"`
 9. **Command Execution Priority :** PowerShellコマンドで試してもだめな場合にpythonやnpmコマンドを実行すること。

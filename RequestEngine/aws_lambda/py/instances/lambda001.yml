@@ -2,6 +2,6 @@
 #   ../../../../.github/workflows/deploy-py-to-aws-lambda.yml (LAMBDA_FUNCTION_NAME, aws-region)
 #   ../CFn/eo-aws-cfnstack.yml (パラメータ化済み)
 re_instance_type: "lambda"
-re_instance_number: "001"
+re_instance_id: "001"
 re_region: "ap-northeast-1"
 re_region_short: "apne1"

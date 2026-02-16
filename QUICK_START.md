@@ -78,7 +78,7 @@ n8nのダッシュボードが表示されたら、Edge Optimizerのワークフ
 
 > **📖 詳細なワークフロー設定ガイド:**
 >
-> [EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) を参照してください。
+> [EO_Documents/Manuals/n8n/N8N_WORKFLOW_README.md](./EO_Documents/Manuals/n8n/N8N_WORKFLOW_README.md) を参照してください。
 >
 > Credentials設定・ノード設定など、詳しい手順が記載されています。
 
@@ -104,8 +104,8 @@ CloudFormation テンプレートで Lambda + IAM + Secrets Manager を**ワン�
 
 ### ワークフロー詳細設定
 
-- **ワークフロー設定ガイド** → [N8N_WORKFLOW_README.md](./EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md)
-- **User-Agent設定** → [NODE175_USERAGENT_README.md](./EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md)
+- **ワークフロー設定ガイド** → [N8N_WORKFLOW_README.md](./EO_Documents/Manuals/n8n/N8N_WORKFLOW_README.md)
+- **User-Agent設定** → [NODE175_USERAGENT_README.md](./EO_Documents/Manuals/n8n/NODE175_USERAGENT_README.md)
 - **トラブルシューティング** → [TROUBLESHOOTING.md](./TROUBLESHOOTING.md)
 
 ---

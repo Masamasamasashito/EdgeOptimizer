@@ -124,10 +124,10 @@ Edge Optimizerはキャッシュウォーマーだけではありません。GEO
 
 ### n8n Workflow
 
-- [EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md](EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) - インポート・Credentials・ノード設定
-- [EO_n8nWorkflow_Json/N8N_NODE_SETUP.md](EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - ノード設定ガイド
-- [EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md](EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md) - User-Agent設定
-- [EO_n8nWorkflow_Json/NODE180_REQUESTENGINE_README.md](EO_n8nWorkflow_Json/NODE180_REQUESTENGINE_README.md) - Request Engine設定
+- [EO_Documents/Manuals/n8n/N8N_WORKFLOW_README.md](EO_Documents/Manuals/n8n/N8N_WORKFLOW_README.md) - インポート・Credentials・ノード設定
+- [EO_Documents/Manuals/n8n/N8N_NODE_SETUP.md](EO_Documents/Manuals/n8n/N8N_NODE_SETUP.md) - ノード設定ガイド
+- [EO_Documents/Manuals/n8n/NODE175_USERAGENT_README.md](EO_Documents/Manuals/n8n/NODE175_USERAGENT_README.md) - User-Agent設定
+- [EO_Documents/Manuals/n8n/NODE180_REQUESTENGINE_README.md](EO_Documents/Manuals/n8n/NODE180_REQUESTENGINE_README.md) - Request Engine設定
 - [n8nQueueModeTest/README.md](n8nQueueModeTest/README.md) - Queue Mode テスト
 
 ---

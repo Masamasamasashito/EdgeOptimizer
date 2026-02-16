@@ -3,6 +3,6 @@
 #   ../terraform/cloud_run.tf (サービス名構築に使用)
 #   ../terraform/main.tf (name_prefix + re_region_short)
 re_instance_type: "cloudrun"
-re_instance_number: "001"
+re_instance_id: "001"
 re_region: "asia-northeast1"
 re_region_short: "ane1"

@@ -232,7 +232,7 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 
 STEP 4 で Credential と #280AWS ノードの設定が完了しました。次に、ワークフローを実行するために必要なノード設定を行います。
 
-**👉 [N8N_NODE_SETUP.md](../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md)** を参照してください。
+**👉 [N8N_NODE_SETUP.md](../n8n/N8N_NODE_SETUP.md)** を参照してください。
 
 以下の設定を行います（全 Request Engine 共通）：
 
@@ -309,9 +309,9 @@ Resource handler returned message: "Role/Policy with name ... already exists"
 
 ## 関連ドキュメント
 
-- [N8N_NODE_SETUP.md](../../../EO_n8nWorkflow_Json/N8N_NODE_SETUP.md) - n8nワークフローノード設定ガイド（#010/DNS認証/#180/動作確認）
+- [N8N_NODE_SETUP.md](../n8n/N8N_NODE_SETUP.md) - n8nワークフローノード設定ガイド（#010/DNS認証/#180/動作確認）
 - [LAMBDA_README.md](LAMBDA_README.md) - Lambda 詳細セットアップ手順
 - [RE_README.md](../RE_README.md) - Request Engine 全体のセキュリティ設定
-- [N8N_WORKFLOW_README.md](../../../EO_n8nWorkflow_Json/N8N_WORKFLOW_README.md) - n8nワークフロー設定ガイド
-- [NODE180_REQUESTENGINE_README.md](../../../EO_n8nWorkflow_Json/NODE180_REQUESTENGINE_README.md) - Request Engine設定ガイド（type_area・accept_language一覧）
-- [NODE175_USERAGENT_README.md](../../../EO_n8nWorkflow_Json/NODE175_USERAGENT_README.md) - User-Agent設定ガイド
+- [N8N_WORKFLOW_README.md](../n8n/N8N_WORKFLOW_README.md) - n8nワークフロー設定ガイド
+- [NODE180_REQUESTENGINE_README.md](../n8n/NODE180_REQUESTENGINE_README.md) - Request Engine設定ガイド（type_area・accept_language一覧）
+- [NODE175_USERAGENT_README.md](../n8n/NODE175_USERAGENT_README.md) - User-Agent設定ガイド
