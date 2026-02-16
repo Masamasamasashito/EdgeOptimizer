@@ -1,6 +1,6 @@
 # Edge Optimizer
 
-![Edge Optimizer — 世界中のCDNエッジを100%キャッシュ化するOSS Warmup基盤](EO_Images/EdgeOptimizer_thum_20260213.png)
+![Edge Optimizer — 世界中のCDNエッジを100%キャッシュ化するOSS Warmup基盤](EO_Documents/Images/EdgeOptimizer_thum_20260213.png)
 
 **GEO分散 × アセットWarmup × URLフィルタリング × バリアント対応 × 4層セキュリティ**を兼ね備えた、唯一のCDNキャッシュWarmup OSS
 
