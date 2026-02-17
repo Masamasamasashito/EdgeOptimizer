@@ -50,7 +50,7 @@ export interface ExecutionResultParams {
   reqHeaders: StringRecord;
   respHeaders?: Headers | StringRecord | null;
   extraError?: JsonRecord | null;
-  area: string;
+  fromArea: string;
   executionId?: string | null;
   requestStartTimestamp?: number | null;
   requestEndTimestamp?: number | null;
@@ -77,7 +77,7 @@ export interface ExtensionConfig {
 
 // Error context state (information preserved when an error occurs)
 export interface ExecutionContextState extends Partial<ExecutionResultParams> {
-  area: string;
+  fromArea: string;
   duration_ms: number;
 }
 

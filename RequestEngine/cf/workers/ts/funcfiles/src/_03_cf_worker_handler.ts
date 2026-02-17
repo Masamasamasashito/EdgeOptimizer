@@ -117,7 +117,7 @@ async function parseRequestInput(request: Request): Promise<WarmupRequest> {
     // Extract httpRequestNumber as metadata
     httpRequestNumber:
       typeof input.httpRequestNumber === "string" ||
-      typeof input.httpRequestNumber === "number"
+        typeof input.httpRequestNumber === "number"
         ? input.httpRequestNumber
         : "None",
     // Extract httpRequestUUID (created by n8n)
@@ -166,7 +166,7 @@ function createErrorResponse(
     reqHeaders: context.reqHeaders || {},
     respHeaders: {},
     extraError: errorData,
-    area: context.area,
+    fromArea: context.fromArea || "",
     executionId: context.executionId,
     requestStartTimestamp: context.requestStartTimestamp,
     requestEndTimestamp: Date.now() / 1000,
@@ -201,7 +201,7 @@ export default {
 
     // Initialize Context (For preserving info on error)
     const context: ExecutionContextState = {
-      area,
+      fromArea: area,
       duration_ms: 0,
       executionId,
       requestStartTimestamp,
@@ -351,7 +351,7 @@ export default {
         reqHeaders: warmupReq.headers,
         respHeaders: resp.headers,
         extraError: null,
-        area,
+        fromArea: area,
         executionId,
         requestStartTimestamp,
         requestEndTimestamp,

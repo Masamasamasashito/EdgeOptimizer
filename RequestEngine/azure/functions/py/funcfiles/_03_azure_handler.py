@@ -169,7 +169,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                     request_start_timestamp=start_time,
                     request_end_timestamp=end_time,
                     execution_id=execution_id,
-                    area=azure_region,
+                    from_area=azure_region,
                 )
                 return func.HttpResponse(
                     json.dumps(result),
@@ -194,7 +194,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                 request_start_timestamp=start_time,
                 request_end_timestamp=end_time,
                 execution_id=execution_id,
-                area=azure_region,
+                from_area=azure_region,
             )
             return func.HttpResponse(
                 json.dumps(result),
@@ -239,7 +239,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                 request_end_timestamp=end_time,
                 execution_id=execution_id,
                 urltype=urltype,
-                area=azure_region,
+                from_area=azure_region,
             )
             return func.HttpResponse(
                 json.dumps(result),
@@ -274,7 +274,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                     request_end_timestamp=end_time,
                     execution_id=execution_id,
                     urltype=urltype,
-                    area=azure_region,
+                    from_area=azure_region,
                 )
                 return func.HttpResponse(
                     json.dumps(result),
@@ -300,7 +300,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                 request_end_timestamp=end_time,
                 execution_id=execution_id,
                 urltype=urltype,
-                area=azure_region,
+                from_area=azure_region,
             )
             return func.HttpResponse(
                 json.dumps(result),
@@ -396,7 +396,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                     redirect_count=redirect_count,
                     urltype=urltype,
                     retry_info=retry_info,
-                    area=azure_region,
+                    from_area=azure_region,
                 )
                 return func.HttpResponse(
                     json.dumps(result),
@@ -427,7 +427,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                 redirect_count=0,
                 urltype=urltype if "urltype" in locals() else None,
                 retry_info=retry_info if "retry_info" in locals() else None,
-                area=azure_region,
+                from_area=azure_region,
             )
             return func.HttpResponse(
                 json.dumps(result),
@@ -457,7 +457,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
             redirect_count=0,
             urltype=urltype if "urltype" in locals() else None,
             retry_info=None,
-            area=azure_region,
+            from_area=azure_region,
         )
         return func.HttpResponse(
             json.dumps(result),

@@ -225,7 +225,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 request_start_timestamp=start_time,
                 request_end_timestamp=end_time,
                 execution_id=context.aws_request_id if context else None,
-                area=aws_region,
+                from_area=aws_region,
             )
         event = event[0]  # Use first element
 
@@ -244,7 +244,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             request_start_timestamp=start_time,
             request_end_timestamp=end_time,
             execution_id=context.aws_request_id if context else None,
-            area=aws_region,
+            from_area=aws_region,
         )
 
     data = event
@@ -285,7 +285,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             request_end_timestamp=end_time,
             execution_id=context.aws_request_id if context else None,
             urltype=urltype,
-            area=aws_region,
+            from_area=aws_region,
         )
 
     # ==================================================================
@@ -316,7 +316,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 request_end_timestamp=end_time,
                 execution_id=context.aws_request_id if context else None,
                 urltype=urltype,
-                area=aws_region,
+                from_area=aws_region,
             )
     except Exception as e:
         logging.error(f"Request Secret validation failed: {str(e)}")
@@ -336,7 +336,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             request_end_timestamp=end_time,
             execution_id=context.aws_request_id if context else None,
             urltype=urltype,
-            area=aws_region,
+            from_area=aws_region,
         )
 
     # ==================================================================
@@ -430,7 +430,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 redirect_count=redirect_count,
                 urltype=urltype,
                 retry_info=retry_info,
-                area=aws_region,
+                from_area=aws_region,
             )
 
     # ==================================================================
@@ -455,7 +455,7 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
                 redirect_count=0,
                 urltype=urltype if "urltype" in locals() else None,
                 retry_info=retry_info if "retry_info" in locals() else None,
-                area=aws_region,
+                from_area=aws_region,
             )
 
     except Exception as e:
@@ -479,5 +479,5 @@ def lambda_handler(event: Any, context: Any) -> Dict[str, Any]:
             redirect_count=0,
             urltype=urltype if "urltype" in locals() else None,
             retry_info=None,  # No retry info for unexpected errors
-            area=aws_region,
+            from_area=aws_region,
         )

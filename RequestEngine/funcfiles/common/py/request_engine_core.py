@@ -488,7 +488,7 @@ def _build_flat_result(
     request_start_timestamp: Optional[float] = None,
     request_end_timestamp: Optional[float] = None,
     execution_id: Optional[str] = None,
-    area: Optional[str] = None,
+    from_area: Optional[str] = None,
     redirect_count: int = 0,
     urltype: Optional[str] = None,
     retry_info: Optional[Dict[str, Any]] = None,
@@ -497,8 +497,8 @@ def _build_flat_result(
     Build response in flat JSON structure (Pure HTTP Focus)
     All keys are normalized to lowercase.
     """
-    if not area:
-        raise RuntimeError("area parameter is required - must be passed from platform handler")
+    if not from_area:
+        raise RuntimeError("from_area parameter is required - must be passed from platform handler")
 
     protocol_value = http_protocol_version or "unknown"
     tls_version_value = tls_version or "unknown"
@@ -528,7 +528,7 @@ def _build_flat_result(
     # ==================================================================
     # 3. Execution Environment / Timestamp Information
     # ==================================================================
-    ordered_result["eo.meta.re-area"] = area
+    ordered_result["eo.meta.re-area"] = from_area
     if execution_id is not None:
         ordered_result["eo.meta.execution-id"] = execution_id
     if request_start_timestamp is not None:

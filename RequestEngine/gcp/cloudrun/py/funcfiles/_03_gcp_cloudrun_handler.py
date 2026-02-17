@@ -214,7 +214,7 @@ def requestengine_tail():
                     request_start_timestamp=start_time,
                     request_end_timestamp=end_time,
                     execution_id=None,
-                    area=gcp_region_display,
+                    from_area=gcp_region_display,
                 )
                 return jsonify(result), 400
             body_json = body_json[0]
@@ -234,7 +234,7 @@ def requestengine_tail():
                 request_start_timestamp=start_time,
                 request_end_timestamp=end_time,
                 execution_id=None,
-                area=gcp_region_display,
+                from_area=gcp_region_display,
             )
             return jsonify(result), 400
 
@@ -274,7 +274,7 @@ def requestengine_tail():
                 request_end_timestamp=end_time,
                 execution_id=None,
                 urltype=urltype,
-                area=gcp_region_display,
+                from_area=gcp_region_display,
             )
             return jsonify(result), 400
 
@@ -304,7 +304,7 @@ def requestengine_tail():
                     request_end_timestamp=end_time,
                     execution_id=None,
                     urltype=urltype,
-                    area=gcp_region_display,
+                    from_area=gcp_region_display,
                 )
                 return jsonify(result), 401
         except Exception as e:
@@ -325,7 +325,7 @@ def requestengine_tail():
                 request_end_timestamp=end_time,
                 execution_id=None,
                 urltype=urltype,
-                area=gcp_region_display,
+                from_area=gcp_region_display,
             )
             return jsonify(result), 500
 
@@ -415,7 +415,7 @@ def requestengine_tail():
                     redirect_count=redirect_count,
                     urltype=urltype,
                     retry_info=retry_info,
-                    area=gcp_region_display,
+                    from_area=gcp_region_display,
                 )
                 return jsonify(result), 200
 
@@ -441,7 +441,7 @@ def requestengine_tail():
                 redirect_count=0,
                 urltype=urltype if "urltype" in locals() else None,
                 retry_info=retry_info if "retry_info" in locals() else None,
-                area=gcp_region_display,
+                from_area=gcp_region_display,
             )
             return jsonify(result), 500
 
@@ -466,7 +466,7 @@ def requestengine_tail():
             redirect_count=0,
             urltype=urltype if "urltype" in locals() else None,
             retry_info=None,
-            area=gcp_region_display,
+            from_area=gcp_region_display,
         )
         return jsonify(result), 500
 

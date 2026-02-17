@@ -456,7 +456,7 @@ export function buildFlatResult(params: ExecutionResultParams): JsonRecord {
     reqHeaders,
     respHeaders,
     extraError,
-    area,
+    fromArea,
     executionId,
     requestStartTimestamp,
     requestEndTimestamp,
@@ -464,8 +464,8 @@ export function buildFlatResult(params: ExecutionResultParams): JsonRecord {
     resourceInfo,
   } = params;
 
-  if (!area) {
-    throw new Error("area parameter is required - must be passed from platform handler");
+  if (!fromArea) {
+    throw new Error("fromArea parameter is required - must be passed from platform handler");
   }
 
   // Convert response headers to StringRecord for CDN detection and security analysis
@@ -500,7 +500,7 @@ export function buildFlatResult(params: ExecutionResultParams): JsonRecord {
   // ==================================================================
   // 3. Execution Environment / Timestamp Information
   // ==================================================================
-  result["eo.meta.re-area"] = area;
+  result["eo.meta.re-area"] = fromArea;
   if (executionId !== undefined && executionId !== null) {
     result["eo.meta.execution-id"] = executionId;
   }
