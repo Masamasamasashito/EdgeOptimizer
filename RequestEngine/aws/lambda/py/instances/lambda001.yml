@@ -1,5 +1,5 @@
 # Referenced by (この定義値を使用するファイル):
-#   ../../../../.github/workflows/deploy-py-to-aws-lambda.yml (LAMBDA_FUNCTION_NAME, aws-region)
+#   ../../../../../.github/workflows/deploy-py-to-aws-lambda.yml (LAMBDA_FUNCTION_NAME, aws-region)
 #   ../CFn/eo-aws-cfnstack.yml (パラメータ化済み)
 re_instance_type: "lambda"
 re_instance_id: "001"

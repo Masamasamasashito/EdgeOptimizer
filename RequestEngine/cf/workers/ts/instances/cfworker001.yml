@@ -1,5 +1,5 @@
 # Referenced by (この定義値を使用するファイル):
-#   ../../../../.github/workflows/deploy-ts-to-cf-worker.yml (wrangler.toml name)
+#   ../../../../../.github/workflows/deploy-ts-to-cf-worker.yml (wrangler.toml name)
 re_instance_type: "cfworker"
 re_instance_id: "001"
 re_region: "global"

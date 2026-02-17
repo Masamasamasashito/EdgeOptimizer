@@ -58,13 +58,13 @@ Lambda Layer は CloudFormation デプロイ**前**に手動で作成する必�
 > **💡 WSL2 / Docker 環境が無い場合:**
 > Lambda Layer の zip ファイルはリポジトリに同梱されています。Docker でビルドせずに、以下のファイルをそのまま AWS コンソールからアップロードできます：
 >
-> 📦 [`RequestEngine/aws_lambda/py/funcfiles/requests-py314-slim-layer.zip`](../../../RequestEngine/aws_lambda/py/funcfiles/requests-py314-slim-layer.zip)
+> 📦 [`RequestEngine/aws/lambda/py/funcfiles/requests-py314-slim-layer.zip`](../../../RequestEngine/aws/lambda/py/funcfiles/requests-py314-slim-layer.zip)
 >
 > この場合、以下の Docker 手順（# 1〜# 4）をスキップし、「AWS コンソールで Layer を作成」の手順から進めてください。
 
 ```bash
 # 1. ディレクトリ移動
-cd RequestEngine/aws_lambda/py
+cd RequestEngine/aws/lambda/py
 
 # 2. WSL2 Ubuntu 起動
 wsl -d Ubuntu

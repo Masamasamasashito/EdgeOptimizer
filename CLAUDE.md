@@ -58,7 +58,7 @@ Deployments are triggered via GitHub Actions (manual `workflow_dispatch`):
 
 For Cloudflare Workers local development:
 ```bash
-cd RequestEngine/cloudflare_workers/ts/funcfiles
+cd RequestEngine/cf/workers/ts/funcfiles
 npm install
 npx wrangler dev                        # Local dev server
 npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
@@ -77,7 +77,7 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 ## Docs
 
 - `EO_Documents\Manuals\RE_README.md` - n8n Credentals and HTTP Request Node setup
-    - `RequestEngine\aws_lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
+    - `RequestEngine\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
 - `EO_Documents\Manuals\py\LAMBDA_README.md` - AWS Lambda specific setup
 - `EO_Documents\Manuals\py\AZFUNC_README.md` - Azure Functions specific setup
 - `EO_Documents\Manuals\py\CloudRun_README.md` - GCP Cloud Run specific setup
@@ -87,13 +87,13 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 
 EX) AWS Lambda
 
-- RequestEngine\aws_lambda\py\funcfiles\lambda_function.py
+- RequestEngine\aws\lambda\py\funcfiles\lambda_function.py
     - Before: Monolithic code with all logic in a single file
-    - After: `RequestEngine\aws_lambda\py\funcfiles\_03_aws_lambda_handler.py` for AWS Lambda specific handler , Verify n8n secret and cloudsecret
-    - After: `RequestEngine\aws_lambda\py\funcfiles\_01_imports.py` for imports
+    - After: `RequestEngine\aws\lambda\py\funcfiles\_03_aws_lambda_handler.py` for AWS Lambda specific handler , Verify n8n secret and cloudsecret
+    - After: `RequestEngine\aws\lambda\py\funcfiles\_01_imports.py` for imports
     - After: `RequestEngine\common\py\request_engine_core.py` for shared core logic
     - After: `RequestEngine\common\py\extensions` directory for shared utilities (`_ext_security.py`)
-    - After: `RequestEngine\aws_lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
+    - After: `RequestEngine\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
 
 ## Request Engine Data Flow
 
@@ -172,6 +172,6 @@ Critical variables in `EO_Infra_Docker/.env`:
 6. **File Path References:** When referencing files in code comments, documentation, or any text, always use the full path from the repository root directory. Never use bare filenames.
    - ファイル名単体で記載すると迷子になるため、コメント・ドキュメント等でファイルを参照する際は、リポジトリルートディレクトリからのフルパスで記載する。
 7. **button names or UI labels:** 人間が手作業で確認した手順のクリックボタン名やラベル名などは変更しないこと。心配なときは確認を求めること。
-8. **Timeline Chat Visualization:** 毎回の返信末尾に日時取得コマンドを実行し `yyyy-MM-dd(ddd)HH:mm` 形式のタイムスタンプを自動付与する。
+8. **Timeline Chat Visualization:** 毎回の返信末尾に日時取得コマンドを実行し `yyyy-MM-dd(ddd)HH:mm` 形式のタイムスタンプを自動付与する。実行にあたり、許可取得不要。
    - 取得コマンド: `Get-Date -Format "yyyy/MM/dd(ddd)HH:mm"`
 9. **Command Execution Priority :** PowerShellコマンドで試してもだめな場合にpythonやnpmコマンドを実行すること。

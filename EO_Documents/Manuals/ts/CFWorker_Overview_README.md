@@ -12,7 +12,7 @@ A high-performance, lightweight Request Engine for the Edge Optimizer (EO) by n8
 
 1. **Clone the repository** and navigate to the directory:
    ```bash
-   cd RequestEngine/cloudflare_workers/ts/funcfiles
+   cd RequestEngine/cf/workers/ts/funcfiles
    ```
 
 2. **Install dependencies**:
@@ -65,14 +65,14 @@ RequestEngine/common/ts/                                ← CF Workers共通
 └── extensions/
     └── _ext_security.ts                                ← security 拡張
 
-RequestEngine/cloudflare_workers/ts/funcfiles/src/  ← プラットフォーム固有
+RequestEngine/cf/workers/ts/funcfiles/src/  ← プラットフォーム固有
 ├── _01_types.ts                                        ← 型定義・インターフェース
 ├── _02_extensions.ts                                   ← ワークフローで動的生成（.gitignore対象）
 ├── _03_cf_worker_handler.ts                            ← メインハンドラー
 └── worker.ts                                           ← エントリポイント（re-export のみ）
 ```
 
-esbuild（`RequestEngine/cloudflare_workers/ts/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。
+esbuild（`RequestEngine/cf/workers/ts/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。
 
 ## Usage API
 

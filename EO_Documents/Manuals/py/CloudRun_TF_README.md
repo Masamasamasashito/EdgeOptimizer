@@ -216,7 +216,7 @@ terraform --version
 ### 1-1. 変数ファイルの作成
 
 ```bash
-cd RequestEngine/gcp_cloudrun/terraform/
+cd RequestEngine/gcp/cloudrun/terraform/
 ```
 
 環境変数（STEP 0-2）から `terraform.tfvars` を生成:

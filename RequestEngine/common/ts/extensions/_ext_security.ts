@@ -24,7 +24,7 @@ import type {
   JsonRecord,
   StringRecord,
   ExtensionContext,
-} from "../../../cloudflare_workers/ts/funcfiles/src/_01_types";
+} from "../../../cf/workers/ts/funcfiles/src/_01_types";
 
 const EXTENSION_NAME = "security";
 const EXTENSION_PREFIX = "eo.security.";

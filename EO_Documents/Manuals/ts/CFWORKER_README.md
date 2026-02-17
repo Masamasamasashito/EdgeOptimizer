@@ -92,16 +92,16 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 9. `main`などのブランチ選ぶ
 10. 非本番ブランチのビルド:`無効`
     - 有効にすると、githubリポジトリ上に`cloudflare-workers-and-pages[bot]`によってブランチ作成される。
-11. ルート ディレクトリ:`/RequestEngine/cloudflare_workers/ts/funcfiles/`
+11. ルート ディレクトリ:`/RequestEngine/cf/workers/ts/funcfiles/`
 	- 重要。githubリポジトリ上でWorkerのビルド/デプロイに必要なディレクトリのパスを指定
 12. 接続
 13. ビルドに Gitリポジトリが表示され、`Git リポジトリにコミットをプッシュして最初のビルドを開始できるようになりました`とでたらOK
-14. 監視パスを構築する > `RequestEngine/cloudflare_workers/ts/funcfiles/*`を追加
+14. 監視パスを構築する > `RequestEngine/cf/workers/ts/funcfiles/*`を追加
 
 ## 手順 8: npm install 実行
 
 1. ローカルのgitリポジトリで `docker compose run --rm cfworker_npm_installer`を実行（ 初期は`node:24-slim`をつかっていた ）。
-    - `/RequestEngine/cloudflare_workers/ts/funcfiles/`でnode_modulesフォルダの必要なライブラリをnpm installするため。package.jsonと同じ階層で実施する。
+    - `/RequestEngine/cf/workers/ts/funcfiles/`でnode_modulesフォルダの必要なライブラリをnpm installするため。package.jsonと同じ階層で実施する。
     - package-lock.jsonも作成される
     - package-lock.jsonはgitリポジトリにコミットする
     - node_modulesはgitリポジトリにはコミットしない
@@ -246,7 +246,7 @@ RequestEngine/common/                          ← 全プラットフォーム�
 └── extensions/
     └── _ext_security.py                       ← security 拡張
 
-RequestEngine/gcp_cloudrun/py/funcfiles/     ← プラットフォーム固有（例: GCP）
+RequestEngine/gcp/cloudrun/py/funcfiles/     ← プラットフォーム固有（例: GCP）
 ├── _01_imports.py                             ← imports
 └── _03_gcp_cloudrun_handler.py                ← ハンドラー
 ```
@@ -261,14 +261,14 @@ RequestEngine/common/ts/                                ← CF Workers共通
 └── extensions/
     └── _ext_security.ts                                ← security 拡張（Python版 _ext_security.py 相当）
 
-RequestEngine/cloudflare_workers/ts/funcfiles/src/  ← プラットフォーム固有
+RequestEngine/cf/workers/ts/funcfiles/src/  ← プラットフォーム固有
 ├── _01_types.ts                                        ← 型定義・インターフェース
 ├── _02_extensions.ts                                   ← ワークフローで動的生成（.gitignore対象）
 ├── _03_cf_worker_handler.ts                            ← メインハンドラー
 └── worker.ts                                           ← エントリポイント（re-export のみ）
 ```
 
-**ビルドの仕組み**: esbuild（`RequestEngine/cloudflare_workers/ts/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。Python版の `cat` 結合と同等の最終成果物。
+**ビルドの仕組み**: esbuild（`RequestEngine/cf/workers/ts/funcfiles/build.mjs`）が `bundle: true` で全 `import` を解決し、`dist/worker.js` に1ファイルにバンドル。Python版の `cat` 結合と同等の最終成果物。
 
 ## `_02_extensions.ts` の動的生成
 

@@ -242,7 +242,7 @@ gcloud iam service-accounts get-iam-policy ${TARGET_SA_EMAIL} --project=$EO_GCP_
 2. プロジェクトディレクトリに移動:
    ```bash
    export EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY="<プロジェクトローカルルートディレクトリ>"
-   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp_cloudrun/py
+   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp/cloudrun/py
    ```
 3. gcloud CLIがインストールされていることを確認:
    ```bash
@@ -265,7 +265,7 @@ gcloud iam service-accounts get-iam-policy ${TARGET_SA_EMAIL} --project=$EO_GCP_
 2. プロジェクトディレクトリに移動:
    ```bash
    export EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY="<プロジェクトローカルルートディレクトリ>"
-   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp_cloudrun/py
+   cd /${EO_GCP_PROJECT_LOCAL_ROOT_DIRECTORY}/RequestEngine/gcp/cloudrun/py
    ```
 3. 認証とプロジェクト設定:
    ```bash
@@ -966,7 +966,7 @@ GitHub Actions 側の `google-github-actions/auth@v3` アクションにおい�
 
 GitHub Actionsワークフローは、`gcloud run deploy --source ./funcfiles`コマンドを使用してデプロイします。この方式の動作:
 
-1. **ソースコードの送信**: GitHub Actionsがリポジトリからチェックアウトした`RequestEngine\gcp_cloudrun\ane1\funcfiles`ディレクトリをCloud Buildに送信
+1. **ソースコードの送信**: GitHub Actionsがリポジトリからチェックアウトした`RequestEngine\gcp\cloudrun\ane1\funcfiles`ディレクトリをCloud Buildに送信
 2. **自動ビルド**: Cloud BuildがPythonビルドパックを使用して、Dockerfileなしで自動的にコンテナイメージをビルド
 3. **デプロイ**: ビルドされたコンテナイメージをCloud Runサービスにデプロイ
 
@@ -1110,7 +1110,7 @@ flowchart LR
 ローカル環境からも同じコマンドでデプロイ可能です（`gcloud`コマンドと適切な認証が必要）:
 
 ```bash
-cd RequestEngine/gcp_cloudrun/py
+cd RequestEngine/gcp/cloudrun/py
 gcloud run deploy eo-re-d01-cloudrun-ane1 \
   --source ./funcfiles \
   --region asia-northeast1 \
@@ -1202,7 +1202,7 @@ Last updated on 2026-01-22T04:27:12.501201Z by eo-gcp-sa-d01-deploy-ane1@<GCPプ
 https://eo-re-d01-cloudrun-ane1-<hash>-an.a.run.app/requestengine_tail
 ```
 
-**エンドポイントパス**： (`/requestengine_tail`)  [`RequestEngine\gcp_cloudrun\ane1\funcfiles\main.py`](RequestEngine\gcp_cloudrun\ane1\funcfiles\main.py) のソースコード内 `CLOUDRUN_ENDPOINT_PATH` 定数で定義されています。
+**エンドポイントパス**： (`/requestengine_tail`)  [`RequestEngine\gcp\cloudrun\ane1\funcfiles\main.py`](RequestEngine\gcp\cloudrun\ane1\funcfiles\main.py) のソースコード内 `CLOUDRUN_ENDPOINT_PATH` 定数で定義されています。
 
 # 認証設定（Cloud Runサービスデプロイ後）
 
@@ -1395,7 +1395,7 @@ OAuth2 Bearer認証を使用するには、n8nワークフローでID Tokenを�
 
 ```bash
 # プロジェクトルートから実行
-cd RequestEngine/gcp_cloudrun/py
+cd RequestEngine/gcp/cloudrun/py
 
 # .envファイルを作成（初回のみ）
 cp env.example .env
@@ -2051,7 +2051,7 @@ PERMISSION_DENIED: Permission 'artifactregistry.repositories.create' denied on r
 - **原因1**: Dockerイメージのビルドエラー
   - **解決**: ローカルで`docker build`を実行してエラーを確認
     ```bash
-    cd RequestEngine/gcp_cloudrun/py
+    cd RequestEngine/gcp/cloudrun/py
     docker build -f Dockerfile -t test-image .
     ```
 - **原因2**: ポート設定が間違っている

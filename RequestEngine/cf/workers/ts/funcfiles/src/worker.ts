@@ -8,9 +8,9 @@
  *
  * Entry point for the Cloudflare Worker.
  * Re-exports the handler from
- * RequestEngine/cloudflare_workers/ts/funcfiles/src/_03_cf_worker_handler.ts
+ * RequestEngine/cf/workers/ts/funcfiles/src/_03_cf_worker_handler.ts
  *
- * Build: esbuild (RequestEngine/cloudflare_workers/ts/funcfiles/build.mjs)
+ * Build: esbuild (RequestEngine/cf/workers/ts/funcfiles/build.mjs)
  * bundles all imports into dist/worker.js
  */
 

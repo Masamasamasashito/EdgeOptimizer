@@ -2,11 +2,47 @@
 
 ## 1. DBテーブル設計考慮観点
 
-`RequestEngine/{EO_CLOUD}/{EO_CODE_LANG}/instances/*.env` は `re_instances` DB テーブルを模した設計。
+`RequestEngine/{EO_CLOUD}/{EO_CODE_LANG}/instances/*.env` は DBテーブル`eo_re_instances`の1レコードを模した設計。
 
 - `EO_RE_INSTANCE_UUID`（UUIDv7）がサロゲート主キー
 - 複合キーを避け、全フィールドは属性として保持
 - テナント分離が必要になった段階で `tenant_id` フィールドを追加
+- `EO_CLOUD` → `EO_RE_INSTANCE_TYPE` の依存方向（クラウド選定後にサービス種別が決まる）
+- `EO_RE_INSTANCE_TYPE` は Lambda, EC2, GKE Pod Container 等、サーバレスに限らない
+
+### 3NF 正規化設計
+
+```sql
+-- ルックアップテーブル: リージョン ↔ リージョン短縮コードの1:1マッピング
+CREATE TABLE eo_regions (
+  region       VARCHAR(32) PRIMARY KEY,
+  region_short VARCHAR(8)  NOT NULL UNIQUE,
+  cloud        VARCHAR(8)  NOT NULL
+);
+
+-- メインテーブル: RE 1個体 = 1レコード
+-- .env ファイルは本テーブル + eo_regions を JOIN した非正規化ビュー
+CREATE TABLE eo_re_instances (
+  eo_re_instance_uuid  UUID        PRIMARY KEY,
+  eo_global_prj_env_id VARCHAR(4)  NOT NULL,
+  eo_project           VARCHAR(8)  NOT NULL DEFAULT 'eo',
+  eo_component         VARCHAR(8)  NOT NULL DEFAULT 're',
+  eo_env               VARCHAR(4)  NOT NULL,
+  eo_cloud             VARCHAR(8)  NOT NULL,
+  eo_code_lang         VARCHAR(4)  NOT NULL,
+  eo_code_lang_ver     VARCHAR(8)  NOT NULL,
+  eo_iac               VARCHAR(16) NOT NULL,
+  eo_re_instance_type  VARCHAR(16) NOT NULL,
+  eo_re_instance_id    VARCHAR(4)  NOT NULL,
+  eo_region            VARCHAR(32) NOT NULL REFERENCES eo_regions(region),
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_by           VARCHAR(64) NOT NULL,
+  is_deleted           BOOLEAN     NOT NULL DEFAULT FALSE
+);
+```
+
+`.env` ファイルに含まれる `EO_REGION_SHORT` は `eo_regions` テーブルから JOIN で導出する非正規化フィールド。
 
 ## 2. インスタンス定義スキーマ（instances/*.env）
 
@@ -15,25 +51,31 @@ GitHub Actions ワークフローから `cat instances/{file}.env >> $GITHUB_ENV
 
 ### フィールド定義
 
+リクエストエンジン1個体に対し、以下のフィールドを定義する。
+
 | フィールド | 説明 | 例 | 備考 |
 |---|---|---|---|
 | `EO_RE_INSTANCE_UUID` | インスタンス主キー（UUIDv7） | `019503a1-...` | タイムスタンプ+ランダム、時系列ソート可能 |
-| `EO_GLOBAL_PRJ_ENV_ID` | プロジェクト環境固定のユニーク識別子 | `a1b2` | グローバル一意必須リソースの命名に使用(半角英数最大4桁。ハイフンやアンダースコア不可) |
+| `EO_GLOBAL_PRJ_ENV_ID` | プロジェクト環境固定のユニーク識別子 | `a1b2` | グローバル一意必須リソースの命名に使用(半角英数最大4桁。ハイフンやアンダースコア不可。`md5("my-tenant-secret-salt" + "{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}")`) |
 | `EO_PROJECT` | プロジェクト識別子 | `eo` | 全環境共通 |
 | `EO_COMPONENT` | コンポーネント識別子 | `re` | re = Request Engine |
 | `EO_ENV` | 環境識別子 | `d01` | d01=dev01, p01=prod01 |
 | `EO_CLOUD` | クラウド識別子 | `aws` | aws / azure / gcp / cf |
 | `EO_CODE_LANG` | プログラミング言語識別子 | `py` | py = Python, ts = TypeScript |
-| `EO_CODE_LANG_VER` | プログラミング言語バージョン | `3.14` | Python 3.14, TypeScript 5.0 |
+| `EO_CODE_LANG_VER` | プログラミング言語バージョン | `314` | Python 3.14, TypeScript 5.0 |
 | `EO_IAC` | IaC ツール識別子 | `cfn` | cfn / bicep / terraform / wrangler / pulmi / none |
 | `EO_RE_INSTANCE_TYPE` | インスタンス種別 | `lambda` | lambda / funcapp / cloudrun / cfworker |
 | `EO_RE_INSTANCE_ID` | インスタンス番号 | `001` | 同一種別内で一意 |
 | `EO_REGION` | クラウドリージョン（フル） | `ap-northeast-1` | クラウド固有のリージョン名 |
-| `EO_REGION_SHORT` | リージョン短縮コード | `apn1` | 全クラウド統一の短縮形 |
+| `EO_REGION_SHORT` | リージョン短縮コード | `apn1` | 全クラウド統一の短縮形(本来は別テーブル) |
+| `created_at` | レコード作成日時 | `2026-02-16T16:00:00+09:00` | ISO 8601、タイムゾーン付き |
+| `updated_at` | レコード最終更新日時 | `2026-02-16T16:00:00+09:00` | ISO 8601、タイムゾーン付き |
+| `created_by` | 作成者/システムID | `nishilab` | 人間のユーザーID or システム名 |
+| `is_deleted` | 論理削除フラグ | `false` | true/false（物理削除しない運用） |
 
 ### クラウド4種の定義例
 
-**AWS Lambda** (`RequestEngine/aws_lambda/py/instances/lambda001.env`)
+**AWS Lambda** (`RequestEngine/aws/lambda/py/instances/lambda001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
@@ -50,7 +92,7 @@ EO_REGION=ap-northeast-1
 EO_REGION_SHORT=apn1
 ```
 
-**Azure Functions** (`RequestEngine/azure_functions/py/instances/funcapp001.env`)
+**Azure Functions** (`RequestEngine/azure/functions/py/instances/funcapp001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
@@ -67,7 +109,7 @@ EO_REGION=japaneast
 EO_REGION_SHORT=jpe
 ```
 
-**GCP Cloud Run** (`RequestEngine/gcp_cloudrun/py/instances/cloudrun001.env`)
+**GCP Cloud Run** (`RequestEngine/gcp/cloudrun/py/instances/cloudrun001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
@@ -84,7 +126,7 @@ EO_REGION=asia-northeast1
 EO_REGION_SHORT=an1
 ```
 
-**Cloudflare Workers** (`RequestEngine/cloudflare_workers/ts/instances/cfworker001.env`)
+**Cloudflare Workers** (`RequestEngine/cf/workers/ts/instances/cfworker001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>

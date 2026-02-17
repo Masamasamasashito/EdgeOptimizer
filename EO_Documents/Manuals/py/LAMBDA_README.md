@@ -222,7 +222,7 @@ eo-re-d01-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作�
 
 ```bash
 # 1. ディレクトリ移動
-cd RequestEngine/aws_lambda/py
+cd RequestEngine/aws/lambda/py
 
 # 2. WSL2 Ubuntu起動(slimのバージョンを調べて、zip名称を変更する)
 wsl -d Ubuntu

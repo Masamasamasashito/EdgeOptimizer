@@ -3,7 +3,7 @@ name: Deploy GCP Cloud Run ane1
 on:
 #   push:
 #     paths:
-#       - 'RequestEngine/gcp_cloudrun/py/funcfiles/**'
+#       - 'RequestEngine/gcp/cloudrun/py/funcfiles/**'
 #       - 'RequestEngine/common/py/**'
 #     branches:
 #       - main
@@ -24,7 +24,7 @@ permissions:
   id-token: write # OIDC認証に必須
   contents: read  # リポジトリの読み取りに必須
 
-# Request Engine Instance config: ../../RequestEngine/gcp_cloudrun/py/instances/cloudrun001.yml
+# Request Engine Instance config: ../../RequestEngine/gcp/cloudrun/py/instances/cloudrun001.yml
 # Resource name pattern: eo-re-d01-cloudrun-{re_region_short}
 env:
   EO_GCP_PROJECT_ID: ${{ secrets.EO_GCP_PROJECT_ID }}
@@ -32,7 +32,7 @@ env:
   EO_GCP_CLOUD_RUN_SERVICE_NAME: eo-re-d01-cloudrun-ane1
   EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL: ${{ secrets.EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL }}
   EO_CLOUDRUN_REQUEST_SECRET_NAME: eo-re-d01-secretmng
-  # Cloud Run スペック（RequestEngine/gcp_cloudrun/py/terraform/variables.tf デフォルト値にあわせた）
+  # Cloud Run スペック（RequestEngine/gcp/cloudrun/py/terraform/variables.tf デフォルト値にあわせた）
   EO_GCP_CLOUD_RUN_MEMORY: '512Mi'
   EO_GCP_CLOUD_RUN_CPU: '1'
   EO_GCP_CLOUD_RUN_TIMEOUT: '300'
@@ -52,7 +52,7 @@ jobs:
       - name: Merge GCP Cloud Run Files
         run: |
           mkdir -p deploy_package
-          SRC_DIR="RequestEngine/gcp_cloudrun/py/funcfiles"
+          SRC_DIR="RequestEngine/gcp/cloudrun/py/funcfiles"
           COMMON_DIR="RequestEngine/common/py"
           EXT_DIR="RequestEngine/common/py/extensions"
 

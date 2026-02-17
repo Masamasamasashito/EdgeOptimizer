@@ -3,12 +3,12 @@ name: Deploy CloudFlare Worker Global
 on:
 #   push:
 #     paths:
-#       - 'RequestEngine/cloudflare_workers/ts/funcfiles/src/**'
-#       - 'RequestEngine/cloudflare_workers/ts/funcfiles/wrangler.toml'
-#       - 'RequestEngine/cloudflare_workers/ts/funcfiles/package.json'
-#       - 'RequestEngine/cloudflare_workers/ts/funcfiles/package-lock.json'
-#       - 'RequestEngine/cloudflare_workers/ts/funcfiles/tsconfig.json'
-#       - 'RequestEngine/cloudflare_workers/ts/funcfiles/build.mjs'
+#       - 'RequestEngine/cf/workers/ts/funcfiles/src/**'
+#       - 'RequestEngine/cf/workers/ts/funcfiles/wrangler.toml'
+#       - 'RequestEngine/cf/workers/ts/funcfiles/package.json'
+#       - 'RequestEngine/cf/workers/ts/funcfiles/package-lock.json'
+#       - 'RequestEngine/cf/workers/ts/funcfiles/tsconfig.json'
+#       - 'RequestEngine/cf/workers/ts/funcfiles/build.mjs'
 #       - 'RequestEngine/common/ts/**'
 #       # if you want to trigger workflow when you change deploy-ts-to-cf-worker.yml
 #       # - '.github/workflows/deploy-ts-to-cf-worker.yml'
@@ -21,7 +21,7 @@ on:
         default: true
         type: boolean
 
-# Request Engine Instance config: ../../RequestEngine/cloudflare_workers/ts/instances/cfworker001.yml
+# Request Engine Instance config: ../../RequestEngine/cf/workers/ts/instances/cfworker001.yml
 # Resource name pattern: eo-re-d01-cfworker-{re_region_short}
 jobs:
   cf_worker_deploy: # ジョブ名（任意）。実行単位の論理名
@@ -44,12 +44,12 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        working-directory: ./RequestEngine/cloudflare_workers/ts/funcfiles
+        working-directory: ./RequestEngine/cf/workers/ts/funcfiles
         run: npm install
 
       - name: Generate _02_extensions.ts (conditional extension imports)
         run: |
-          EXT_FILE="RequestEngine/cloudflare_workers/ts/funcfiles/src/_02_extensions.ts"
+          EXT_FILE="RequestEngine/cf/workers/ts/funcfiles/src/_02_extensions.ts"
           EXT_SECURITY="${{ inputs.ext_security }}"
           EXT_SECURITY="${EXT_SECURITY:-true}"
 
@@ -65,7 +65,7 @@ jobs:
 
           # Security extension
           if [ "$EXT_SECURITY" == "true" ]; then
-            echo 'import "../../../../common/ts/extensions/_ext_security";' >> "$EXT_FILE"
+            echo 'import "../../../../../common/ts/extensions/_ext_security";' >> "$EXT_FILE"
             echo "  [INCLUDED] _ext_security.ts"
           else
             echo "  [EXCLUDED] _ext_security.ts"
@@ -76,11 +76,11 @@ jobs:
           cat "$EXT_FILE"
 
       - name: Build worker (strip comments only, no minify)
-        working-directory: ./RequestEngine/cloudflare_workers/ts/funcfiles
+        working-directory: ./RequestEngine/cf/workers/ts/funcfiles
         run: npm run build
 
       - name: Generate wrangler.toml
-        working-directory: ./RequestEngine/cloudflare_workers/ts/funcfiles
+        working-directory: ./RequestEngine/cf/workers/ts/funcfiles
         run: |
           cat <<EOF > wrangler.toml
           name = "eo-re-d01-cfworker-global"
@@ -111,5 +111,5 @@ jobs:
           wranglerVersion: '4.64.0'
           apiToken: ${{ secrets.EO_CF_WORKER_USER_API_TOKEN_FOR_GITHUB }}
           accountId: ${{ secrets.EO_CF_ACCOUNT_ID }}
-          workingDirectory: ./RequestEngine/cloudflare_workers/ts/funcfiles
+          workingDirectory: ./RequestEngine/cf/workers/ts/funcfiles
           command: deploy

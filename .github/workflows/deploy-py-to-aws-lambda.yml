@@ -3,7 +3,7 @@ name: Deploy AWS Lambda apne1
 on:
 #   push:
 #     paths:
-#       - 'RequestEngine/aws_lambda/py/funcfiles/**'
+#       - 'RequestEngine/aws/lambda/py/funcfiles/**'
 #       - 'RequestEngine/common/py/**'
 #     branches:
 #       - main
@@ -19,7 +19,7 @@ permissions:
   id-token: write # Required for OIDC authentication
   contents: read  # Required for repository read
 
-# Request Engine Instance config: ../../RequestEngine/aws_lambda/py/instances/lambda001.yml
+# Request Engine Instance config: ../../RequestEngine/aws/lambda/py/instances/lambda001.yml
 # Resource name pattern: eo-re-d01-lambda-{re_region_short}
 env:
   PYTHON_VERSION: "3.14"
@@ -37,7 +37,7 @@ jobs:
       - name: Merge Lambda Function Files
         run: |
           mkdir -p deploy_package
-          SRC_DIR="RequestEngine/aws_lambda/py/funcfiles"
+          SRC_DIR="RequestEngine/aws/lambda/py/funcfiles"
           COMMON_DIR="RequestEngine/common/py"
           EXT_DIR="RequestEngine/common/py/extensions"
 

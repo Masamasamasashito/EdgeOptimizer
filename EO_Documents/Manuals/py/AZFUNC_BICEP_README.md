@@ -140,7 +140,7 @@ az login
 az account show --query id -o tsv
 
 # 移動
-cd RequestEngine/azure_functions/bicep/
+cd RequestEngine/azure/functions/bicep/
 
 # Step 1: 管理グループ作成（テナントスコープ）
 az deployment tenant create \
@@ -164,7 +164,7 @@ az login
 az account show --query id -o tsv
 
 # 移動
-cd RequestEngine/azure_functions/bicep/
+cd RequestEngine/azure/functions/bicep/
 
 # Step 1: 管理グループ作成（テナントスコープ）
 az deployment tenant create --location japaneast --template-file eo-re-d01-azure-mgmt-group.bicep --parameters subscriptionId='<YOUR_SUBSCRIPTION_ID>'
@@ -330,7 +330,7 @@ az account show --query tenantId -o tsv
 
 Function App 等のリソースは**リソースグループスコープ**でデプロイします。Azure CLI または Azure Portal から実行できます。
 
-RequestEngine\azure_functions\bicep ディレクトリに移動してから実行してください。
+RequestEngine\azure\functions\bicep ディレクトリに移動してから実行してください。
 
 #### 方法A: Azure CLI でデプロイ
 

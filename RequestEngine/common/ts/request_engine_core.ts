@@ -21,7 +21,7 @@ import type {
   ExtensionContext,
   ExtensionBuildFunc,
   ExtensionConfig,
-} from "../../cloudflare_workers/ts/funcfiles/src/_01_types";
+} from "../../cf/workers/ts/funcfiles/src/_01_types";
 
 // ======================================================================
 // Constants
