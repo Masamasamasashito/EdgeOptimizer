@@ -19,7 +19,7 @@ permissions:
   id-token: write # Required for OIDC authentication
   contents: read  # Required for repository read
 
-# Request Engine Instance config: ../../RequestEngine/aws/lambda/py/instances/lambda001.env
+# Request Engine Instance config: ../../RequestEngine/aws/lambda/py/instances_conf/lambda001.env
 # Resource name pattern: eo-re-d01-lambda-{re_region_short}
 env:
   PYTHON_VERSION: "3.14"

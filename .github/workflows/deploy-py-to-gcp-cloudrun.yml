@@ -24,7 +24,7 @@ permissions:
   id-token: write # OIDC認証に必須
   contents: read  # リポジトリの読み取りに必須
 
-# Request Engine Instance config: ../../RequestEngine/gcp/cloudrun/py/instances/cloudrun001.env
+# Request Engine Instance config: ../../RequestEngine/gcp/cloudrun/py/instances_conf/cloudrun001.env
 # Resource name pattern: eo-re-d01-cloudrun-{re_region_short}
 env:
   EO_GCP_PROJECT_ID: ${{ secrets.EO_GCP_PROJECT_ID }}

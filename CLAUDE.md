@@ -69,7 +69,7 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 - `EO_Infra_Docker/` - Docker Compose for local n8n, PostgreSQL, Redis, Playwright, SearXNG
 - `RequestEngine/` - Serverless function implementations per platform
   - `*/{py,ts}/funcfiles/` - Actual function code
-  - `*/instances/*.env` - Instance definitions (region, resource name)
+  - `*/instances_conf/*.env` - Instance definitions (region, resource name)
 - `terraform/` - Infrastructure as Code modules
 - `EOn8nWorkflowJson/` - n8n workflow definitions for import
 - `test/` - **OSS公開を避けるファイルの置き場。このディレクトリ内のファイルを他のディレクトリへ移動禁止。**

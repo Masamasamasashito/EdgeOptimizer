@@ -1,4 +1,4 @@
-// Request Engine Instance config: ../instances/funcapp001.env
+// Request Engine Instance config: ../instances_conf/funcapp001.env
 // ==============================================================================
 // Edge Optimizer - Azure Functions Request Engine Infrastructure
 // ==============================================================================

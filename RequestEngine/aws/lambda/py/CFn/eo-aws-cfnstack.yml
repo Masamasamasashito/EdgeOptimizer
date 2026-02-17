@@ -1,4 +1,4 @@
-# Request Engine Instance config: ../instances/lambda001.env
+# Request Engine Instance config: ../instances_conf/lambda001.env
 AWSTemplateFormatVersion: "2010-09-09"
 Description: >
   Edge Optimizer - AWS Lambda Request Engine Infrastructure

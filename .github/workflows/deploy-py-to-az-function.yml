@@ -19,7 +19,7 @@ permissions:
   id-token: write # OIDC認証に必須
   contents: read  # リポジトリの読み取りに必須
 
-# Request Engine Instance config: ../../RequestEngine/azure/functions/py/instances/funcapp001.env
+# Request Engine Instance config: ../../RequestEngine/azure/functions/py/instances_conf/funcapp001.env
 # Resource name pattern: eo-re-d01-funcapp-{re_region_short}
 env:
   FUNCTION_APP_NAME: eo-re-d01-funcapp-jpe

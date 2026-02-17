@@ -2,7 +2,7 @@
 
 ## 1. DBテーブル設計考慮観点
 
-`RequestEngine/{EO_CLOUD}/{EO_SERVICE}/{EO_CODE_LANG}/instances/*.env` は DBテーブル`eo_re_instances`の1レコードを模した設計。
+`RequestEngine/{EO_CLOUD}/{EO_SERVICE}/{EO_CODE_LANG}/instances_conf/*.env` は DBテーブル`eo_re_instances`の1レコードを模した設計。
 
 - `EO_RE_INSTANCE_UUID`（UUIDv7）がサロゲート主キー
 - 複合キーを避け、全フィールドは属性として保持
@@ -44,10 +44,10 @@ CREATE TABLE eo_re_instances (
 
 `.env` ファイルに含まれる `EO_REGION_SHORT` は `eo_regions` テーブルから JOIN で導出する非正規化フィールド。
 
-## 2. インスタンス定義スキーマ（instances/*.env）
+## 2. インスタンス定義スキーマ（instances_conf/*.env）
 
 各 Request Engine インスタンスは `.env` 形式で定義する。
-GitHub Actions ワークフローから `cat instances/{file}.env >> $GITHUB_ENV` で環境変数として読み込む。
+GitHub Actions ワークフローから `cat instances_conf/{file}.env >> $GITHUB_ENV` で環境変数として読み込む。
 
 ### フィールド定義
 
@@ -75,7 +75,7 @@ GitHub Actions ワークフローから `cat instances/{file}.env >> $GITHUB_ENV
 
 ### クラウド4種の定義例
 
-**AWS Lambda** (`RequestEngine/aws/lambda/py/instances/lambda001.env`)
+**AWS Lambda** (`RequestEngine/aws/lambda/py/instances_conf/lambda001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
@@ -92,7 +92,7 @@ EO_REGION=ap-northeast-1
 EO_REGION_SHORT=apne1
 ```
 
-**Azure Functions** (`RequestEngine/azure/functions/py/instances/funcapp001.env`)
+**Azure Functions** (`RequestEngine/azure/functions/py/instances_conf/funcapp001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
@@ -109,7 +109,7 @@ EO_REGION=japaneast
 EO_REGION_SHORT=jpe
 ```
 
-**GCP Cloud Run** (`RequestEngine/gcp/cloudrun/py/instances/cloudrun001.env`)
+**GCP Cloud Run** (`RequestEngine/gcp/cloudrun/py/instances_conf/cloudrun001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
@@ -126,7 +126,7 @@ EO_REGION=asia-northeast1
 EO_REGION_SHORT=asne1
 ```
 
-**Cloudflare Workers** (`RequestEngine/cf/workers/ts/instances/cfworker001.env`)
+**Cloudflare Workers** (`RequestEngine/cf/workers/ts/instances_conf/cfworker001.env`)
 ```env
 EO_RE_INSTANCE_UUID=<UUIDv7>
 EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
