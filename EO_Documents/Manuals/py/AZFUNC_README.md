@@ -252,12 +252,29 @@ func --version
 # インストール/更新
 winget install Microsoft.Azure.FunctionsCoreTools
 ```
+# localdev/ ディレクトリ（Azure Functions ローカル開発用Docker環境）
+
+`RequestEngine/azure/functions/py/localdev/` は Azure Functions ローカル開発用のDocker環境です。
+
+- **用途**: `python:slim-bookworm` ベースに Azure Functions Core Tools（`func` CLI）をインストールしたコンテナで、`func start` によるローカルテストが可能
+- **サービス名**: `azfunc_builder`
+- **ベースイメージ**: `python:slim-bookworm` + Azure Functions Core Tools v4
+- **ポート**: `7071`（Azure Functions デフォルト）
+- **本番デプロイ**: GitHub Actions（`.github/workflows/deploy-py-to-az-function.yml`）で実行。この Docker 環境はローカル開発のみに使用
+
+```
+RequestEngine/azure/functions/py/
+├── localdev/
+│   ├── Dockerfile           # Python + func CLI インストール済みイメージ
+│   ├── docker-compose.yml   # azfunc_builder サービス定義
+│   └── env.example          # Docker イメージ・ポート設定テンプレート（cp env.example .env）
+└── funcfiles/               # Azure Functions コード（function_app.py, host.json, requirements.txt）
+```
+
 # ローカルDockerでAzure Functions 初期化/開発環境構築
 
-[\<プロジェクトルートディレクトリ>\RequestEngine\azure\functions\py](\<プロジェクトルートディレクトリ>\RequestEngine\azure\functions\py)
-
 - [Dockerfile](localdev/Dockerfile)
-- [docker-compose.yml](localdev/docker-compose.yml) 
+- [docker-compose.yml](localdev/docker-compose.yml)
 - [env.example](localdev/env.example)
 
 ## ローカルDocker起動と関数作成
@@ -270,9 +287,9 @@ winget install Microsoft.Azure.FunctionsCoreTools
 **開発済3ファイルなどが有る場合に、`func init . --python`を実行したい場合、既存ファイルを退避してから実行してください。**
 ### 初回セットアップ手順(基本的にリポジトリクローン時は不要。手順4以降を実行してください。)
 
-- `cd RequestEngine\azure\functions\py`
-- `mkdir funcfiles`
-- `cp localdev/env.example localdev/.env`
+- `cd RequestEngine\azure\functions\py\localdev`
+- `mkdir ../funcfiles`
+- `cp env.example .env`
 - .env を編集する
 - イメージビルド（コンテナ常駐`docker compose up -d`は、今回は使わない）
   - `docker compose build`
@@ -311,7 +328,7 @@ winget install Microsoft.Azure.FunctionsCoreTools
 
 既に`funcfiles/`ディレクトリにファイルが存在する場合：
 
-1. `cd RequestEngine\azure\functions\py`
+1. `cd RequestEngine\azure\functions\py\localdev`
 2. コンテナ中に入る
    - `docker compose run --rm azfunc_builder bash`
 3. 開発作業
@@ -531,7 +548,7 @@ GitHub Actionsを使用しない場合、または初回設定時：
 # ローカルDockerで一度ビルド／起動チェック
 
 ```
-cd RequestEngine\azure\functions\py\funcfiles
+cd RequestEngine\azure\functions\py\localdev
 docker compose run --rm azfunc_builder bash
 func start
 ```

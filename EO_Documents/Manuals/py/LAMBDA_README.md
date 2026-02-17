@@ -214,6 +214,25 @@ eo-re-d01-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作�
 > - `<AWSアカウントID>`を実際のAWSアカウントIDに置き換えてください
 > - シークレット名を変えない場合、シークレット名の末尾でワイルドカード（`-*`）を使用することで、シークレットのバージョンに関係なくアクセスできます
 
+## localdev/ ディレクトリ（Lambda Layer ビルド用Docker環境）
+
+`RequestEngine/aws/lambda/py/localdev/` は Lambda Layer ビルド専用のDocker環境です。
+
+- **用途**: Python `requests` パッケージを Lambda Layer 用 zip ファイルとしてビルド
+- **サービス名**: `lambda_layer_builder`
+- **ベースイメージ**: `python:slim`（zip + pip 付き）
+- **出力先**: `funcfiles/requests-py314-slim-layer.zip`
+- **本番デプロイ**: GitHub Actions（`.github/workflows/deploy-py-to-aws-lambda.yml`）で実行。この Docker 環境は Layer ビルドのみに使用
+
+```
+RequestEngine/aws/lambda/py/
+├── localdev/
+│   ├── Dockerfile           # zip + pip を含む Python イメージ
+│   ├── docker-compose.yml   # lambda_layer_builder サービス定義
+│   └── env.example          # Docker イメージ設定テンプレート（cp env.example .env）
+└── funcfiles/               # Lambda 関数コード + Layer zip 出力先
+```
+
 ## 8. Python 3.14 Lambda Layer を Docker で作る
 
 > ⚠️ **この手順は手動・CFn版共通で必須です。** Lambda Layer は CloudFormation では作成できないため、手動で作成する必要があります。
@@ -222,7 +241,7 @@ eo-re-d01-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作�
 
 ```bash
 # 1. ディレクトリ移動
-cd RequestEngine/aws/lambda/py
+cd RequestEngine/aws/lambda/py/localdev
 
 # 2. WSL2 Ubuntu起動(slimのバージョンを調べて、zip名称を変更する)
 wsl -d Ubuntu

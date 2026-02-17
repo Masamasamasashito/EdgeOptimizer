@@ -64,7 +64,7 @@ Lambda Layer は CloudFormation デプロイ**前**に手動で作成する必�
 
 ```bash
 # 1. ディレクトリ移動
-cd RequestEngine/aws/lambda/py
+cd RequestEngine/aws/lambda/py/localdev
 
 # 2. WSL2 Ubuntu 起動
 wsl -d Ubuntu

@@ -98,9 +98,27 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
 13. ビルドに Gitリポジトリが表示され、`Git リポジトリにコミットをプッシュして最初のビルドを開始できるようになりました`とでたらOK
 14. 監視パスを構築する > `RequestEngine/cf/workers/ts/funcfiles/*`を追加
 
+## localdev/ ディレクトリ（npm install 実行用Docker環境）
+
+`RequestEngine/cf/workers/ts/localdev/` は Cloudflare Workers 用の npm install 実行環境です。
+
+- **用途**: `node:slim` コンテナ内で `funcfiles/package.json` に基づき `npm install` を実行し、`node_modules` を生成
+- **サービス名**: `cfworker_npm_installer`
+- **ベースイメージ**: `node:slim`
+- **本番デプロイ**: GitHub Actions（`.github/workflows/deploy-ts-to-cf-worker.yml`）で Wrangler を使用。この Docker 環境は npm install のみに使用
+
+```
+RequestEngine/cf/workers/ts/
+├── localdev/
+│   ├── Dockerfile           # Node.js イメージ
+│   ├── docker-compose.yml   # cfworker_npm_installer サービス定義
+│   └── env.example          # Docker イメージ設定テンプレート（cp env.example .env）
+└── funcfiles/               # Workers ソースコード（package.json, src/, build.mjs）
+```
+
 ## 手順 8: npm install 実行
 
-1. ローカルのgitリポジトリで `docker compose run --rm cfworker_npm_installer`を実行（ 初期は`node:24-slim`をつかっていた ）。
+1. `cd RequestEngine/cf/workers/ts/localdev` でlocaldevディレクトリに移動し、`docker compose run --rm cfworker_npm_installer`を実行（ 初期は`node:24-slim`をつかっていた ）。
     - `/RequestEngine/cf/workers/ts/funcfiles/`でnode_modulesフォルダの必要なライブラリをnpm installするため。package.jsonと同じ階層で実施する。
     - package-lock.jsonも作成される
     - package-lock.jsonはgitリポジトリにコミットする

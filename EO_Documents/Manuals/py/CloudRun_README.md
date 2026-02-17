@@ -1387,6 +1387,25 @@ OAuth2 Bearer認証を使用するには、n8nワークフローでID Tokenを�
 - n8nワークフローでService AccountのID Tokenを取得して、リクエストヘッダーに`Authorization: Bearer <idToken>`を設定してください
 - `EO_Documents\Manuals\RE_README.md` も参照してください
 
+## localdev/ ディレクトリ（Cloud Run ローカル開発用Docker環境）
+
+`RequestEngine/gcp/cloudrun/py/localdev/` は Cloud Run ローカル開発用のDocker環境です。
+
+- **用途**: `python:slim` ベースのコンテナで Flask/gunicorn サーバーを起動し、ポート8080でローカルテストが可能
+- **サービス名**: `gcloudrun_builder`
+- **ベースイメージ**: `python:slim`（gcc + pip 依存関係インストール済み）
+- **ポート**: `8080`（Cloud Run デフォルト）
+- **本番デプロイ**: `gcloud run deploy --source`（GitHub Actions `.github/workflows/deploy-py-to-gcp-cloudrun.yml` 経由）で実行。本番は Procfile + Cloud Build を使用し、この Dockerfile は使用しない
+
+```
+RequestEngine/gcp/cloudrun/py/
+├── localdev/
+│   ├── Dockerfile           # Python + gunicorn + Flask 実行環境
+│   ├── docker-compose.yml   # gcloudrun_builder サービス定義
+│   └── env.example          # シークレット・プロジェクトID設定テンプレート（cp env.example .env）
+└── funcfiles/               # Cloud Run アプリケーションコード（main.py, requirements.txt, Procfile）
+```
+
 ## ローカル開発
 
 ### Docker Compose で実行
@@ -1395,10 +1414,10 @@ OAuth2 Bearer認証を使用するには、n8nワークフローでID Tokenを�
 
 ```bash
 # プロジェクトルートから実行
-cd RequestEngine/gcp/cloudrun/py
+cd RequestEngine/gcp/cloudrun/py/localdev
 
 # .envファイルを作成（初回のみ）
-cp localdev/env.example localdev/.env
+cp env.example .env
 
 # .envファイルを編集して、必要な環境変数を設定
 # - EO_CLOUDRUN_REQUEST_SECRET_LOCAL: ローカル開発用の照合用リクエストシークレット（EO_Infra_Docker/.envのN8N_EO_REQUEST_SECRETと同じ値）
@@ -1439,7 +1458,7 @@ docker compose down
 
 - サービス名: `gcloudrun_builder`
 - ポート: `8080:8080`
-- ボリューム: `./funcfiles:/app`（ホットリロード対応）
+- ボリューム: `../funcfiles:/app`（ホットリロード対応）
 - 環境変数: `.env`ファイルから読み込み
 
 ### ローカルでテスト
