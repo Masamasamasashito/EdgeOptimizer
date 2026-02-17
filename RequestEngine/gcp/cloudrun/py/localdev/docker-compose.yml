@@ -15,7 +15,8 @@ services:
   #---------------------------------------------------------------------------
   gcloudrun_builder:
     build:
-      context: .
+      context: ..
+      dockerfile: localdev/Dockerfile
       args:
         GCP_CLOUDRUN_DOCKER_IMAGE: ${COMMON_GCP_CLOUDRUN_DOCKER_IMAGE:-python}
         GCP_CLOUDRUN_DOCKER_IMAGE_TAG: ${COMMON_GCP_CLOUDRUN_DOCKER_IMAGE_TAG:-slim}
@@ -32,7 +33,7 @@ services:
       - CLOUDRUN_REQUEST_SECRET_NAME=${CLOUDRUN_REQUEST_SECRET_NAME:-eo-re-dev01-secretmng}
     volumes:
       # ローカルディレクトリをgcloudrun_builderコンテナの/appにマウント（編集可能）
-      - ./funcfiles:/app
+      - ../funcfiles:/app
     # 実行するコマンド
     command: python main.py
 #---------------------------------------------------------------------------

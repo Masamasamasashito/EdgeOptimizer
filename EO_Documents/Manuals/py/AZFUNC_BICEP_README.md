@@ -62,9 +62,9 @@ Edge Optimizer の Azure Functions Request Engine に必要な以下のリソー
 - {pj}: プロジェクトプレフィックス（例: `eo` Edge Optimizer）
 - {comp}: コンポーネント名（例: `re` は Request Engine）
 - {env}: 環境名（例: `d01` は dev01）
-- {region}: リージョン名（例: `jpeast` は Japan East）
+- {region}: リージョン名（例: `jpe` は Japan East）
 
-デフォルトパラメータ（`eo-re-d01-funcapp-jpeast`）の場合：
+デフォルトパラメータ（`eo-re-d01-funcapp-jpe`）の場合：
 
 | リソース種別 | リソース名パターン | グローバル一意命名 | 文字制約 |
 |-------------|-------------------|---------------|----------|
@@ -261,20 +261,20 @@ Bicep デプロイ先のリソースグループを作成します。
 
 **Azure Portal:**
 1. Azure Portal > リソースグループ > 「+ 作成」
-2. リソースグループ名: `eo-re-d01-resource-group-jpeast`
+2. リソースグループ名: `eo-re-d01-resource-group-jpe`
 3. リージョン: `(Asia Pacific) Japan East`
 4. 「レビューと作成」> 「作成」
 
 **Azure CLI (Bash):**
 ```bash
 az group create \
-  --name eo-re-d01-resource-group-jpeast \
+  --name eo-re-d01-resource-group-jpe \
   --location japaneast
 ```
 
 **Azure CLI (PowerShell):**
 ```powershell
-az group create --name eo-re-d01-resource-group-jpeast --location japaneast
+az group create --name eo-re-d01-resource-group-jpe --location japaneast
 ```
 
 ### 1-2. Entra ID アプリケーションの作成（GitHub Actions OIDC 用）
@@ -282,13 +282,13 @@ az group create --name eo-re-d01-resource-group-jpeast --location japaneast
 **重要**: Entra ID アプリケーションは Bicep で作成できないため、手動で作成します。
 
 1. Azure Portal > Microsoft Entra ID > 概要 > +追加 > アプリを登録
-2. 名前: `eo-ghactions-deploy-entra-app-azfunc-jpeast`
+2. 名前: `eo-ghactions-deploy-entra-app-azfunc-jpe`
 3. サポートされているアカウントの種類: **この組織ディレクトリのみに含まれるアカウント**
    - ⚠️「個人用 Microsoft アカウントのみ」は選択しない（OIDC認証でエラーになる）
 4. リダイレクト URI: 設定不要
 5. 「登録」をクリック
 6. 以下の値をメモ:
-   - **アプリケーション (クライアント) ID** → GitHub Secrets `EO_AZ_FUNC_JPEAST_DEPLOY_ENTRA_APP_ID_FOR_GITHUB`
+   - **アプリケーション (クライアント) ID** → GitHub Secrets `EO_AZ_FUNC_JPE_DEPLOY_ENTRA_APP_ID_FOR_GITHUB`
    - **ディレクトリ (テナント) ID** → GitHub Secrets `EO_AZ_TENANT_ID` および Bicep パラメータ `tenantId`
 
 ### 1-3. テナント ID の確認
@@ -315,7 +315,7 @@ az account show --query tenantId -o tsv
     "projectPrefix": { "value": "eo" },
     "component": { "value": "re" },
     "environment": { "value": "d01" },
-    "regionShort": { "value": "jpeast" },
+    "regionShort": { "value": "jpe" },
     "location": { "value": "japaneast" },
     "tenantId": { "value": "<YOUR_TENANT_ID>" },
     "pythonVersion": { "value": "3.13" },
@@ -338,34 +338,34 @@ RequestEngine\azure\functions\bicep ディレクトリに移動してから実�
 ```bash
 az deployment group create \
   --name eo-azure-funcapp-deployment \
-  --resource-group eo-re-d01-resource-group-jpeast \
+  --resource-group eo-re-d01-resource-group-jpe \
   --template-file eo-re-d01-azure-funcapp.bicep \
   --parameters \
     tenantId='<YOUR_TENANT_ID>' \
     projectPrefix='eo' \
     component='re' \
     environment='d01' \
-    regionShort='jpeast' \
+    regionShort='jpe' \
     location='japaneast'
 ```
 
 **パラメータを直接指定 (PowerShell):**
 ```powershell
-az deployment group create --name eo-azure-funcapp-deployment --resource-group eo-re-d01-resource-group-jpeast --template-file eo-re-d01-azure-funcapp.bicep --parameters tenantId='<YOUR_TENANT_ID>' projectPrefix='eo' component='re' environment='d01' regionShort='jpeast' location='japaneast'
+az deployment group create --name eo-azure-funcapp-deployment --resource-group eo-re-d01-resource-group-jpe --template-file eo-re-d01-azure-funcapp.bicep --parameters tenantId='<YOUR_TENANT_ID>' projectPrefix='eo' component='re' environment='d01' regionShort='jpe' location='japaneast'
 ```
 
 **パラメータファイルを使用 (Bash):**
 ```bash
 az deployment group create \
   --name eo-azure-funcapp-deployment \
-  --resource-group eo-re-d01-resource-group-jpeast \
+  --resource-group eo-re-d01-resource-group-jpe \
   --template-file eo-re-d01-azure-funcapp.bicep \
   --parameters @eo-re-d01-azure-funcapp.parameters.json
 ```
 
 **パラメータファイルを使用 (PowerShell):**
 ```powershell
-az deployment group create --name eo-azure-funcapp-deployment --resource-group eo-re-d01-resource-group-jpeast --template-file eo-re-d01-azure-funcapp.bicep --parameters '@eo-re-d01-azure-funcapp.parameters.json'
+az deployment group create --name eo-azure-funcapp-deployment --resource-group eo-re-d01-resource-group-jpe --template-file eo-re-d01-azure-funcapp.bicep --parameters '@eo-re-d01-azure-funcapp.parameters.json'
 ```
 
 #### 方法B: Azure Portal でデプロイ
@@ -389,13 +389,13 @@ az bicep build --file eo-re-d01-azure-funcapp.bicep
 4. 「保存」をクリック
 5. **カスタム デプロイ** 画面で設定:
    - **サブスクリプション**: デプロイ先のサブスクリプションを選択
-   - **リソースグループ**: `eo-re-d01-resource-group-jpeast`（STEP 1-1 で作成済み）
+   - **リソースグループ**: `eo-re-d01-resource-group-jpe`（STEP 1-1 で作成済み）
    - **リージョン**: `Japan East`
    - **Tenant Id**: STEP 1-3 で確認したテナントID
    - **Project Prefix**: `eo`（デフォルト）
    - **Component**: `re`（デフォルト）
    - **Environment**: `d01`（デフォルト）
-   - **Region Short**: `jpeast`（デフォルト）
+   - **Region Short**: `jpe`（デフォルト）
    - **Location**: `japaneast`（デフォルト）
    - **Python Version**: `3.13`（デフォルト）
    - **Instance Memory MB**: `512`（デフォルト）
@@ -409,7 +409,7 @@ az bicep build --file eo-re-d01-azure-funcapp.bicep
 #### 方法C: リソースグループ画面からデプロイ
 
 1. 上記 **方法B 手順1** で JSON に変換済みであること
-2. Azure Portal > リソースグループ > `eo-re-d01-resource-group-jpeast`
+2. Azure Portal > リソースグループ > `eo-re-d01-resource-group-jpe`
 3. 「+ 作成」> 検索バーで「テンプレート」と入力 > 「テンプレートのデプロイ（カスタムテンプレートを使用したデプロイ）」
 4. 以降は **方法B** の手順2以降と同様
 
@@ -424,7 +424,7 @@ az bicep build --file eo-re-d01-azure-funcapp.bicep
 
 Azure Portal で自分に権限を付与します。
 
-1. Key Vault > eo-re-d01-kv-jpeast > アクセス制御 (IAM)
+1. Key Vault > eo-re-d01-kv-jpe > アクセス制御 (IAM)
 2. 「+ 追加」> 「ロールの割り当ての追加」
 3. ロール: `キー コンテナー シークレット責任者`（Key Vault Secrets Officer）
     - `シークレットの読み取り・書き込み・削除（管理者用）`
@@ -434,7 +434,7 @@ Azure Portal で自分に権限を付与します。
 
 ### 3-2. Key Vault シークレットの更新
 
-1. Azure Portal > Key Vault > `eo-re-d01-kv-jpeast`
+1. Azure Portal > Key Vault > `eo-re-d01-kv-jpe`
 2. オブジェクト > シークレット > `AZFUNC-REQUEST-SECRET`
 3. 「+ 新しいバージョン」をクリック
 4. シークレット値: `EO_Infra_Docker/.env` の `N8N_EO_REQUEST_SECRET` の値
@@ -443,14 +443,14 @@ Azure Portal で自分に権限を付与します。
 **Azure CLI (Bash):**
 ```bash
 az keyvault secret set \
-  --vault-name eo-re-d01-kv-jpeast \
+  --vault-name eo-re-d01-kv-jpe \
   --name AZFUNC-REQUEST-SECRET \
   --value '<N8N_EO_REQUEST_SECRET の値>'
 ```
 
 **Azure CLI (PowerShell):**
 ```powershell
-az keyvault secret set --vault-name eo-re-d01-kv-jpeast --name AZFUNC-REQUEST-SECRET --value '<N8N_EO_REQUEST_SECRET の値>'
+az keyvault secret set --vault-name eo-re-d01-kv-jpe --name AZFUNC-REQUEST-SECRET --value '<N8N_EO_REQUEST_SECRET の値>'
 ```
 ---
 
@@ -458,7 +458,7 @@ az keyvault secret set --vault-name eo-re-d01-kv-jpeast --name AZFUNC-REQUEST-SE
 
 ### 4-1. フェデレーション資格情報の設定
 
-1. Azure Portal > Microsoft Entra ID > アプリの登録 > `eo-ghactions-deploy-entra-app-azfunc-jpeast`
+1. Azure Portal > Microsoft Entra ID > アプリの登録 > `eo-ghactions-deploy-entra-app-azfunc-jpe`
 2. 証明書とシークレット > フェデレーション資格情報 > 「+ 資格情報の追加」
 3. シナリオ: 「Azure リソースをデプロイする Github Actions」
 4. 設定:
@@ -466,16 +466,16 @@ az keyvault secret set --vault-name eo-re-d01-kv-jpeast --name AZFUNC-REQUEST-SE
    - リポジトリ: リポジトリ名
    - エンティティ型: ブランチ
    - GitHub ブランチ名: `main`
-   - 名前: `eo-azfunc-jpeast-ghactions-main-deploy-federation`
+   - 名前: `eo-azfunc-jpe-ghactions-main-deploy-federation`
 5. 「追加」
 
 ### 4-2. サービスプリンシパルへのデプロイ権限付与
 
-1. Azure Portal > リソースグループ > `eo-re-d01-resource-group-jpeast` > アクセス制御 (IAM)
+1. Azure Portal > リソースグループ > `eo-re-d01-resource-group-jpe` > アクセス制御 (IAM)
 2. 「+ 追加」> 「ロールの割り当ての追加」
 3. ロール: `Web サイト共同作成者`
 4. アクセスの割り当て先: **ユーザー、グループ、またはサービス プリンシパル**
-5. メンバー: `eo-ghactions-deploy-entra-app-azfunc-jpeast` のApplicationを検索して選択
+5. メンバー: `eo-ghactions-deploy-entra-app-azfunc-jpe` のApplicationを検索して選択
 6. 「レビューと割り当て」
 
 ### 4-3. GitHub Secrets の設定
@@ -484,7 +484,7 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions:
 
 | シークレット名 | 値 | 説明 |
 |--------------|-----|------|
-| `EO_AZ_FUNC_JPEAST_DEPLOY_ENTRA_APP_ID_FOR_GITHUB` | アプリケーション (クライアント) ID | Entra ID アプリの Client ID |
+| `EO_AZ_FUNC_JPE_DEPLOY_ENTRA_APP_ID_FOR_GITHUB` | アプリケーション (クライアント) ID | Entra ID アプリの Client ID |
 | `EO_AZ_TENANT_ID` | ディレクトリ (テナント) ID | Azure AD テナント ID |
 | `EO_AZURE_SUBSCRIPTION_ID` | Azure サブスクリプション ID | デプロイ先のサブスクリプション |
 | `EO_AZ_RE_KEYVAULT_URL` | Bicep Output の `keyVaultUri` 値 | Key Vault URI（語尾スラッシュ不要）|
@@ -496,13 +496,13 @@ Bash:
 # デプロイ後に Output から取得
 az deployment group show \
   --name eo-azure-funcapp-deployment \
-  --resource-group eo-re-d01-resource-group-jpeast \
+  --resource-group eo-re-d01-resource-group-jpe \
   --query properties.outputs.keyVaultUri.value -o tsv
 ```
 
 PowerShell:
 ```powershell
-az deployment group show --name eo-azure-funcapp-deployment --resource-group eo-re-d01-resource-group-jpeast --query properties.outputs.keyVaultUri.value -o tsv
+az deployment group show --name eo-azure-funcapp-deployment --resource-group eo-re-d01-resource-group-jpe --query properties.outputs.keyVaultUri.value -o tsv
 ```
 
 または Azure Portal > Key Vault > 概要 > 「コンテナーの URI」
@@ -516,13 +516,13 @@ Bicep で作成した Function App にはまだ関数コードがありません
 ### 5-1. GitHub Actions ワークフローの実行
 
 1. GitHub リポジトリ > **Actions** タブ
-2. 左サイドバー > **Deploy Azure Functions jpeast**
+2. 左サイドバー > **Deploy Azure Functions jpe**
 3. 「Run workflow」> ブランチ `main` を選択 > 「Run workflow」
 4. ワークフローが完了するまで待機（約2-3分）
 
 ### 5-2. デプロイ結果の確認
 
-1. Azure Portal > Function App > `eo-re-d01-funcapp-jpeast`
+1. Azure Portal > Function App > `eo-re-d01-funcapp-jpe`
 2. 左サイドバー > **関数** をクリック
 3. `requestengine_func` が表示されていれば成功
 
@@ -534,7 +534,7 @@ Bicep で作成した Function App にはまだ関数コードがありません
 
 ### 6-1. Function App Key の取得
 
-1. Azure Portal > Function App > `eo-re-d01-funcapp-jpeast`
+1. Azure Portal > Function App > `eo-re-d01-funcapp-jpe`
 2. 関数 > `requestengine_func`
 3. 「関数の URL の取得」> `default` (ファンクション キー) を選択
 4. URL をコピー（`?code=...` まで含む）
@@ -544,7 +544,7 @@ Bicep で作成した Function App にはまだ関数コードがありません
 1. n8n > Personal > Credentials > Create Credential
 2. Credential Type: `Header Auth`
 3. 設定:
-   - Name: `EO_RE_Func_jpeast_AppKey`
+   - Name: `EO_RE_Func_jpe_AppKey`
    - Header Name: `x-functions-key`
    - Header Value: Function Key の値（URL の `?code=` 以降の部分）
 4. 「Save」
@@ -560,12 +560,12 @@ Bicep で作成した Function App にはまだ関数コードがありません
 1. n8n > `280AZ-japan-east RequestEngine KeyVault` ノードを開く
 2. **Parameters** > **URL** に Function App の URL を設定:
    ```
-   https://eo-re-d01-funcapp-jpeast.azurewebsites.net/api/requestengine_func
+   https://eo-re-d01-funcapp-jpe.azurewebsites.net/api/requestengine_func
    ```
 3. 「Save」
 
 **URL の確認方法**:
-- Azure Portal > 関数アプリ > `eo-re-d01-funcapp-jpeast` > 関数 > `requestengine_func`
+- Azure Portal > 関数アプリ > `eo-re-d01-funcapp-jpe` > 関数 > `requestengine_func`
 - 「関数の URL の取得」> `default` (ファンクション キー) の URL から `?code=...` を除いた部分
 
 **認証の補足**:
@@ -582,7 +582,7 @@ Bicep で作成した Function App にはまだ関数コードがありません
 | projectPrefix | `eo` | プロジェクトプレフィックス |
 | component | `re` | コンポーネント識別子（Request Engine） |
 | environment | `d01` | 環境識別子（dev01, prod01 等） |
-| regionShort | `jpeast` | リージョン短縮名 |
+| regionShort | `jpe` | リージョン短縮名 |
 | **Azure 設定** |||
 | location | `japaneast` | デプロイ先リージョン |
 | tenantId | (入力必須) | Azure AD テナント ID |
@@ -617,7 +617,7 @@ az provider register --namespace Microsoft.KeyVault
 2. または論理削除された Key Vault を完全削除:
    ```bash
    # Bash / PowerShell 共通
-   az keyvault purge --name eo-re-d01-kv-jpeast --location japaneast
+   az keyvault purge --name eo-re-d01-kv-jpe --location japaneast
    ```
 
 ### Function App から Key Vault にアクセスできない

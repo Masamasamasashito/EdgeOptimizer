@@ -10,7 +10,7 @@
 # ==============================================================================
 
 # --- Required: GCP Project ---
-gcp_project_id     = "<GCPプロジェクトID>"         # e.g., "eo-re-d01-pr-ane1"
+gcp_project_id     = "<GCPプロジェクトID>"         # e.g., "eo-re-d01-pr-asne1"
 gcp_project_number = "<GCPプロジェクト番号>"        # e.g., "123456789012"
 
 # --- Required: GitHub Actions OIDC ---
@@ -21,7 +21,7 @@ github_repo = "<Githubリポジトリ名>"                # e.g., "EdgeOptimizer
 # project_prefix = "eo"
 # component      = "re"
 # environment    = "d01"
-# region_short   = "ane1"
+# region_short   = "asne1"
 
 # --- Optional: GCP Region (default shown) ---
 # gcp_region = "asia-northeast1"

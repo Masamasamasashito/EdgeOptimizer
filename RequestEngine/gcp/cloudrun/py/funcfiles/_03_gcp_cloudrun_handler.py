@@ -29,7 +29,7 @@
 # GCP Cloud Run uses OAuth2 Bearer authentication, so n8n workflow uses
 # 230 data Keeper for GCP, 235 Get IDtoken From GCP Service Account Access Token,
 # 240 IDtoken to json, 245 data and GCP IDtoken Merger nodes before reaching
-# 280 GCP-ane1 RequestEngine Oauth2 Bearer node.
+# 280 GCP-asne1 RequestEngine Oauth2 Bearer node.
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO)

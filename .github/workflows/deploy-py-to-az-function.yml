@@ -1,4 +1,4 @@
-name: Deploy Azure Functions jpeast
+name: Deploy Azure Functions jpe
 
 on:
 #   push:
@@ -19,11 +19,11 @@ permissions:
   id-token: write # OIDC認証に必須
   contents: read  # リポジトリの読み取りに必須
 
-# Request Engine Instance config: ../../RequestEngine/azure/functions/py/instances/funcapp001.yml
+# Request Engine Instance config: ../../RequestEngine/azure/functions/py/instances/funcapp001.env
 # Resource name pattern: eo-re-d01-funcapp-{re_region_short}
 env:
-  FUNCTION_APP_NAME: eo-re-d01-funcapp-jpeast
-  RESOURCE_GROUP: eo-re-d01-resource-group-jpeast
+  FUNCTION_APP_NAME: eo-re-d01-funcapp-jpe
+  RESOURCE_GROUP: eo-re-d01-resource-group-jpe
 
 jobs:
   deploy:
@@ -128,7 +128,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.EO_AZ_FUNC_JPEAST_DEPLOY_ENTRA_APP_ID_FOR_GITHUB }}
+          client-id: ${{ secrets.EO_AZ_FUNC_JPE_DEPLOY_ENTRA_APP_ID_FOR_GITHUB }}
           tenant-id: ${{ secrets.EO_AZ_TENANT_ID }}
           subscription-id: ${{ secrets.EO_AZURE_SUBSCRIPTION_ID }}
 

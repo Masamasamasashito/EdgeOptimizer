@@ -71,7 +71,7 @@ n8nから各クラウド基盤のサーバレス関数（Request Engine）への
 
 ## RequestEngine Azure Functions App Key
 
-**EO_RE_Func_jpeast_AppKey**
+**EO_RE_Func_jpe_AppKey**
 
 Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `default` ( Do not select `_master` )
 
@@ -82,7 +82,7 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 - `280AZ-japan-east RequestEngine KeyVault`ノード
     - Parameters > URL
     - Azure > 関数アプリ > 関数 > リソースJSON > invoke_url_template
-     `https://eo-re-d01-funcapp-jpeast-xxxxxxxxxxxxxxxx.japaneast-01.azurewebsites.net/api/requestengine_func`
+     `https://eo-re-d01-funcapp-jpe-xxxxxxxxxxxxxxxx.japaneast-01.azurewebsites.net/api/requestengine_func`
 
 ## RequestEngine Worker Cloudflare Access Secret
 
@@ -103,11 +103,11 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 ## RequestEngine GCP Service Account Json key To Get Acces Token
 
-**EO_RE_GCP_RUN_ane1_OAuth2_Invoker_SA**
+**EO_RE_GCP_RUN_asne1_OAuth2_Invoker_SA**
 
 - **権限の参照**: GCP Cloud Run のサービスアカウント（Deployer / Compute Engine Default / Runtime / OAuth2 Invoker）のロール・権限一覧と設定手順は [EO_Documents/Manuals/py/CloudRun_README.md](py/CloudRun_README.md) を参照。
 
-個人GCPメール > IAMと管理 > サービスアカウント > `eo-gcp-sa-d01-oa2be-inv-ane1`を選択 > 鍵
+個人GCPメール > IAMと管理 > サービスアカウント > `eo-gcp-sa-d01-oa2be-inv-asne1`を選択 > 鍵
 
 `********************-xxxxxxxxxxxx.json`
 
@@ -131,19 +131,19 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 | クラウド名 | リージョン | クラウドのシークレットサービス | リクエストエンジンコード内環境変数 | ランタイム |
 |---|---|---|---|---|
-| **Azure** | Japan East (jpeast) | Key Vault: `eo-re-d01-kv-jpeast`<br>シークレット: `AZFUNC-REQUEST-SECRET` | `AZFUNC_REQUEST_SECRET_NAME` | Python 3.13 |
+| **Azure** | Japan East (jpe) | Key Vault: `eo-re-d01-kv-jpe`<br>シークレット: `AZFUNC-REQUEST-SECRET` | `AZFUNC_REQUEST_SECRET_NAME` | Python 3.13 |
 | **AWS** | apne1 (ap-northeast-1) | Secrets Managerのシークレット名: `eo-re-d01-secretsmng-apne1`<br>シークレットキー: `LAMBDA_REQUEST_SECRET` | `LAMBDA_REQUEST_SECRET_NAME`<br>`LAMBDA_REQUEST_SECRET_KEY_NAME` | Python 3.14 |
-| **GCP** | ane1 (asia-northeast1) | Secret Managerのシークレット名: `eo-re-d01-secretmng`<br>シークレットキー: `CLOUDRUN_REQUEST_SECRET` | `CLOUDRUN_REQUEST_SECRET_NAME`<br>`CLOUDRUN_REQUEST_SECRET_KEY_NAME` | Python (Flask) |
+| **GCP** | asne1 (asia-northeast1) | Secret Managerのシークレット名: `eo-re-d01-secretmng`<br>シークレットキー: `CLOUDRUN_REQUEST_SECRET` | `CLOUDRUN_REQUEST_SECRET_NAME`<br>`CLOUDRUN_REQUEST_SECRET_KEY_NAME` | Python (Flask) |
 | **Cloudflare** | global (Edge) | `CFWORKER_REQUEST_SECRET` | `env.CFWORKER_REQUEST_SECRET` | TypeScript (V8) |
 
 ### 詳細情報
 
 #### Azure Functions
 
-- **リクエストエンジン名**: リソースグループ: `eo-re-d01-resource-group-jpeast`、関数アプリ: `eo-re-d01-funcapp-jpeast`、関数名: `requestengine_func`
-- **Key Vault URI**: `https://eo-re-d01-kv-jpeast.vault.azure.net/` (GitHubシークレット: `EO_AZ_RE_KEYVAULT_URL`)
-- **シークレット識別子**: `https://eo-re-d01-kv-jpeast.vault.azure.net/secrets/AZFUNC-REQUEST-SECRET/{VERSION}`
-- **Key Vault**: `eo-re-d01-kv-jpeast`
+- **リクエストエンジン名**: リソースグループ: `eo-re-d01-resource-group-jpe`、関数アプリ: `eo-re-d01-funcapp-jpe`、関数名: `requestengine_func`
+- **Key Vault URI**: `https://eo-re-d01-kv-jpe.vault.azure.net/` (GitHubシークレット: `EO_AZ_RE_KEYVAULT_URL`)
+- **シークレット識別子**: `https://eo-re-d01-kv-jpe.vault.azure.net/secrets/AZFUNC-REQUEST-SECRET/{VERSION}`
+- **Key Vault**: `eo-re-d01-kv-jpe`
 - **シークレット**: `AZFUNC-REQUEST-SECRET`
 - **シークレット取得方法**: Azure Key Vault Secrets API (`SecretClient`)
 - **保存方式**: テキスト
@@ -164,8 +164,8 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 #### GCP Cloud Run
 
-- **リクエストエンジン名**: 組織: `<組織ドメイン>`、プロジェクト名: `eo-re-d01-pr-ane1`、Cloud Runサービス: `eo-re-d01-cloudrun-ane1`
-- **リソース名**: `projects/eo-re-d01-pr-ane1/secrets/eo-re-d01-secretmng/versions/{VERSION}`
+- **リクエストエンジン名**: 組織: `<組織ドメイン>`、プロジェクト名: `eo-re-d01-pr-asne1`、Cloud Runサービス: `eo-re-d01-cloudrun-asne1`
+- **リソース名**: `projects/eo-re-d01-pr-asne1/secrets/eo-re-d01-secretmng/versions/{VERSION}`
 - **シークレット**: `eo-re-d01-secretmng`
 - **シークレットキー**: `CLOUDRUN_REQUEST_SECRET`
 - **保存方式**: シークレットキーの値はテキストだが、シークレットはJSON形式

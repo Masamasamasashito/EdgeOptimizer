@@ -21,7 +21,7 @@ on:
         default: true
         type: boolean
 
-# Request Engine Instance config: ../../RequestEngine/cf/workers/ts/instances/cfworker001.yml
+# Request Engine Instance config: ../../RequestEngine/cf/workers/ts/instances/cfworker001.env
 # Resource name pattern: eo-re-d01-cfworker-{re_region_short}
 jobs:
   cf_worker_deploy: # ジョブ名（任意）。実行単位の論理名

@@ -1,4 +1,4 @@
-name: Deploy GCP Cloud Run ane1
+name: Deploy GCP Cloud Run asne1
 
 on:
 #   push:
@@ -24,13 +24,13 @@ permissions:
   id-token: write # OIDC認証に必須
   contents: read  # リポジトリの読み取りに必須
 
-# Request Engine Instance config: ../../RequestEngine/gcp/cloudrun/py/instances/cloudrun001.yml
+# Request Engine Instance config: ../../RequestEngine/gcp/cloudrun/py/instances/cloudrun001.env
 # Resource name pattern: eo-re-d01-cloudrun-{re_region_short}
 env:
   EO_GCP_PROJECT_ID: ${{ secrets.EO_GCP_PROJECT_ID }}
   EO_GCP_REGION: asia-northeast1
-  EO_GCP_CLOUD_RUN_SERVICE_NAME: eo-re-d01-cloudrun-ane1
-  EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL: ${{ secrets.EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL }}
+  EO_GCP_CLOUD_RUN_SERVICE_NAME: eo-re-d01-cloudrun-asne1
+  EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL: ${{ secrets.EO_GCP_RUN_ASNE1_RUNTIME_SA_EMAIL }}
   EO_CLOUDRUN_REQUEST_SECRET_NAME: eo-re-d01-secretmng
   # Cloud Run スペック（RequestEngine/gcp/cloudrun/py/terraform/variables.tf デフォルト値にあわせた）
   EO_GCP_CLOUD_RUN_MEMORY: '512Mi'
@@ -135,7 +135,7 @@ jobs:
         uses: google-github-actions/auth@v3
         with:
           workload_identity_provider: ${{ secrets.EO_GCP_WIF_PROVIDER_PATH }}
-          service_account: ${{ secrets.EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL }}
+          service_account: ${{ secrets.EO_GCP_RUN_ASNE1_DEPLOY_SA_EMAIL }}
           audience: ${{ secrets.EO_GCP_WIF_PROVIDER_PATH }}
 
       - name: Set up Cloud SDK
@@ -158,7 +158,7 @@ jobs:
           gcloud config list
 
           echo "=== Impersonation / credentials related envs ==="
-          echo "EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL=${{ secrets.EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL }}"
+          echo "EO_GCP_RUN_ASNE1_DEPLOY_SA_EMAIL=${{ secrets.EO_GCP_RUN_ASNE1_DEPLOY_SA_EMAIL }}"
           echo "EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL=${EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL}"
           echo "GOOGLE_GHA_CREDS_PATH=${GOOGLE_GHA_CREDS_PATH}"
           echo "GOOGLE_APPLICATION_CREDENTIALS=${GOOGLE_APPLICATION_CREDENTIALS}"

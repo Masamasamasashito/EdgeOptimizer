@@ -15,7 +15,8 @@ services:
   #---------------------------------------------------------------------------
   cfworker_npm_installer:
     build:
-      context: .
+      context: ..
+      dockerfile: localdev/Dockerfile
       args:
         CF_WORKER_DOCKER_IMAGE: ${COMMON_CF_WORKER_DOCKER_IMAGE:-node}
         CF_WORKER_DOCKER_IMAGE_TAG: ${COMMON_CF_WORKER_DOCKER_IMAGE_TAG:-slim}
@@ -25,7 +26,7 @@ services:
     logging: *default-logging
     volumes:
       # ローカルディレクトリをnpm-installerコンテナの/appにマウント（編集可能）
-      - ./funcfiles:/app
+      - ../funcfiles:/app
     # 実行するコマンド
     command: npm install
 #---------------------------------------------------------------------------

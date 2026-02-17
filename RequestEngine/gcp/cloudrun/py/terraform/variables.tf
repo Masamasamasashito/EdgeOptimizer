@@ -40,18 +40,18 @@ variable "environment" {
 variable "region_short" {
   description = "Short region name for resource naming"
   type        = string
-  default     = "ane1"
+  default     = "asne1"
 
   validation {
-    condition     = contains(["ane1", "ane2", "ane3", "ase1", "use1", "usw2", "euw1"], var.region_short)
-    error_message = "region_short must be one of: ane1, ane2, ane3, ase1, use1, usw2, euw1."
+    condition     = contains(["asne1", "asne2", "asne3", "asse1", "use1", "usw2", "euw1"], var.region_short)
+    error_message = "region_short must be one of: asne1, asne2, asne3, asse1, use1, usw2, euw1."
   }
 }
 
 # --- GCP Settings ---
 
 variable "gcp_project_id" {
-  description = "GCP Project ID (e.g., eo-re-d01-pr-ane1)"
+  description = "GCP Project ID (e.g., eo-re-d01-pr-asne1)"
   type        = string
 
   validation {

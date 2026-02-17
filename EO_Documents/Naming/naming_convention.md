@@ -2,7 +2,7 @@
 
 ## 1. DBテーブル設計考慮観点
 
-`RequestEngine/{EO_CLOUD}/{EO_CODE_LANG}/instances/*.env` は DBテーブル`eo_re_instances`の1レコードを模した設計。
+`RequestEngine/{EO_CLOUD}/{EO_SERVICE}/{EO_CODE_LANG}/instances/*.env` は DBテーブル`eo_re_instances`の1レコードを模した設計。
 
 - `EO_RE_INSTANCE_UUID`（UUIDv7）がサロゲート主キー
 - 複合キーを避け、全フィールドは属性として保持
@@ -67,7 +67,7 @@ GitHub Actions ワークフローから `cat instances/{file}.env >> $GITHUB_ENV
 | `EO_RE_INSTANCE_TYPE` | インスタンス種別 | `lambda` | lambda / funcapp / cloudrun / cfworker |
 | `EO_RE_INSTANCE_ID` | インスタンス番号 | `001` | 同一種別内で一意 |
 | `EO_REGION` | クラウドリージョン（フル） | `ap-northeast-1` | クラウド固有のリージョン名 |
-| `EO_REGION_SHORT` | リージョン短縮コード | `apn1` | 全クラウド統一の短縮形(本来は別テーブル) |
+| `EO_REGION_SHORT` | リージョン短縮コード | `apne1` | 全クラウド統一の短縮形(本来は別テーブル) |
 | `created_at` | レコード作成日時 | `2026-02-16T16:00:00+09:00` | ISO 8601、タイムゾーン付き |
 | `updated_at` | レコード最終更新日時 | `2026-02-16T16:00:00+09:00` | ISO 8601、タイムゾーン付き |
 | `created_by` | 作成者/システムID | `nishilab` | 人間のユーザーID or システム名 |
@@ -89,7 +89,7 @@ EO_IAC=cfn
 EO_RE_INSTANCE_TYPE=lambda
 EO_RE_INSTANCE_ID=001
 EO_REGION=ap-northeast-1
-EO_REGION_SHORT=apn1
+EO_REGION_SHORT=apne1
 ```
 
 **Azure Functions** (`RequestEngine/azure/functions/py/instances/funcapp001.env`)
@@ -123,7 +123,7 @@ EO_IAC=terraform
 EO_RE_INSTANCE_TYPE=cloudrun
 EO_RE_INSTANCE_ID=001
 EO_REGION=asia-northeast1
-EO_REGION_SHORT=an1
+EO_REGION_SHORT=asne1
 ```
 
 **Cloudflare Workers** (`RequestEngine/cf/workers/ts/instances/cfworker001.env`)
@@ -187,17 +187,17 @@ AWS, GCP, Cloudflare のリソースはプロジェクト/リージョン内で�
 
 | クラウド | フルリージョン | EO_REGION_SHORT |
 |---|---|---|
-| AWS | ap-northeast-1 | `apn1` |
-| AWS | ap-northeast-3 | `apn3` |
+| AWS | ap-northeast-1 | `apne1` |
+| AWS | ap-northeast-3 | `apne3` |
 | AWS | us-east-1 | `use1` |
 | AWS | us-west-2 | `usw2` |
 | Azure | japaneast | `jpe` |
 | Azure | eastus | `eus` |
 | Azure | westeurope | `weu` |
-| GCP | asia-northeast1 | `an1` |
-| GCP | asia-northeast2 | `an2` |
-| GCP | asia-northeast3 | `an3` |
-| GCP | asia-southeast1 | `ase1` |
+| GCP | asia-northeast1 | `asne1` |
+| GCP | asia-northeast2 | `asne2` |
+| GCP | asia-northeast3 | `asne3` |
+| GCP | asia-southeast1 | `asse1` |
 | GCP | us-east1 | `use1` |
 | GCP | us-west1 | `usw1` |
 | GCP | europe-west1 | `euw1` |
@@ -210,20 +210,20 @@ AWS, GCP, Cloudflare のリソースはプロジェクト/リージョン内で�
 ```
 {EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_RE_INSTANCE_TYPE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}
 ```
-展開例: `eo-re-d01-lambda-apn1-001`
+展開例: `eo-re-d01-lambda-apne1-001`
 
 ### 5.2 AWS リソース
 
 | リソース | パターン | 例 | 制限 |
 |---|---|---|---|
-| Lambda 関数 | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-lambda-apn1-001` | 64文字 |
-| Lambda Log Group | `/aws/lambda/{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `/aws/lambda/eo-re-d01-lambda-apn1-001` | |
-| Secrets Manager | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-secretsmng-{EO_REGION_SHORT}` | `eo-re-d01-secretsmng-apn1` | 512文字 |
-| IAM Role | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-role` | `eo-re-d01-lambda-apn1-001-role` | 64文字 |
-| IAM Policy | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{purpose}-iamp` | `eo-re-d01-lambda-apn1-001-basic-exec-iamp` | 128文字 |
-| IAM User | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-iamu` | `eo-re-d01-lambda-apn1-001-iamu` | 64文字 |
-| GH Actions Role | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-ghactions-deploy-iamr` | `eo-re-d01-lambda-apn1-001-ghactions-deploy-iamr` | 64文字 |
-| OIDC Provider Tag | `{EO_PROJECT}-ghactions-idp-request-engine-lambda-aws-{EO_REGION_SHORT}` | `eo-ghactions-idp-request-engine-lambda-aws-apn1` | |
+| Lambda 関数 | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-lambda-apne1-001` | 64文字 |
+| Lambda Log Group | `/aws/lambda/{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `/aws/lambda/eo-re-d01-lambda-apne1-001` | |
+| Secrets Manager | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-secretsmng-{EO_REGION_SHORT}` | `eo-re-d01-secretsmng-apne1` | 512文字 |
+| IAM Role | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-role` | `eo-re-d01-lambda-apne1-001-role` | 64文字 |
+| IAM Policy | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{purpose}-iamp` | `eo-re-d01-lambda-apne1-001-basic-exec-iamp` | 128文字 |
+| IAM User | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-iamu` | `eo-re-d01-lambda-apne1-001-iamu` | 64文字 |
+| GH Actions Role | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-ghactions-deploy-iamr` | `eo-re-d01-lambda-apne1-001-ghactions-deploy-iamr` | 64文字 |
+| OIDC Provider Tag | `{EO_PROJECT}-ghactions-idp-request-engine-lambda-aws-{EO_REGION_SHORT}` | `eo-ghactions-idp-request-engine-lambda-aws-apne1` | |
 
 ### 5.3 Azure リソース
 
@@ -243,12 +243,12 @@ AWS, GCP, Cloudflare のリソースはプロジェクト/リージョン内で�
 
 | リソース | パターン | 例 | 制限 |
 |---|---|---|---|
-| Cloud Run Service | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-cloudrun-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-cloudrun-an1-001` | 63文字 |
+| Cloud Run Service | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-cloudrun-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-cloudrun-asne1-001` | 63文字 |
 | **Service Account** | `{EO_PROJECT}-gsa-{EO_ENV}-{role}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | 下記参照 | **30文字** |
-| SA (Deployer) | `{EO_PROJECT}-gsa-{EO_ENV}-deploy-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-deploy-an1-001` (26文字) | 30文字 |
-| SA (Runtime) | `{EO_PROJECT}-gsa-{EO_ENV}-runtime-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-runtime-an1-001` (27文字) | 30文字 |
-| SA (OAuth2 Invoker) | `{EO_PROJECT}-gsa-{EO_ENV}-oa2inv-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-oa2inv-an1-001` (26文字) | 30文字 |
-| Artifact Registry | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-ar-{EO_REGION_SHORT}` | `eo-re-d01-ar-an1` | 63文字 |
+| SA (Deployer) | `{EO_PROJECT}-gsa-{EO_ENV}-deploy-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-deploy-asne1-001` (26文字) | 30文字 |
+| SA (Runtime) | `{EO_PROJECT}-gsa-{EO_ENV}-runtime-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-runtime-asne1-001` (27文字) | 30文字 |
+| SA (OAuth2 Invoker) | `{EO_PROJECT}-gsa-{EO_ENV}-oa2inv-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-oa2inv-asne1-001` (26文字) | 30文字 |
+| Artifact Registry | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-ar-{EO_REGION_SHORT}` | `eo-re-d01-ar-asne1` | 63文字 |
 | Secret Manager | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-secretmng` | `eo-re-d01-secretmng` | 255文字 |
 | WIF Pool | `{EO_PROJECT}-gcp-pool-wif-{EO_ENV}` | `eo-gcp-pool-wif-d01` | 32文字 |
 | WIF IdP | `{EO_PROJECT}-gcp-idp-gh-oidc-wif-{EO_ENV}` | `eo-gcp-idp-gh-oidc-wif-d01` | 32文字 |
@@ -276,7 +276,7 @@ AWS, GCP, Cloudflare のリソースはプロジェクト/リージョン内で�
 | `eo_iac` | IaC ツール | `cfn` / `bicep` / `terraform` / `none` |
 | `eo_re_instance_type` | インスタンス種別 | `lambda` / `funcapp` / `cloudrun` / `cfworker` |
 | `eo_re_instance_id` | インスタンス番号 | `001` |
-| `eo_region_short` | リージョン短縮 | `apn1` / `jpe` / `an1` / `global` |
+| `eo_region_short` | リージョン短縮 | `apne1` / `jpe` / `asne1` / `global` |
 | `eo_re_instance_uuid` | UUIDv7 主キー | `019503a1-...` |
 | `eo_global_prj_env_id` | グローバルプロジェクト環境ID | `a1b2` |
 
@@ -296,9 +296,9 @@ GCP Service Account は `labels` 非対応のため、`display_name` + `descript
 
 ```hcl
 resource "google_service_account" "deployer" {
-  account_id   = "eo-gsa-d01-deploy-an1-001"
-  display_name = "EO GCP Deployer SA (an1-001)"
-  description  = "eo_project=eo, eo_component=re, eo_env=d01, eo_re_instance_type=cloudrun, eo_re_instance_id=001, eo_region_short=an1"
+  account_id   = "eo-gsa-d01-deploy-asne1-001"
+  display_name = "EO GCP Deployer SA (asne1-001)"
+  description  = "eo_project=eo, eo_component=re, eo_env=d01, eo_re_instance_type=cloudrun, eo_re_instance_id=001, eo_region_short=asne1"
 }
 ```
 

@@ -15,7 +15,8 @@ services:
   #---------------------------------------------------------------------------
   lambda_layer_builder:
     build:
-      context: .
+      context: ..
+      dockerfile: localdev/Dockerfile
       args:
         LAMBDA_LAYER_DOCKER_IMAGE: ${COMMON_LAMBDA_LAYER_DOCKER_IMAGE:-python}
         LAMBDA_LAYER_DOCKER_IMAGE_TAG: ${COMMON_LAMBDA_LAYER_DOCKER_IMAGE_TAG:-slim}
@@ -23,7 +24,7 @@ services:
     # container_name: lambda-layer-container
     logging: *default-logging
     volumes:
-      - .:/lambda-layer
+      - ..:/lambda-layer
     # 実行時に実行される処理
     command: >
       /bin/bash -c "

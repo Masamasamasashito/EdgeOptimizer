@@ -85,7 +85,7 @@ eo_gcp_resource_labels
 - {pj}: プロジェクトプレフィックス（例: `eo`）
 - {comp}: コンポーネント名（例: `re` は Request Engine）
 - {env}: 環境名（例: `d01` は dev01）
-- {region}: リージョン短縮名（例: `ane1` は asia-northeast1）
+- {region}: リージョン短縮名（例: `asne1` は asia-northeast1）
 
 デフォルトパラメータの場合:
 
@@ -114,11 +114,11 @@ eo_gcp_resource_labels
 
 以降のコマンドで使用する変数を事前に設定します（[CloudRun_README.md](CloudRun_README.md) と同じ変数名）。
 
-- EX) `export EO_GCP_PROJECT_ID="eo-re-d01-pr-ane1"`
+- EX) `export EO_GCP_PROJECT_ID="eo-re-d01-pr-asne1"`
 
 ```bash
 # GCP プロジェクト
-export EO_GCP_PROJECT_ID="<GCPプロジェクトID>"              # 例: "eo-re-d01-pr-ane1"
+export EO_GCP_PROJECT_ID="<GCPプロジェクトID>"              # 例: "eo-re-d01-pr-asne1"
 export EO_GCP_PROJECT_NUMBER="<GCPプロジェクト番号>"         # 例: "123456789012"
 
 # GCP 組織（組織配下のプロジェクトの場合）
@@ -313,7 +313,7 @@ n8n が Cloud Run を呼び出すための認証キーを発行します。
 
 > **重要**: JSON キーはセキュリティ上 Terraform 管理外としています（state ファイルに秘密鍵を保存しないため）。
 
-1. GCP Console > IAM と管理 > サービス アカウント > `eo-gcp-sa-d01-oa2be-inv-ane1`
+1. GCP Console > IAM と管理 > サービス アカウント > `eo-gcp-sa-d01-oa2be-inv-asne1`
 2. 「鍵」タブ > 「キーを追加」 > 「新しい鍵を作成」 > **JSON** > 「作成」
 3. ダウンロードされた JSON ファイルを保管
    - ファイル名の後方を `-Oauth2_Invoker-jsonkey-yyyymmdd.json` のように変えておくとわかりやすい
@@ -326,16 +326,16 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions > Repository
 |--------------|-------------|------|
 | `EO_GCP_PROJECT_ID` | `terraform output gcp_project_id` | GCP プロジェクト ID |
 | `EO_GCP_WIF_PROVIDER_PATH` | `terraform output wif_provider_path` | WIF IdP（ID プロバイダ）の完全パス |
-| `EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL` | `terraform output deploy_sa_email` | Deployer SA のメールアドレス |
-| `EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL` | `terraform output runtime_sa_email` | Runtime SA のメールアドレス |
+| `EO_GCP_RUN_ASNE1_DEPLOY_SA_EMAIL` | `terraform output deploy_sa_email` | Deployer SA のメールアドレス |
+| `EO_GCP_RUN_ASNE1_RUNTIME_SA_EMAIL` | `terraform output runtime_sa_email` | Runtime SA のメールアドレス |
 
 **`terraform output` の出力例（GitHub Secrets に登録する値）:**
 
 ```
-gcp_project_id      = "eo-re-d01-pr-ane1"
+gcp_project_id      = "eo-re-d01-pr-asne1"
 wif_provider_path   = "projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/providers/eo-gcp-idp-gh-oidc-wif-d01"
-deploy_sa_email     = "eo-gcp-sa-d01-deploy-ane1@eo-re-d01-pr-ane1.iam.gserviceaccount.com"
-runtime_sa_email    = "eo-gcp-sa-d01-runtime-ane1@eo-re-d01-pr-ane1.iam.gserviceaccount.com"
+deploy_sa_email     = "eo-gcp-sa-d01-deploy-asne1@eo-re-d01-pr-asne1.iam.gserviceaccount.com"
+runtime_sa_email    = "eo-gcp-sa-d01-runtime-asne1@eo-re-d01-pr-asne1.iam.gserviceaccount.com"
 ```
 
 **一括確認:**
@@ -353,7 +353,7 @@ Terraform で作成した Cloud Run サービスにはプレースホルダー�
 > **注意**: GitHub Actions のワークフロー実行は **GUI（GitHub Web UI）からのみ** 対応しています。CLI（`gh workflow run` 等）からの実行は、デプロイ先やオプションの誤選択を防ぐため現状では使用していません。
 
 1. GitHub リポジトリ > **Actions** タブ
-2. 左サイドバー > **Deploy GCP Cloud Run ane1**
+2. 左サイドバー > **Deploy GCP Cloud Run asne1**
 3. 「Run workflow」> ブランチ `main` を選択
 4. extension オプション:
    - `Enable security extension (eo.security.*)` — デフォルトtrue（推奨）
@@ -364,7 +364,7 @@ Terraform で作成した Cloud Run サービスにはプレースホルダー�
 
 ```bash
 # Cloud Run サービスの状態確認
-gcloud run services describe eo-re-d01-cloudrun-ane1 \
+gcloud run services describe eo-re-d01-cloudrun-asne1 \
   --region asia-northeast1 \
   --format='value(status.url)'
 ```
@@ -381,10 +381,10 @@ terraform output cloud_run_service_url
 1. n8n > Personal > Credentials > Create Credential
 2. Credential Type: `Google Service Account API`
 3. 設定:
-   - Name: `EO_RE_GCP_RUN_ane1_OAuth2_Invoker_SA`
+   - Name: `EO_RE_GCP_RUN_asne1_OAuth2_Invoker_SA`
    - Region: `asia-northeast1`
    - STEP 3-2 でダウンロードした JSON キーの内容を転記
-   - **Service Account Email**: OAuth2 Invoker SA（`eo-gcp-sa-d01-oa2be-inv-ane1`）の JSON キー内 `client_email` の値を入力
+   - **Service Account Email**: OAuth2 Invoker SA（`eo-gcp-sa-d01-oa2be-inv-asne1`）の JSON キー内 `client_email` の値を入力
    - **Private Key**: JSON キー内の `private_key` フィールドの改行文字（`\n`）を含めた**そのままの形式**で貼り付け
    - **Set up for use in HTTP Request node**: 有効化
    - **Scope(s)**: `https://www.googleapis.com/auth/iam`（IAM API へのアクセス用）
@@ -427,7 +427,7 @@ GCP Cloud Run 固有の設定:
 - **Method**: `POST`
 - **URL**: `<Cloud Run サービス URL>/requestengine_tail`
   - STEP 5-2 で確認したサービス URL に `/requestengine_tail` を付加
-  - 例: `https://eo-re-d01-cloudrun-ane1-xxxxxxxxxx-an.a.run.app/requestengine_tail`
+  - 例: `https://eo-re-d01-cloudrun-asne1-xxxxxxxxxx-an.a.run.app/requestengine_tail`
 - **Authentication**: なし（ヘッダーで直接指定するため）
 - **Send Headers**: 有効化（4件）
 
@@ -467,7 +467,7 @@ GCP Cloud Run 固有の設定:
 | `project_prefix` | `eo` | プロジェクトプレフィックス |
 | `component` | `re` | コンポーネント識別子（Request Engine） |
 | `environment` | `d01` | 環境識別子（d01, p01 等） |
-| `region_short` | `ane1` | リージョン短縮名 |
+| `region_short` | `asne1` | リージョン短縮名 |
 | **GCP 設定** |||
 | `gcp_project_id` | (入力必須) | GCP プロジェクト ID |
 | `gcp_project_number` | (入力必須) | GCP プロジェクト番号 |
@@ -521,9 +521,9 @@ GCP Cloud Run 固有の設定:
 1. n8n Credentials の JSON キーが正しいか確認
 2. OAuth2 Invoker SA に Cloud Run Invoker ロールが必要な場合がある:
    ```bash
-   gcloud run services add-iam-policy-binding eo-re-d01-cloudrun-ane1 \
+   gcloud run services add-iam-policy-binding eo-re-d01-cloudrun-asne1 \
      --region=asia-northeast1 \
-     --member="serviceAccount:eo-gcp-sa-d01-oa2be-inv-ane1@$EO_GCP_PROJECT_ID.iam.gserviceaccount.com" \
+     --member="serviceAccount:eo-gcp-sa-d01-oa2be-inv-asne1@$EO_GCP_PROJECT_ID.iam.gserviceaccount.com" \
      --role="roles/run.invoker"
    ```
 
@@ -541,7 +541,7 @@ GCP Cloud Run 固有の設定:
 terraform {
   backend "gcs" {
     bucket = "<YOUR_STATE_BUCKET>"
-    prefix = "terraform/gcp-cloudrun-ane1"
+    prefix = "terraform/gcp-cloudrun-asne1"
   }
 }
 ```

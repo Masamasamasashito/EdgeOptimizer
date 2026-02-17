@@ -1,4 +1,4 @@
-// Request Engine Instance config: ../instances/funcapp001.yml
+// Request Engine Instance config: ../instances/funcapp001.env
 // ==============================================================================
 // Edge Optimizer - Azure Functions Request Engine Infrastructure
 // ==============================================================================
@@ -15,7 +15,7 @@
 //
 // POST-DEPLOYMENT STEPS:
 // 1. Update Key Vault secret value with N8N_EO_REQUEST_SECRET from EO_Infra_Docker/.env
-// 2. Set GitHub Secrets (EO_AZ_FUNC_JPEAST_DEPLOY_ENTRA_APP_ID_FOR_GITHUB, EO_AZ_TENANT_ID, etc.)
+// 2. Set GitHub Secrets (EO_AZ_FUNC_JPE_DEPLOY_ENTRA_APP_ID_FOR_GITHUB, EO_AZ_TENANT_ID, etc.)
 // 3. Assign 'Web Site Contributor' role to Entra ID Application on Resource Group
 // 4. Create IAM user 'Key Vault Secrets Officer' for secret management (if needed)
 //
@@ -43,13 +43,13 @@ param environment string = 'd01'
 
 @description('Region short name for resource naming')
 @allowed([
-  'jpeast'    // Japan East
-  'jpwest'    // Japan West
-  'eastus'    // East US
-  'westus'    // West US
-  'westeu'    // West Europe
+  'jpe'       // Japan East
+  'jpw'       // Japan West
+  'eus'       // East US
+  'wus'       // West US
+  'weu'       // West Europe
 ])
-param regionShort string = 'jpeast'
+param regionShort string = 'jpe'
 
 // --- Azure Settings ---
 @description('Azure region for deployment')
