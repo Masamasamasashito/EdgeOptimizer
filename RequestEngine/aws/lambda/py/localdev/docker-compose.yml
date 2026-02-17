@@ -24,15 +24,20 @@ services:
     # container_name: lambda-layer-container
     logging: *default-logging
     volumes:
+      # 生成物はdockerの母艦ホストの RequestEngine/aws/lambda/py/funcfiles/ に作成されます
+      # 左側の ../ は RequestEngine/aws/lambda/py/ を指す。右側の /lambda-layer はコンテナ内のパス
       - ..:/lambda-layer
     # 実行時に実行される処理
     command: >
       /bin/bash -c "
+        echo '================PYTHON VERSION================' &&
+        python --version &&
+        echo '==============================================' &&
         mkdir -p /opt/python &&
         pip install --no-cache-dir -t /opt/python requests &&
         mkdir -p /lambda-layer/funcfiles &&
         cd /opt &&
-        zip -r /lambda-layer/funcfiles/requests-py314-slim-layer.zip .
+        zip -r /lambda-layer/funcfiles/requests-python-slim-layer.zip .
       "
 #---------------------------------------------------------------------------
 # volumes

@@ -51,7 +51,7 @@
 
 ## STEP 1: 事前準備（CFnデプロイ前）
 
-### 1-1. Lambda Layer の作成
+### 1-1. Lambda Layer 作成
 
 Lambda Layer は CloudFormation デプロイ**前**に手動で作成する必要があります。
 
@@ -66,32 +66,44 @@ Lambda Layer は CloudFormation デプロイ**前**に手動で作成する必�
 # 1. ディレクトリ移動
 cd RequestEngine/aws/lambda/py/localdev
 
-# 2. WSL2 Ubuntu 起動
+# 2. (ローカルにDockerがインストールされていない場合)WSL2 Ubuntu 起動
 wsl -d Ubuntu
 
 # 3. Docker Compose で Layer zip 作成
 docker compose run --rm lambda_layer_builder
 
-# 4. WSL 終了
+# 4. 実行結果の初期の方にpythonバージョンが表示される
+# CFn実行時に必要なため、メモしておく
+# バージョン固定は`EO_RequestEngine/aws/lambda/py/localdev/env.example`を複製した`.env`の`COMMON_LAMBDA_LAYER_DOCKER_IMAGE_TAG`で`python3.14-slim`のように指定可能
+# Edge Optimizer のDockerは、各種バージョンをすべて.envで管理出来るようになっています。
+
+# 5. (ローカルにDockerがインストールされていない場合)WSL 終了
 exit
 ```
 
-作成された zip ファイル: `funcfiles/requests-py314-slim-layer.zip`
+作成された zip ファイル: `EO_RequestEngine/aws/lambda/py/funcfiles/requests-python-slim-layer.zip`
 
 **AWS コンソールで Layer を作成:**
 
 1. Lambda > レイヤー > 「レイヤーを作成」
-2. 名前: `eo-re-d01-lambda-py314-slim-layer`
-3. zip ファイルをアップロード
-4. 互換性のあるランタイム: `Python 3.14`
-5. 「作成」をクリック
-6. **ARN をメモ**（例: `arn:aws:lambda:ap-northeast-1:123456789012:layer:eo-re-d01-lambda-py314-slim-layer:1`）
+2. 名前: `eo-re-d01-lambda-python-slim-layer`
+3. 説明:  `Python 3.14 yyyymmdd v1`
+    - Lambda Layer 作成時に確認したpythonバージョンと、バージョン番号を記載しておく。 バージョン毎に説明文を変えることで、バージョン管理が容易になる。
+4. zip ファイルをアップロード
+5. 互換性のあるアーキテクチャ: `x86_64`
+6. 互換性のあるランタイム: `Python 3.14`
+7. 「作成」をクリック
+8. **バージョンARN をメモ**（例: `arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:layer:eo-re-d01-lambda-python-slim-layer:1`）
 
 詳細手順: [LAMBDA_README.md](LAMBDA_README.md) の Section 8-9 参照
 
 ### 1-2. GitHub OIDC Provider の確認
 
+Github ActionsでAWSにデプロイする際に、OIDC Providerが必要になります。
+
 **重要**: AWS アカウントに既存の GitHub OIDC Provider がある場合、テンプレートの修正が必要です。
+
+AWS IAMのIDプロバイダは、グローバルリソースなので、リージョンごとに作成する必要はありません。
 
 **確認方法:**
 1. AWS コンソール > IAM > ID プロバイダ
@@ -110,35 +122,39 @@ exit
 ### 2-1. AWS コンソールからデプロイ
 
 1. AWS コンソール > CloudFormation > 「スタックの作成」
-2. 「新しいリソースを使用（標準）」を選択
-3. 「テンプレートファイルのアップロード」で `eo-aws-cfnstack.yml` を選択
-4. スタック名: `eo-re-d01-lambda-apne1-stack`（任意）
-5. パラメータを入力:
+2. 「既存のテンプレートを選択」を選択
+3. 「テンプレートソース」で「テンプレートファイルのアップロード」を選択
+4. 「テンプレートファイルのアップロード」で `RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml` を選択
+5. 次へ
+6. スタック名: `eo-re-d01-lambda-apne1-stack-yyyymmdd-001`（任意）
+7. パラメータを入力:
 
 | パラメータ | 値 | 備考 |
 |-----------|-----|------|
-| AWSAccountId | `123456789012` | 12桁のAWSアカウントID |
-| AWSRegion | `ap-northeast-1` | デプロイ先リージョン |
+| AWSAccountId | `<AWSアカウントID>` | 12桁のAWSアカウントID |
+| Region Short Name | `apne1` | デプロイ先リージョン（短縮名） |
+| AWSRegion | `ap-northeast-1` | デプロイ先リージョン（フルネーム）  |
+| PythonRuntime | `python3.14` | Lambdaランタイム |
 | GitHubOrg | `your-org` | GitHub組織名またはユーザー名 |
 | GitHubRepo | `your-repo` | リポジトリ名 |
-| LambdaLayerName | `eo-re-d01-lambda-py314-slim-layer` | STEP 1-1 で作成した Layer 名 |
+| LambdaLayerName | `eo-re-d01-lambda-python-slim-layer` | STEP 1-1 で作成した Layer 名 |
 
-6. 「次へ」> 「次へ」
-7. 「AWS CloudFormation によって IAM リソースが作成される場合があることを承認します」にチェック
-8. 「送信」
+8. 「次へ」> 「次へ」
+9. 「AWS CloudFormation によって IAM リソースが作成される場合があることを承認します」にチェック
+10. 「送信」
 
 ### 2-2. AWS CLI からデプロイ
 
 ```bash
 aws cloudformation create-stack \
-  --stack-name eo-re-d01-lambda-apne1-stack \
+  --stack-name eo-re-d01-lambda-apne1-stack-yyyymmdd-001 \
   --template-body file://eo-aws-cfnstack.yml \
   --parameters \
-    ParameterKey=AWSAccountId,ParameterValue=123456789012 \
+    ParameterKey=AWSAccountId,ParameterValue=<AWSアカウントID> \
     ParameterKey=AWSRegion,ParameterValue=ap-northeast-1 \
     ParameterKey=GitHubOrg,ParameterValue=your-org \
     ParameterKey=GitHubRepo,ParameterValue=your-repo \
-    ParameterKey=LambdaLayerName,ParameterValue=eo-re-d01-lambda-py314-slim-layer \
+    ParameterKey=LambdaLayerName,ParameterValue=eo-re-d01-lambda-python-slim-layer \
   --capabilities CAPABILITY_NAMED_IAM \
   --region ap-northeast-1
 ```
@@ -211,7 +227,7 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 
 **ARN の確認:**
 - AWS コンソール > CloudFormation > スタック > 出力タブ > `GitHubActionsDeployRoleArn`
-- 例: `arn:aws:iam::123456789012:role/eo-re-d01-lambda-apne1-ghactions-deploy-iamr`
+- 例: `arn:aws:iam::<AWSアカウントID>:role/eo-re-d01-lambda-apne1-ghactions-deploy-iamr`
 
 **GitHub への設定:**
 1. GitHub リポジトリ > Settings > Secrets and variables > Actions
@@ -225,23 +241,102 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 `.github/workflows/deploy-to-aws-lambda-apne1.yml` が設定済みであることを確認してください。
 
 詳細: [LAMBDA_README.md](LAMBDA_README.md) の「github workflow AWS Lambda自動デプロイ」セクション参照
-
 ---
 
 ## STEP 6: n8n ワークフローノード設定
 
-STEP 4 で Credential と #280AWS ノードの設定が完了しました。次に、ワークフローを実行するために必要なノード設定を行います。
+STEP 4 で Credential と #280AWS ノードの設定が完了しました。次に、ワークフローを実行するために必要なノ### 3-5. n8n ワークフロー設定（重要！）
 
-**👉 [N8N_NODE_SETUP.md](../n8n/N8N_NODE_SETUP.md)** を参照してください。
+**`EO_n8nWorkflow_Json/eo-n8n-workflow-jp.json` のピンク色スティッキーノートの設定①から⑧と⑩を実施してください。**
 
-以下の設定を行います（全 Request Engine 共通）：
+以下に、ワークフロー内の設定手順を抜粋します（詳細は n8n 画面内の付箋を確認してください）。
 
-1. **#010 XMLサイトマップURL設定** — Warmup対象サイトのサイトマップURLを設定
-2. **#015-020 DNS認証設定** — ドメイン所有権のDNS TXTレコード検証を設定
-3. **#180 Request Engine 設定** — クラウド・リージョン・言語を設定
-4. **動作確認** — ワークフローをテスト実行
+#### **設定① 010 Step.0 Starter by XML sitemap**
+- **XMLサイトマップURL記載**
+- Start by XML sitemapノードをダブルクリック。右上の鉛筆マークをクリックして、XMLサイトマップURLを以下形式のJSONで書き換えてください。
+```json
+[
+    {
+        "Website" : "https://sample.com/sitemap.xml"
+    }
+]
+```
+
+#### **設定② #015-020 DNS認証設定**
+- ドメイン所有権のDNS TXTレコード検証を設定します。
+- **DNSレコード追加**:
+    - ホスト名: `_eo-dns-txt-auth.sample.com`
+        - ※ご自身のドメインに合わせて変更してください
+    - 値 (内容): 任意のランダムな文字列 (例: `eo-dns-txt-value-check-sampletxt`)
+- **n8nノード設定**:
+    - **020 DNS TXT Check**: 「DNSTXT_TOKEN」の Value に、上記で設定した値 (`eo-dns-txt-value-check-sampletxt`) を設定します。
+- **目的**: 誤って管理外のドメインへ大量リクエストを送らないための安全装置です。
+
+#### **設定③ 125-1 HTTP Req to MainDoc URL locs through Playwright**
+- Playwrightによるヘッドレスブラウザ（dockerコンテナ）を使わない場合、`125-2 HTTP Req to MainDoc URL locs without Playwright` に入れ替えてください。
+- **注意**: Playwrightを使わない場合、JavaScriptによる動的生成コンテンツのリンクが取得できず、Target URLリスト抽出網羅性が下がります。
+
+#### **設定④ 140 Resource URLs Discovery from DOM**
+- 取得したDOMデータから、正規表現やDOM解析を用いて「サブリンク（画像、CSS、JSなど）」を抽出します。
+- **ドメインホワイトリスト**の設定を確認し、意図しない外部ドメインへのリクエストを防ぐ設定になっているか確認してください。
+
+#### **設定⑤ 155 Excluded Patterns Filter**
+- `/wp-admin/` や `contact` 、特殊なBlob URLなど、リクエストしたくないパスを除外設定します。
+- 必要に応じて「部分一致」や「完全一致」の条件を追加してください。
+
+#### **設定⑥ 175 Assign UserAgents**
+- アセット用とメインドキュメント用で適切な User-Agent を設定します。
+- **重要**: UA無しは想定されていないため、必ず1つ以上設定してください。
+
+#### **設定⑦ 180 RequestEngine Settings**
+- クラウド種別、エリア、言語設定を定義します。
+- 例:
+    - `AwsLambda_ap-northeast-1` / `ja,ja-JP...`
+    - `CloudflareWorkers_global` / ...
+- ここで定義した `type_area` を後続の **225 Switcher** で使用します。
+
+#### **設定⑧ 225 RequestEngine Switcher**
+- **本n8nワークフローのインテリジェンス層です。**
+- 「どのリクエストを」「どこから（どのクラウド/エリア）」送るかを決定します。
+- **重要**: 今回作成した AWS Lambda (ap-northeast-1) を利用するために、`AwsLambda_ap-northeast-1` へのルーティング設定が有効になっていることを確認してください。
+
+#### **設定⑨ 235 Get IDtoken [今回はスキップ]**
+- Google Cloud Run を使用しない場合は設定不要です。
+
+#### **設定⑩ 280系 RequestEngine設定**
+- 各クラウド（AWS Lambda, Azure Functions, Cloudflare Workers, GCP Cloud Run）へリクエストを送るノードの設定です。
+- **今回構築した Lambdaの設定**:
+    - ノード `280AWS-ap-northeast1 RequestEngine` を開く
+    - **Authentication**: `Header Auth` を選択
+    - **Header Auth**: STEP 3-4 で設定した `Header Auth` (IAM Access Key) を選択
+    - **URL**: STEP 3-1 でメモした API Gateway のURL、または Lambda 関数URLを入力
+        - ※ 本構成では `lambda:InvokeFunction` を直接叩く場合、n8n の AWS Lambda ノードを使用しますが、このワークフローは HTTP Request ノードで統一されているため、通常は **Function URL (関数URL)** を発行して設定するか、API Gateway経由で設定します。
+        - **補足**: `eo-aws-cfnstack.yml` では IAM User を作成しましたが、Function URL は作成していません。
+            - **方法A (推奨)**: Lambda コンソール > 設定 > 関数URL > 「関数URLを作成」 > 認証タイプ `AWS_IAM` を選択。このURLを n8n の URL 欄に設定。
+            - **方法B**: n8n の `AWS Lambda` ノードに置き換えて、Function Name を指定して実行（要ワークフロー修正）。
+    - **Headers**:
+        - `x-aws-lambda-token`: `{{ $json.tokenCalculatedByN8n }}` (変更不要)
+
+設定が完了したら、n8n 画面右上の「Save」を押して保存してください。
+
+
+## STEP 7: github actions workflow実行
+
+まだ、AWS Lambdaにデプロイしていないので、github actions workflowは実行できません。
+github actions workflowでデプロイします。
+
+1. 該当リポジトリのgithub で > (タブ)Actions
+2. (左メニュー)All workflows > (ワークフロー名) Deploy AWS Lambda
+3. Run workflow
+4. (ドロップダウン)main
+5. Run workflow
+6. workflow完了を確認する
 
 ---
+
+## STEP 8: n8n workflow実行
+
+Lambdaだけ実行可能な状態です。Lambda以外を使わない場合、180 RequestEngine Settingsノードで非該当のrequestEngineListをコメントアウトするか、削除してください。※おすすめはメンテナンス性を考慮して、コメントアウトです。
 
 ## パラメータ一覧
 
@@ -257,7 +352,7 @@ STEP 4 で Credential と #280AWS ノードの設定が完了しました。次�
 | AWSRegion | `ap-northeast-1` | デプロイ先リージョン |
 | **Lambda設定** |||
 | PythonRuntime | `python3.14` | Pythonランタイムバージョン |
-| LambdaLayerName | `eo-re-d01-lambda-py314-slim-layer` | Lambda Layer 名 |
+| LambdaLayerName | `eo-re-d01-lambda-python-slim-layer` | Lambda Layer 名 |
 | LambdaLayerVersion | `1` | Lambda Layer バージョン |
 | LambdaTimeout | `30` | タイムアウト（秒） |
 | LambdaMemorySize | `128` | メモリサイズ（MB） |

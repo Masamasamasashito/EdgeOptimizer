@@ -221,7 +221,7 @@ eo-re-d01-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作�
 - **用途**: Python `requests` パッケージを Lambda Layer 用 zip ファイルとしてビルド
 - **サービス名**: `lambda_layer_builder`
 - **ベースイメージ**: `python:slim`（zip + pip 付き）
-- **出力先**: `funcfiles/requests-py314-slim-layer.zip`
+- **出力先**: `funcfiles/requests-python-slim-layer.zip`
 - **本番デプロイ**: GitHub Actions（`.github/workflows/deploy-py-to-aws-lambda.yml`）で実行。この Docker 環境は Layer ビルドのみに使用
 
 ```
@@ -261,8 +261,8 @@ exit
 
 1. Lambda の レイヤー
 2. レイヤーを作成
-   - `eo-re-d01-lambda-py314-slim-layer`
-3. 「カスタムレイヤー」→ さきほど作った `funcfiles/requests-py314-slim-layer.zip` を選択
+   - `eo-re-d01-lambda-python-slim-layer`
+3. 「カスタムレイヤー」→ さきほど作った `RequestEngine/aws/lambda/py/funcfiles/requests-python-slim-layer.zip` を選択
 4. 作成
 5. ARNをメモる
 6. Lambda関数へ
