@@ -7,7 +7,7 @@
 # Request Engine Instance config: ../instances/cloudrun001.yml
 # Service name: eo-re-d01-cloudrun-ane1
 # Authentication: OAuth2 Bearer (no allUsers IAM binding - requires valid ID token)
-# Reference: ../../../../.github/workflows/deploy-py-to-gcp-cloudrun.yml for deployment configuration
+# Reference: ../../../../../.github/workflows/deploy-py-to-gcp-cloudrun.yml for deployment configuration
 
 resource "google_cloud_run_v2_service" "request_engine" {
   project  = var.gcp_project_id

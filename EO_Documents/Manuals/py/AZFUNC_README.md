@@ -254,7 +254,7 @@ winget install Microsoft.Azure.FunctionsCoreTools
 ```
 # ローカルDockerでAzure Functions 初期化/開発環境構築
 
-[\<プロジェクトルートディレクトリ>\RequestEngine\azure\functions\jpeast](\<プロジェクトルートディレクトリ>\RequestEngine\azure\functions\jpeast)
+[\<プロジェクトルートディレクトリ>\RequestEngine\azure\functions\py](\<プロジェクトルートディレクトリ>\RequestEngine\azure\functions\py)
 
 - [Dockerfile](Dockerfile)
 - [docker-compose.yml](docker-compose.yml) 
@@ -270,7 +270,7 @@ winget install Microsoft.Azure.FunctionsCoreTools
 **開発済3ファイルなどが有る場合に、`func init . --python`を実行したい場合、既存ファイルを退避してから実行してください。**
 ### 初回セットアップ手順(基本的にリポジトリクローン時は不要。手順4以降を実行してください。)
 
-- `cd RequestEngine\azure\functions\jpeast`
+- `cd RequestEngine\azure\functions\py`
 - `mkdir funcfiles`
 - `cp env.example .env`
 - .env を編集する
@@ -311,7 +311,7 @@ winget install Microsoft.Azure.FunctionsCoreTools
 
 既に`funcfiles/`ディレクトリにファイルが存在する場合：
 
-1. `cd RequestEngine\azure\functions\jpeast`
+1. `cd RequestEngine\azure\functions\py`
 2. コンテナ中に入る
    - `docker compose run --rm azfunc_builder bash`
 3. 開発作業
@@ -531,7 +531,7 @@ GitHub Actionsを使用しない場合、または初回設定時：
 # ローカルDockerで一度ビルド／起動チェック
 
 ```
-cd RequestEngine\azure\functions\jpeast\funcfiles
+cd RequestEngine\azure\functions\py\funcfiles
 docker compose run --rm azfunc_builder bash
 func start
 ```
@@ -834,7 +834,7 @@ n8n の `280AZ-japan-east RequestEngine KeyVault` ノードで Azure Functions �
 ## デプロイ手順
 
 ```bash
-cd RequestEngine\azure\functions\jpeast\funcfiles
+cd RequestEngine\azure\functions\py\funcfiles
 func azure functionapp publish eo-re-d01-funcapp-jpeast --python
 ```
 
@@ -1131,7 +1131,7 @@ Azureへのデプロイ（コンテナの外でローカルpwsh7で行う）
 ## デプロイ手順
 
 ```bash
-cd RequestEngine\azure\functions\jpeast\funcfiles
+cd RequestEngine\azure\functions\py\funcfiles
 func azure functionapp publish eo-re-d01-funcapp-jpeast --python
 ```
 

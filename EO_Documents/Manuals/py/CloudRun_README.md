@@ -966,7 +966,7 @@ GitHub Actions 側の `google-github-actions/auth@v3` アクションにおい�
 
 GitHub Actionsワークフローは、`gcloud run deploy --source ./funcfiles`コマンドを使用してデプロイします。この方式の動作:
 
-1. **ソースコードの送信**: GitHub Actionsがリポジトリからチェックアウトした`RequestEngine\gcp\cloudrun\ane1\funcfiles`ディレクトリをCloud Buildに送信
+1. **ソースコードの送信**: GitHub Actionsがリポジトリからチェックアウトした`RequestEngine\gcp\cloudrun\py\funcfiles`ディレクトリをCloud Buildに送信
 2. **自動ビルド**: Cloud BuildがPythonビルドパックを使用して、Dockerfileなしで自動的にコンテナイメージをビルド
 3. **デプロイ**: ビルドされたコンテナイメージをCloud Runサービスにデプロイ
 
@@ -1202,7 +1202,7 @@ Last updated on 2026-01-22T04:27:12.501201Z by eo-gcp-sa-d01-deploy-ane1@<GCPプ
 https://eo-re-d01-cloudrun-ane1-<hash>-an.a.run.app/requestengine_tail
 ```
 
-**エンドポイントパス**： (`/requestengine_tail`)  [`RequestEngine\gcp\cloudrun\ane1\funcfiles\main.py`](RequestEngine\gcp\cloudrun\ane1\funcfiles\main.py) のソースコード内 `CLOUDRUN_ENDPOINT_PATH` 定数で定義されています。
+**エンドポイントパス**： (`/requestengine_tail`)  [`RequestEngine\gcp\cloudrun\py\funcfiles\main.py`](RequestEngine\gcp\cloudrun\py\funcfiles\main.py) のソースコード内 `CLOUDRUN_ENDPOINT_PATH` 定数で定義されています。
 
 # 認証設定（Cloud Runサービスデプロイ後）
 
