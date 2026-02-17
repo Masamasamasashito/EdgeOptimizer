@@ -158,7 +158,7 @@ function createErrorResponse(
   const payload = buildFlatResult({
     statusCode: status,
     statusMessage: reason.toUpperCase(),
-    duration_ms: context.duration_ms || 0,
+    durationMs: context.durationMs || 0,
     targetUrl: context.targetUrl || "",
     httpRequestNumber: context.httpRequestNumber || "None",
     httpRequestUUID: context.httpRequestUUID,
@@ -202,7 +202,7 @@ export default {
     // Initialize Context (For preserving info on error)
     const context: ExecutionContextState = {
       fromArea: area,
-      duration_ms: 0,
+      durationMs: 0,
       executionId,
       requestStartTimestamp,
     };
@@ -239,7 +239,7 @@ export default {
       // ------------------------------------------------
       // Check URL
       if (!warmupReq.targetUrl) {
-        context.duration_ms = performance.now() - start_time;
+        context.durationMs = performance.now() - start_time;
         return createErrorResponse(
           400,
           "missing_url",
@@ -252,7 +252,7 @@ export default {
       // Note: env.CFWORKER_REQUEST_SECRET is already in-memory (loaded at Worker startup),
       // so no API calls or caching mechanism is needed (unlike other platforms).
       if (!env.CFWORKER_REQUEST_SECRET) {
-        context.duration_ms = performance.now() - start_time;
+        context.durationMs = performance.now() - start_time;
         return createErrorResponse(
           500,
           "missing_secret",
@@ -263,7 +263,7 @@ export default {
 
       // Check Token Existence
       if (!warmupReq.tokenCalculatedByN8n) {
-        context.duration_ms = performance.now() - start_time;
+        context.durationMs = performance.now() - start_time;
         return createErrorResponse(
           401,
           "missing_token",
@@ -280,7 +280,7 @@ export default {
         env.CFWORKER_REQUEST_SECRET,
       );
       if (warmupReq.tokenCalculatedByN8n !== tokenCalculatedByCloudSecret) {
-        context.duration_ms = performance.now() - start_time;
+        context.durationMs = performance.now() - start_time;
         return createErrorResponse(
           401,
           "invalid_token",
@@ -315,16 +315,16 @@ export default {
       // (Receive WarmupResultData from Target URL)
       // ==================================================================
       // 1. Measure TTFB (When await fetch completes)
-      const ttfb_end = performance.now();
-      const measured_ttfb = ttfb_end - start_time;
+      const ttfbEnd = performance.now();
+      const measuredTtfb = ttfbEnd - start_time;
 
       // 2. Download Body & Measure Size
       const bodyBuffer = await resp.arrayBuffer();
-      const measured_body_size = bodyBuffer.byteLength;
+      const measuredBodySize = bodyBuffer.byteLength;
 
       // 3. Measure Duration (Download complete)
-      const end_time = performance.now();
-      const measured_duration = end_time - start_time;
+      const endTime = performance.now();
+      const measuredDuration = endTime - start_time;
 
       // 4. Redirect count (Workers API only exposes boolean)
       const redirectCount = resp.redirected ? 1 : 0;
@@ -340,9 +340,9 @@ export default {
         statusMessage: resp.statusText,
 
         // Pass measurements
-        duration_ms: measured_duration,
-        ttfb_ms: measured_ttfb,
-        content_length_bytes: measured_body_size,
+        durationMs: measuredDuration,
+        ttfbMs: measuredTtfb,
+        contentLengthBytes: measuredBodySize,
 
         targetUrl: warmupReq.targetUrl,
         httpRequestNumber: warmupReq.httpRequestNumber,
@@ -369,7 +369,7 @@ export default {
       });
     } catch (e: unknown) {
       // Fetch Execution Error (DNS error, timeout, etc.)
-      context.duration_ms = performance.now() - start_time;
+      context.durationMs = performance.now() - start_time;
       const errorText = String(e);
 
       return createErrorResponse(

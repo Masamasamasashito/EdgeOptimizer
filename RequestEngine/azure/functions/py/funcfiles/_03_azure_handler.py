@@ -13,7 +13,7 @@
 # - HTTP Method: POST (GET is not implemented)
 # - JSON Body: { targetUrl, tokenCalculatedByN8n, headersForTargetUrl, httpRequestNumber, httpRequestUUID, httpRequestRoundID }
 #   * targetUrl: Target URL to warm up (required)
-#   * tokenCalculatedByN8n: SHA-256(url + request secret) calculated in n8n using EO_Infra_Docker/.env N8N_EO_REQUEST_SECRET (required)
+#   * token_calculated_by_n8n: SHA-256(url + request secret) calculated in n8n using EO_Infra_Docker/.env N8N_EO_REQUEST_SECRET (required)
 #   * headersForTargetUrl: Optional custom headers for target URL request (object)
 #   * httpRequestNumber: Optional request sequence number
 #   * httpRequestUUID: Optional UUID for each request (created by n8n)
@@ -208,7 +208,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
         # Extract request data
         # ==================================================================
         target_url = data.get("targetUrl") or ""
-        n8n_requestsecret_token = data.get("tokenCalculatedByN8n")
+        token_calculated_by_n8n = data.get("tokenCalculatedByN8n")
         http_request_number = data.get("httpRequestNumber")
         http_request_uuid = data.get("httpRequestUUID")
         http_request_round_id = data.get("httpRequestRoundID")
@@ -252,8 +252,8 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
         # ==================================================================
         try:
             kv_request_secret = _get_kv_request_secret()
-            tokenCalculatedByCloudSecret = _calc_token(target_url, kv_request_secret)
-            if n8n_requestsecret_token == tokenCalculatedByCloudSecret:
+            token_calculated_by_cloud_secret = _calc_token(target_url, kv_request_secret)
+            if token_calculated_by_n8n == token_calculated_by_cloud_secret:
                 # Token verification successful: continue processing
                 pass
             else:
@@ -321,7 +321,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
         # ==================================================================
         # Execute HTTP request (with retry)
         # ==================================================================
-        # Initial_Response_ms (TTFB) measurement
+        # initial_response_ms (TTFB) measurement
         # stream=True makes requests.get() return at headers-received (before body download)
         http_request_start_time = time.time()
         try:
@@ -338,7 +338,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                 # TTFB measurement (stream=True: headers already received, body not yet downloaded)
                 # ==================================================================
                 ttfb_end = time.time()
-                Initial_Response_ms = (ttfb_end - http_request_start_time) * 1000
+                initial_response_ms = (ttfb_end - http_request_start_time) * 1000
 
                 # ==================================================================
                 # Get HTTP protocol version (connection still open with stream=True)
@@ -380,7 +380,7 @@ def requestengine_func(req: func.HttpRequest) -> func.HttpResponse:
                     status_code=response.status_code,
                     status_message=response.reason or "OK",
                     duration_ms=duration_ms,
-                    Initial_Response_ms=Initial_Response_ms,
+                    initial_response_ms=initial_response_ms,
                     content_length_bytes=content_length,
                     target_url=target_url,
                     http_request_number=http_request_number,

@@ -20,8 +20,8 @@ export interface Env {
 // Matches RequestEngine/funcfiles/common/py/request_engine_core.py _determine_resource_type() output
 export interface ResourceInfo {
   urltype: string | null;
-  url_extension: string | null;
-  resource_category: string | null;
+  urlExtension: string | null;
+  resourceCategory: string | null;
 }
 
 // Normalized request data structure
@@ -40,9 +40,9 @@ export interface WarmupRequest {
 export interface ExecutionResultParams {
   statusCode: number;
   statusMessage: string;
-  duration_ms: number;
-  ttfb_ms?: number;
-  content_length_bytes?: number;
+  durationMs: number;
+  ttfbMs?: number;
+  contentLengthBytes?: number;
   targetUrl: string;
   httpRequestNumber: string | number;
   httpRequestUUID?: string | null;
@@ -78,7 +78,7 @@ export interface ExtensionConfig {
 // Error context state (information preserved when an error occurs)
 export interface ExecutionContextState extends Partial<ExecutionResultParams> {
   fromArea: string;
-  duration_ms: number;
+  durationMs: number;
 }
 
 // Error reason definitions

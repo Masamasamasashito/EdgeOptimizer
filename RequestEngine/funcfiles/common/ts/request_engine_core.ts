@@ -229,15 +229,15 @@ export function determineResourceType(
 ): ResourceInfo {
   const resourceInfo: ResourceInfo = {
     urltype,
-    url_extension: null,
-    resource_category: null,
+    urlExtension: null,
+    resourceCategory: null,
   };
 
   const ext = getUrlExtension(url);
-  resourceInfo.url_extension = ext;
+  resourceInfo.urlExtension = ext;
 
   if (urltype === "main_document") {
-    resourceInfo.resource_category = "html";
+    resourceInfo.resourceCategory = "html";
   } else if (urltype === "asset") {
     const imageExts = ["jpg", "jpeg", "gif", "png", "webp", "avif", "svg", "ico"];
     const cssExts = ["css"];
@@ -246,20 +246,20 @@ export function determineResourceType(
     const videoExts = ["mp4", "webm", "ogg", "mov"];
 
     if (ext && imageExts.includes(ext)) {
-      resourceInfo.resource_category = "image";
+      resourceInfo.resourceCategory = "image";
     } else if (ext && cssExts.includes(ext)) {
-      resourceInfo.resource_category = "css";
+      resourceInfo.resourceCategory = "css";
     } else if (ext && jsExts.includes(ext)) {
-      resourceInfo.resource_category = "js";
+      resourceInfo.resourceCategory = "js";
     } else if (ext && fontExts.includes(ext)) {
-      resourceInfo.resource_category = "font";
+      resourceInfo.resourceCategory = "font";
     } else if (ext && videoExts.includes(ext)) {
-      resourceInfo.resource_category = "video";
+      resourceInfo.resourceCategory = "video";
     } else {
-      resourceInfo.resource_category = "other";
+      resourceInfo.resourceCategory = "other";
     }
   } else if (urltype === "exception") {
-    resourceInfo.resource_category = "exception";
+    resourceInfo.resourceCategory = "exception";
   }
 
   return resourceInfo;
@@ -446,9 +446,9 @@ export function buildFlatResult(params: ExecutionResultParams): JsonRecord {
   const {
     statusCode,
     statusMessage,
-    duration_ms,
-    ttfb_ms,
-    content_length_bytes,
+    durationMs,
+    ttfbMs,
+    contentLengthBytes,
     targetUrl,
     httpRequestNumber,
     httpRequestUUID,
@@ -534,14 +534,14 @@ export function buildFlatResult(params: ExecutionResultParams): JsonRecord {
   // 6. Measurements
   //    Matches RequestEngine/funcfiles/common/request_engine_core.py _build_flat_result()
   // ==================================================================
-  if (duration_ms !== undefined) {
-    result["eo.meta.duration-ms"] = Math.round(duration_ms * 100) / 100;
+  if (durationMs !== undefined) {
+    result["eo.meta.duration-ms"] = Math.round(durationMs * 100) / 100;
   }
-  if (ttfb_ms !== undefined) {
-    result["eo.meta.ttfb-ms"] = Math.round(ttfb_ms * 100) / 100;
+  if (ttfbMs !== undefined) {
+    result["eo.meta.ttfb-ms"] = Math.round(ttfbMs * 100) / 100;
   }
-  if (content_length_bytes !== undefined) {
-    result["eo.meta.actual-content-length"] = content_length_bytes;
+  if (contentLengthBytes !== undefined) {
+    result["eo.meta.actual-content-length"] = contentLengthBytes;
   }
   result["eo.meta.redirect-count"] = redirectCount ?? 0;
 
@@ -587,10 +587,10 @@ export function buildFlatResult(params: ExecutionResultParams): JsonRecord {
   // ==================================================================
   // 10. Complement content-length header
   // ==================================================================
-  if (content_length_bytes !== undefined) {
+  if (contentLengthBytes !== undefined) {
     const clKey = "headers.response-headers.content-length";
     if (!(clKey in result) || !result[clKey]) {
-      result[clKey] = String(content_length_bytes);
+      result[clKey] = String(contentLengthBytes);
     }
   }
 

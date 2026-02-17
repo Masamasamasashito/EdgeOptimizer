@@ -475,7 +475,7 @@ def _build_flat_result(
     status_code: int,
     status_message: str,
     duration_ms: float,
-    Initial_Response_ms: Optional[float] = None,
+    initial_response_ms: Optional[float] = None,
     content_length_bytes: Optional[int] = None,
     target_url: str,
     http_request_number: Optional[Any] = None,
@@ -557,8 +557,8 @@ def _build_flat_result(
     # ==================================================================
     if duration_ms is not None:
         ordered_result["eo.meta.duration-ms"] = round(duration_ms, 2)
-    if Initial_Response_ms is not None:
-        ordered_result["eo.meta.ttfb-ms"] = round(Initial_Response_ms, 2)
+    if initial_response_ms is not None:
+        ordered_result["eo.meta.ttfb-ms"] = round(initial_response_ms, 2)
     if content_length_bytes is not None:
         ordered_result["eo.meta.actual-content-length"] = content_length_bytes
     ordered_result["eo.meta.redirect-count"] = redirect_count
