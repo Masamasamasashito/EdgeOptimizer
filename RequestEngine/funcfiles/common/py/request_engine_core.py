@@ -103,7 +103,7 @@ _CDN_DETECTION_CONFIG = [
 # 各拡張機能は _ext_*.py ファイルで定義され、デプロイ時にマージされる
 #
 # 拡張機能の追加方法:
-# 1. RequestEngine/common/extensions/_ext_<name>.py を作成
+# 1. RequestEngine/funcfiles/common/extensions/_ext_<name>.py を作成
 # 2. ファイル内で EXTENSION_NAME, EXTENSION_PREFIX, build_output() を定義
 # 3. ファイル末尾で register_extension() を呼び出す
 # 4. GitHub Actions のマージスクリプトに新しいファイルを追加

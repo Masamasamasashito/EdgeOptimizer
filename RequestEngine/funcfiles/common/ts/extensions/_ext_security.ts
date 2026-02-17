@@ -16,7 +16,7 @@
  * - Referrer-Policy
  * - Permissions-Policy
  *
- * Matches RequestEngine/common/extensions/_ext_security.py
+ * Matches RequestEngine/funcfiles/common/extensions/_ext_security.py
  */
 
 import { registerExtension } from "../request_engine_core";
@@ -24,7 +24,7 @@ import type {
   JsonRecord,
   StringRecord,
   ExtensionContext,
-} from "../../../cf/workers/ts/funcfiles/src/_01_types";
+} from "../../../../cf/workers/ts/funcfiles/src/_01_types";
 
 const EXTENSION_NAME = "security";
 const EXTENSION_PREFIX = "eo.security.";

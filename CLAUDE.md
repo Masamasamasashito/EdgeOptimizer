@@ -91,8 +91,8 @@ EX) AWS Lambda
     - Before: Monolithic code with all logic in a single file
     - After: `RequestEngine\aws\lambda\py\funcfiles\_03_aws_lambda_handler.py` for AWS Lambda specific handler , Verify n8n secret and cloudsecret
     - After: `RequestEngine\aws\lambda\py\funcfiles\_01_imports.py` for imports
-    - After: `RequestEngine\common\py\request_engine_core.py` for shared core logic
-    - After: `RequestEngine\common\py\extensions` directory for shared utilities (`_ext_security.py`)
+    - After: `RequestEngine\funcfiles\common\py\request_engine_core.py` for shared core logic
+    - After: `RequestEngine\funcfiles\common\py\extensions` directory for shared utilities (`_ext_security.py`)
     - After: `RequestEngine\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
 
 ## Request Engine Data Flow

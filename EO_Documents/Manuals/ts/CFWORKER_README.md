@@ -259,7 +259,7 @@ Python版 Request Engine（AWS Lambda / Azure Functions / GCP Cloud Run）の `c
 ## Python版（参考）
 
 ```
-RequestEngine/common/                          ← 全プラットフォーム共通（Python）
+RequestEngine/funcfiles/common/                          ← 全プラットフォーム共通（Python）
 ├── request_engine_core.py                     ← 共通コアロジック
 └── extensions/
     └── _ext_security.py                       ← security 拡張
@@ -274,7 +274,7 @@ Python版はワークフローで `cat` コマンドにより `_ext_*.py` を直
 ## CF Workers版
 
 ```
-RequestEngine/common/ts/                                ← CF Workers共通
+RequestEngine/funcfiles/common/ts/                                ← CF Workers共通
 ├── request_engine_core.ts                              ← 共通コアロジック（Python版 request_engine_core.py 相当）
 └── extensions/
     └── _ext_security.ts                                ← security 拡張（Python版 _ext_security.py 相当）
@@ -298,12 +298,12 @@ RequestEngine/cf/workers/ts/funcfiles/src/  ← プラットフォーム固有
 // Extension imports that register themselves with the extension registry.
 // Matches Python: GitHub Actions cat-merge of extensions/_ext_*.py
 
-import "../../../common/extensions/_ext_security";
+import "../../../../../funcfiles/common/ts/extensions/_ext_security";
 ```
 
 ## Extension の追加方法
 
-1. `RequestEngine/common/ts/extensions/_ext_<name>.ts` を作成
+1. `RequestEngine/funcfiles/common/ts/extensions/_ext_<name>.ts` を作成
 2. ファイル内で `registerExtension()` を呼び出す（自己登録パターン）
 3. `.github/workflows/deploy-ts-to-cf-worker.yml` に以下を追加:
    - `workflow_dispatch.inputs` に `ext_<name>` ブール入力を追加

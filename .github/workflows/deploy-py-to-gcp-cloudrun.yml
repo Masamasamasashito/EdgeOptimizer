@@ -4,7 +4,7 @@ on:
 #   push:
 #     paths:
 #       - 'RequestEngine/gcp/cloudrun/py/funcfiles/**'
-#       - 'RequestEngine/common/py/**'
+#       - 'RequestEngine/funcfiles/common/py/**'
 #     branches:
 #       - main
   workflow_dispatch:
@@ -53,8 +53,8 @@ jobs:
         run: |
           mkdir -p deploy_package
           SRC_DIR="RequestEngine/gcp/cloudrun/py/funcfiles"
-          COMMON_DIR="RequestEngine/common/py"
-          EXT_DIR="RequestEngine/common/py/extensions"
+          COMMON_DIR="RequestEngine/funcfiles/common/py"
+          EXT_DIR="RequestEngine/funcfiles/common/py/extensions"
 
           # Create header comment
           {

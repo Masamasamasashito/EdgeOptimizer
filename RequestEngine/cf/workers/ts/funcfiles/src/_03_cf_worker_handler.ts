@@ -45,7 +45,7 @@ import {
   prepareRequestHeaders,
   buildFlatResult,
   determineResourceType,
-} from "../../../../common/ts/request_engine_core";
+} from "../../../../../funcfiles/common/ts/request_engine_core";
 
 // Side-effect import: registers extensions into the extension registry
 import "./_02_extensions";

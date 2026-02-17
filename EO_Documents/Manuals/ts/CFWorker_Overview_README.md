@@ -60,7 +60,7 @@ npm run deploy
 Python版 Request Engine の `common/` + プラットフォーム固有ハンドラー構造を TypeScript で再現。
 
 ```
-RequestEngine/common/ts/                                ← CF Workers共通
+RequestEngine/funcfiles/common/ts/                                ← CF Workers共通
 ├── request_engine_core.ts                              ← 共通コアロジック
 └── extensions/
     └── _ext_security.ts                                ← security 拡張

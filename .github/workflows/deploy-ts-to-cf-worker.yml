@@ -9,7 +9,7 @@ on:
 #       - 'RequestEngine/cf/workers/ts/funcfiles/package-lock.json'
 #       - 'RequestEngine/cf/workers/ts/funcfiles/tsconfig.json'
 #       - 'RequestEngine/cf/workers/ts/funcfiles/build.mjs'
-#       - 'RequestEngine/common/ts/**'
+#       - 'RequestEngine/funcfiles/common/ts/**'
 #       # if you want to trigger workflow when you change deploy-ts-to-cf-worker.yml
 #       # - '.github/workflows/deploy-ts-to-cf-worker.yml'
 
@@ -65,7 +65,7 @@ jobs:
 
           # Security extension
           if [ "$EXT_SECURITY" == "true" ]; then
-            echo 'import "../../../../../common/ts/extensions/_ext_security";' >> "$EXT_FILE"
+            echo 'import "../../../../../funcfiles/common/ts/extensions/_ext_security";' >> "$EXT_FILE"
             echo "  [INCLUDED] _ext_security.ts"
           else
             echo "  [EXCLUDED] _ext_security.ts"
