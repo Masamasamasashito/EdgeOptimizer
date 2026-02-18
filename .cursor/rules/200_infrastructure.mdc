@@ -1,14 +1,14 @@
 ---
-description: クラウド各社のIaCツール使い分けと環境変数の管理ルール
-globs: {infra/**, **/*.tf, **/*.bicep, .github/workflows/**, wrangler.toml}
+description: クラウド各社のIaCツール（CFn, Bicep, Terraform, Wrangler）の使い分け
+globs: {**/*.tf, **/*.bicep, **/*.yaml, **/wrangler.toml, .github/workflows/**/*}
 ---
 
-# プラットフォーム別ツール定義
-- **AWS:** CloudFormation (CFn) / SecretsManager
-- **Azure:** Bicep / KeyVault
-- **GCP:** Terraform / Secret Manager
-- **Cloudflare:** wrangler / シークレット管理
+# IaC使い分け
+- **AWS:** CloudFormation (YAML) を使用。
+- **Azure:** Bicep を使用。
+- **GCP:** Terraform を使用。
+- **Cloudflare:** wrangler.toml を正とする。
 
-# 実装ルール
-- **共通化:** 手動構築とIaCデプロイの両方で利用するexport環境変数などは、必ず共通化すること。
-- **秘密情報:** 各社のマネージドシークレットサービス（KeyVault等）を優先利用し、コードへのハードコードを禁止する。
+# セキュリティ
+- シークレット情報はコードに直接書かず、各プラットフォームのマネージドサービスを参照する定義にすること。
+- GitHub Actionsのワークフローを修正する際は、デプロイ用環境変数の整合性を必ず確認すること。
