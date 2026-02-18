@@ -1,0 +1,15 @@
+---
+description: 各クラウド（AWS/Azure/GCP/CF）の関数実装ルール
+globs: RequestEngine/**/*
+---
+
+# 実装プロトコル
+- **環境変数の共通化:** 手動構築とIaC（CFn/Bicep/TF）で利用する環境変数は必ず共通の名称を使用し、ポータビリティを確保すること。
+- **n8n連携:** レスポンスのJSON構造を変更するとn8nのCSV化処理が壊れるため、キー名の変更は厳禁。
+- **構造:** Python等のインポート管理（例: `_01_imports.py`）など、既存の分割ルールに従うこと。
+
+# クラウド別ツール意識
+- **AWS:** Lambda / SecretsManager
+- **Azure:** Functions / KeyVault
+- **GCP:** Cloud Run / Secret Manager
+- **Cloudflare:** Workers / wrangler secrets

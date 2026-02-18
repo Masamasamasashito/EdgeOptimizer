@@ -1,0 +1,28 @@
+---
+description: プロジェクト全体の基本原則、言語、命名、コマンド実行、およびGit運用ルール
+globs: **/*
+alwaysApply: true
+---
+
+# プロジェクト基本方針
+AWS/Azure/GCP/Cloudflareを利用したマルチクラウド・サーバレスアーキテクチャ。
+GitHub Actionsでのデプロイと、self-hosted n8nによるCSVデータ処理が主軸。
+
+# 1. 命名と整合性の厳守
+- **Name Persistence:** 既存の変数名・関数名・エンドポイント名は変更厳禁。変更時は必ず事前提案し承諾を得ること。
+- **Naming Readability:** 新規命名は「初見で役割がわかること」を最優先。
+- **UI labels:** UI上のボタン名やラベル名は、手順書との整合性維持のため勝手に変更しない。
+
+# 2. Git運用ルール
+- **git commit を実行しないこと:** ユーザーが明示的に「コミットして」と依頼した場合を除き、`git commit` や `git add` を含むコマンドをターミナルで実行してはならない。
+- **提案に留める:** AIはコードの変更・編集の提案までを行い、コミット作業はユーザーが手動で行うことを前提とする。
+
+# 3. コミュニケーション
+- **Language Policy:** 思考（Thought）および出力（Output）はすべて「日本語」で行う。
+- **File Path References:** 参照時は必ずリポジトリルートからのフルパス（例: `RequestEngine/aws/lambda/py/funcfiles/_01_imports.py`）を記載すること。ファイル名単体は禁止。
+- **Approval:** 構造・ロジックの変更前には必ず案を提示し、承認を得ること。
+
+# 4. コマンド実行とタイムスタンプ
+- **Priority:** まず PowerShell で試行し、不可な場合のみ Python/npm を検討。
+- **Timestamp:** 返信の末尾に必ず以下のPowerShellコマンドを実行し、JST(UTC+9)の時刻を付与すること（許可不要）。
+  `Get-Date -Format "yyyy/MM/dd(ddd)HH:mm"`
