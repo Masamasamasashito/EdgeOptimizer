@@ -6,7 +6,7 @@
 
 CRAFTED BY [にしラボ / Nishi Labo](https://4649-24.com)
 
-## 🎬 エグゼクティブサマリ
+## 🎬 YOUTUBE
 
 https://youtu.be/XYEp38gtJlU
 
