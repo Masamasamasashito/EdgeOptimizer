@@ -6,11 +6,9 @@
 
 CRAFTED BY [にしラボ / Nishi Labo](https://4649-24.com)
 
-## 🎬 エグゼクティブサマリ動画
+## 🎬 エグゼクティブサマリ
 
-[![Edge Optimizer エグゼクティブサマリ](https://img.youtube.com/vi/XYEp38gtJlU/hqdefault.jpg)](https://youtu.be/XYEp38gtJlU)
-
-▶️ クリックして YouTube で視聴
+https://img.youtube.com/vi/XYEp38gtJlU
 
 ## What is Edge Optimizer?
 
@@ -43,7 +41,7 @@ n8n（ワークフローオーケストレーション）+ Playwright（ヘッ�
 | **バリアント対応** | ❌ 固定UA or 無配慮 | ✅ User-Agent/Accept-Language自由設定 |
 | **セキュリティ** | ⚠️ 簡易的 | ✅ 4層（DNS認証/クラウド認証/トークン照合/レート制御） |
 | **オーケストレーション** | ❌ なし | ✅ n8nでノーコード/ローコード自動化 |
-| **IaC** | ❌ なし | ✅ CloudFormation, Bicep, GitHub Actions |
+| **IaC** | ❌ なし | ✅ CloudFormation, Bicep, Terraform, GitHub Actions |
 
 ## 対応CDN
 
