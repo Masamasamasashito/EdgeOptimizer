@@ -8,7 +8,7 @@ CRAFTED BY [にしラボ / Nishi Labo](https://4649-24.com)
 
 ## 🎬 エグゼクティブサマリ
 
-https://img.youtube.com/vi/XYEp38gtJlU
+https://youtu.be/XYEp38gtJlU
 
 ## What is Edge Optimizer?
 
