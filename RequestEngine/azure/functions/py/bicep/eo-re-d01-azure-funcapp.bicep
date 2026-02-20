@@ -102,7 +102,7 @@ param softDeleteRetentionDays int = 7
 var functionAppName = '${projectPrefix}-${component}-${environment}-funcapp-${regionShort}'
 var keyVaultName = '${projectPrefix}-${component}-${environment}-kv-${regionShort}'
 var storageAccountName = '${projectPrefix}${component}${environment}storage'  // No hyphens, max 24 chars
-var appServicePlanName = 'ASP-${projectPrefix}${component}${environment}resourcegroup${regionShort}'
+var appServicePlanName = 'ASP-${projectPrefix}${component}${environment}resourcegrp${regionShort}'
 
 // Secret name (hyphens only, no underscores)
 var secretName = 'AZFUNC-REQUEST-SECRET'

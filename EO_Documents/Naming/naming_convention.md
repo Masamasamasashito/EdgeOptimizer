@@ -73,6 +73,14 @@ GitHub Actions ワークフローから `cat instances_conf/{file}.env >> $GITHU
 | `created_by` | 作成者/システムID | `nishilab` | 人間のユーザーID or システム名 |
 | `is_deleted` | 論理削除フラグ | `false` | true/false（物理削除しない運用） |
 
+** Azure のみのフィールド **
+| フィールド | 説明 | 例 | 備考 |
+|---|---|---|---|
+| `EO_AZ_TENANT_ID` | Azure AD テナント ID | `1234567890` | Azure AD テナント ID |
+| `EO_AZ_SUBSC_ID` | Azure サブスクリプションID | `1234567890` | Azure サブスクリプションID |
+
+
+
 ### クラウド4種の定義例
 
 **AWS Lambda** (`RequestEngine/aws/lambda/py/instances_conf/lambda001.env`)

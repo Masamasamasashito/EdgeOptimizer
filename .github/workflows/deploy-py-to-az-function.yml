@@ -130,7 +130,7 @@ jobs:
         with:
           client-id: ${{ secrets.EO_AZ_FUNC_JPE_DEPLOY_ENTRA_APP_ID_FOR_GITHUB }}
           tenant-id: ${{ secrets.EO_AZ_TENANT_ID }}
-          subscription-id: ${{ secrets.EO_AZURE_SUBSCRIPTION_ID }}
+          subscription-id: ${{ secrets.EO_AZ_SUBSC_ID }}
 
       # Deploy to Azure Functions using func command (Python v2 model)
       - name: Deploy to Azure Functions

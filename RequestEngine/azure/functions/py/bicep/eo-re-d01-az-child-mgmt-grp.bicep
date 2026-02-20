@@ -12,11 +12,11 @@
 // This template requires TENANT scope deployment:
 //   az deployment tenant create \
 //     --location japaneast \
-//     --template-file eo-re-d01-azure-mgmt-group.bicep \
+//     --template-file eo-re-d01-az-child-mgmt-grp.bicep \
 //     --parameters subscriptionId='<YOUR_SUBSCRIPTION_ID>'
 //
 // POST-DEPLOYMENT:
-// 1. Deploy eo-re-d01-azure-mgmt-group-policies.bicep for policy assignments
+// 1. Deploy eo-re-d01-az-child-mgmt-grp-policies.bicep for policy assignments
 // 2. Deploy eo-re-d01-azure-funcapp.bicep to resource group under this subscription
 //
 // ==============================================================================
@@ -36,7 +36,7 @@ param subscriptionId string
 // ==============================================================================
 
 // Management Group naming (fixed)
-var managementGroupName = 'eo-re-d01-azure-mgmt-group'
+var managementGroupName = 'eo-re-d01-az-child-mgmt-grp'
 var managementGroupDisplayName = 'Edge Optimizer RE D01 Management Group'
 
 // ==============================================================================
