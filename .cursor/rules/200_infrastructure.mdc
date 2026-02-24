@@ -9,6 +9,9 @@ globs: {**/*.tf, **/*.bicep, **/*.yaml, **/wrangler.toml, .github/workflows/**/*
 - **GCP:** Terraform を使用。
 - **Cloudflare:** wrangler.toml を正とする。
 
+# Azure Bicep の命名
+- 000 の命名方針に従う。パラメータ・変数名は該当マニュアル（例: `EO_Documents/Manuals/py/AZFUNC_BICEP_README.md`）の export 一覧・手順と一致させる。何用のリソース・ポリシーかが名前で分かるようにする。
+
 # セキュリティ
 - シークレット情報はコードに直接書かず、各プラットフォームのマネージドサービスを参照する定義にすること。
-- GitHub Actionsのワークフローを修正する際は、デプロイ用環境変数の整合性を必ず確認すること。
+- GitHub Actions のワークフローを修正する際は、デプロイ用環境変数の整合性を必ず確認すること。
