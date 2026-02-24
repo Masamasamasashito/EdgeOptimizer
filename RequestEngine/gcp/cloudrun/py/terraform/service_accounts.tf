@@ -4,7 +4,7 @@
 # Creates 3 Service Accounts with least-privilege IAM configuration.
 # Reference: EO_Documents/Manuals/py/CloudRun_README.md "Service Account合計5件の用途と権限" table
 #
-# SA naming: eo-gcp-sa-{env}-{role}-{region_short}
+# SA naming: eo-gsa-{env}-{role}-{region_short}
 # Constraint: SA ID must be 6-30 chars, lowercase alphanumeric + hyphens
 
 # ==============================================================================
@@ -12,7 +12,7 @@
 # ==============================================================================
 resource "google_service_account" "deployer" {
   project      = var.gcp_project_id
-  account_id   = "${var.project_prefix}-gcp-sa-${var.environment}-deploy-${local.region_short}"
+  account_id   = "${var.project_prefix}-gsa-${var.environment}-deploy-${local.region_short}"
   display_name = "EO GCP Deployer SA (${local.region_short})"
   description  = "GitHub Actions deploy agent for Cloud Run (WIF OIDC)"
 
@@ -65,7 +65,7 @@ resource "google_service_account_iam_member" "deployer_actAs_compute" {
 # ==============================================================================
 resource "google_service_account" "runtime" {
   project      = var.gcp_project_id
-  account_id   = "${var.project_prefix}-gcp-sa-${var.environment}-runtime-${local.region_short}"
+  account_id   = "${var.project_prefix}-gsa-${var.environment}-runtime-${local.region_short}"
   display_name = "EO GCP Cloud Run Runtime SA (${local.region_short})"
   description  = "Cloud Run runtime identity with Secret Manager access"
 
@@ -98,7 +98,7 @@ resource "google_service_account_iam_member" "runtime_actAs_deployer" {
 # ==============================================================================
 resource "google_service_account" "oauth2_invoker" {
   project      = var.gcp_project_id
-  account_id   = "${var.project_prefix}-gcp-sa-${var.environment}-oa2be-inv-${local.region_short}"
+  account_id   = "${var.project_prefix}-gsa-${var.environment}-oa2inv-${local.region_short}"
   display_name = "EO GCP OAuth2 Invoker SA (${local.region_short})"
   description  = "OAuth2 Bearer token auth for n8n to invoke Cloud Run"
 

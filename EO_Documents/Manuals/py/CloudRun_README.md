@@ -112,7 +112,7 @@ GCPは、組織を前提とした設計が必要です。
 
 ## サービスアカウントID文字制約等の制限事項と略語
 
-GCPはサービスアカウント命名で**IDは6〜30文字**。本ドキュメントでは御命名に合わせ、Deployer は `deploy`、OAuth2 Invoker は `oa2be-Inv`（IDは oa2be-inv）を使用（文字数チェック: `eo-gcp-sa-d01-deploy-asne1`=27文字、`eo-gcp-sa-d01-oa2be-inv-asne1`=30文字、いずれも6〜30の制限内）。
+GCPはサービスアカウント命名で**IDは6〜30文字**。本ドキュメントでは御命名に合わせ、Deployer は `deploy`、OAuth2 Invoker は `oa2inv`（IDは oa2inv）を使用（文字数チェック: `eo-gsa-d01-deploy-asne1`=27文字、`eo-gsa-d01-oa2inv-asne1`=30文字、いずれも6〜30の制限内）。
 
 1. 6文字以上、30文字以下
 2. 小文字の英字 ( a-z )、数字 ( 0-9 )、ハイフン ( - ) のみを使用
@@ -125,7 +125,7 @@ EOプロジェクト略語
 - pr : Project
 - re : Request Engine
 - sa : Service Account
-- oa2be-Inv : OAuth2 Bearer / Invoker（IDは30文字制限のため oa2be-inv を使用。Runtime と紛らわしいため run ではなく inv）
+- oa2inv : OAuth2 Bearer / Invoker（IDは30文字制限のため oa2inv を使用。Runtime と紛らわしいため run ではなく inv）
 - ghactions : GitHub Actions
 - asne1 : Asia Northeast1
 - d01 : dev01
@@ -137,10 +137,10 @@ EOプロジェクト略語
 | Service Account ID | 用途 | プロジェクトレベルロール(Action) | リソースレベルロール(Who)※オーナーロールを除く |
 | --- | --- | --- | --- |
 | `<GCPプロジェクトID>@appspot.gserviceaccount.com` | **App Engine デフォルト**<br>App Engine 有効化時に自動作成。App Engine アプリのデフォルトの実行主体。 | ●`roles/editor` (編集者) | ●`roles/editor` (編集者)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（編集者）。<br>2. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。 |
-| `<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` | **Compute Engine デフォルト**<br>Compute Engine API 有効化時に自動作成。VM・Cloud Build 等のデフォルトの実行主体。本構成ではイメージビルドと Cloud Run デプロイの実行者として利用。 | ●`roles/editor` (編集者) | ●`roles/editor` (編集者)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（編集者）。<br>2. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。<br>●`roles/iam.serviceAccountUser` (Compute Engine デフォルト SA のサービス アカウント ユーザー)<br>プリンシパル:<br>3. `serviceAccount:eo-gcp-sa-d01-deploy-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com` … **Deployer SA**（Compute Engine デフォルト SA のサービス アカウント ユーザー）。 |
-| `eo-gcp-sa-d01-runtime-asne1` | **実行主体（Cloud Run Runtime）＋ 照合用リクエストシークレット取得 (CloudRun_Runtime)**<br>Cloud RunリクエストエンジンがSecret Managerから照合用リクエストシークレットを取得するため | ●`roles/secretmanager.secretAccessor` (Secret Manager のシークレット アクセサー) | ●`roles/iam.serviceAccountUser` (Runtime SA のサービス アカウント ユーザー : Cloud Run の実行主体として Runtime SA をセットする権限)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（Runtime SA のサービス アカウント ユーザー）。イメージビルドと Cloud Run デプロイの実行主体。デプロイ時に「Cloud Run リクエストエンジンの実行 SA ＝ Runtime SA」を指定するため、Compute Engine デフォルト SA に Runtime SA を「使う」権限が必要。<br>2. `serviceAccount:eo-gcp-sa-d01-deploy-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com` … **Deployer SA**（Runtime SA のサービス アカウント ユーザー）。GitHub Actions が WIF でなりすまして(Impersonate)デプロイを指示する主体。デプロイ時に「Cloud Run リクエストエンジンの実行 SA ＝ Runtime SA」を指定するため、Deployer SA に Runtime SA を「使う」権限が必要。<br>●`roles/editor` (編集者)<br>プリンシパル:<br>3. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。 |
-| `eo-gcp-sa-d01-deploy-asne1` | **デプロイ担当 (Deployer)**<br>GitHub Actions で Workload Identity OIDC 認証を経て Cloud Run をビルド・デプロイ | ●`roles/artifactregistry.admin` (Artifact Registry 管理者。ソースデプロイで `cloud-run-source-deploy` リポジトリ自動作成に必須)<br>●`roles/artifactregistry.repoAdmin` (Artifact Registry リポジトリ管理者。`artifactregistry.repositories.create` は含まれない)<br>●`roles/cloudbuild.builds.editor` (Cloud Build 編集者)<br>●`roles/run.admin` (Cloud Run 管理者)<br>●`roles/serviceusage.serviceUsageConsumer` (Service Usage ユーザー。各APIをコールする権限)<br>●`roles/storage.admin` (ストレージ管理者) | ●`roles/editor` (編集者)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（編集者）。<br>2. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。<br>●`roles/iam.workloadIdentityUser` (Deployer SA の Workload Identity ユーザー)<br>プリンシパル:<br>3. `principalSet://iam.googleapis.com/projects/<GCPプロジェクト番号>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/attribute.repository/<Github組織名orユーザー名>/<Githubリポジトリ名>` … GitHub Actions からの WIF 紐付け。 |
-| `eo-gcp-sa-d01-oa2be-inv-asne1` | **OAuth2 Bearerトークン認証用 (OAuth2_Invoker)**<br>n8n HTTP RequestノードがリクエストエンジンCloud Runへ接続する際の認証。JSONキーを発行し、n8nのCredentialsに登録。 | 無し | ●`roles/editor` (編集者)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（編集者）。<br>2. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。<br>●`roles/iam.serviceAccountTokenCreator` (OAuth2 Invoker SA のサービス アカウント トークン作成者)<br>プリンシパル:<br>3. `serviceAccount:eo-gcp-sa-d01-oa2be-inv-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com` … **OAuth2 Invoker SA**（OAuth2 Invoker SA 自身へのトークン作成者。EOn8nWorkflowJson の n8n-workflow.json 内「235 Get IDtoken From GCP Service Account Access Token」ノードで ID トークンを受け取るため）。 |
+| `<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` | **Compute Engine デフォルト**<br>Compute Engine API 有効化時に自動作成。VM・Cloud Build 等のデフォルトの実行主体。本構成ではイメージビルドと Cloud Run デプロイの実行者として利用。 | ●`roles/editor` (編集者) | ●`roles/editor` (編集者)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（編集者）。<br>2. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。<br>●`roles/iam.serviceAccountUser` (Compute Engine デフォルト SA のサービス アカウント ユーザー)<br>プリンシパル:<br>3. `serviceAccount:eo-gsa-d01-deploy-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com` … **Deployer SA**（Compute Engine デフォルト SA のサービス アカウント ユーザー）。 |
+| `eo-gsa-d01-runtime-asne1` | **実行主体（Cloud Run Runtime）＋ 照合用リクエストシークレット取得 (CloudRun_Runtime)**<br>Cloud RunリクエストエンジンがSecret Managerから照合用リクエストシークレットを取得するため | ●`roles/secretmanager.secretAccessor` (Secret Manager のシークレット アクセサー) | ●`roles/iam.serviceAccountUser` (Runtime SA のサービス アカウント ユーザー : Cloud Run の実行主体として Runtime SA をセットする権限)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（Runtime SA のサービス アカウント ユーザー）。イメージビルドと Cloud Run デプロイの実行主体。デプロイ時に「Cloud Run リクエストエンジンの実行 SA ＝ Runtime SA」を指定するため、Compute Engine デフォルト SA に Runtime SA を「使う」権限が必要。<br>2. `serviceAccount:eo-gsa-d01-deploy-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com` … **Deployer SA**（Runtime SA のサービス アカウント ユーザー）。GitHub Actions が WIF でなりすまして(Impersonate)デプロイを指示する主体。デプロイ時に「Cloud Run リクエストエンジンの実行 SA ＝ Runtime SA」を指定するため、Deployer SA に Runtime SA を「使う」権限が必要。<br>●`roles/editor` (編集者)<br>プリンシパル:<br>3. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。 |
+| `eo-gsa-d01-deploy-asne1` | **デプロイ担当 (Deployer)**<br>GitHub Actions で Workload Identity OIDC 認証を経て Cloud Run をビルド・デプロイ | ●`roles/artifactregistry.admin` (Artifact Registry 管理者。ソースデプロイで `cloud-run-source-deploy` リポジトリ自動作成に必須)<br>●`roles/artifactregistry.repoAdmin` (Artifact Registry リポジトリ管理者。`artifactregistry.repositories.create` は含まれない)<br>●`roles/cloudbuild.builds.editor` (Cloud Build 編集者)<br>●`roles/run.admin` (Cloud Run 管理者)<br>●`roles/serviceusage.serviceUsageConsumer` (Service Usage ユーザー。各APIをコールする権限)<br>●`roles/storage.admin` (ストレージ管理者) | ●`roles/editor` (編集者)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（編集者）。<br>2. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。<br>●`roles/iam.workloadIdentityUser` (Deployer SA の Workload Identity ユーザー)<br>プリンシパル:<br>3. `principalSet://iam.googleapis.com/projects/<GCPプロジェクト番号>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/attribute.repository/<Github組織名orユーザー名>/<Githubリポジトリ名>` … GitHub Actions からの WIF 紐付け。 |
+| `eo-gsa-d01-oa2inv-asne1` | **OAuth2 Bearerトークン認証用 (OAuth2_Invoker)**<br>n8n HTTP RequestノードがリクエストエンジンCloud Runへ接続する際の認証。JSONキーを発行し、n8nのCredentialsに登録。 | 無し | ●`roles/editor` (編集者)<br>プリンシパル:<br>1. `serviceAccount:<GCPプロジェクト番号>-compute@developer.gserviceaccount.com` … **Compute Engine デフォルト SA**（編集者）。<br>2. `serviceAccount:<GCPプロジェクトID>@appspot.gserviceaccount.com` … **App Engine デフォルト SA**（編集者）。<br>●`roles/iam.serviceAccountTokenCreator` (OAuth2 Invoker SA のサービス アカウント トークン作成者)<br>プリンシパル:<br>3. `serviceAccount:eo-gsa-d01-oa2inv-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com` … **OAuth2 Invoker SA**（OAuth2 Invoker SA 自身へのトークン作成者。EOn8nWorkflowJson の n8n-workflow.json 内「235 Get IDtoken From GCP Service Account Access Token」ノードで ID トークンを受け取るため）。 |
 
 **GCPコンソールでの権限確認場所**
 
@@ -187,11 +187,11 @@ export APPENGINE_SA="${EO_GCP_PROJECT_ID}@appspot.gserviceaccount.com"
 # Compute Engine デフォルト
 export COMPUTEENGINE_SA="${EO_GCP_PROJECT_NUMBER}$-compute@developer.gserviceaccount.com"
 # 実行主体（Cloud Run Runtime）＋ 照合用リクエストシークレット取得 (CloudRun_Runtime)
-export RUNTIME_SA="eo-gcp-sa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export RUNTIME_SA="eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 # デプロイ担当 (Deployer)
-export DEPLOY_SA="eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export DEPLOY_SA="eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 # OAuth2 Bearerトークン認証用 (OAuth2_Invoker)
-export OAUTH2_INVOKER_SA="eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export OAUTH2_INVOKER_SA="eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 
 # 確認対象を指定 (例: CloudRun_Runtime の権限を確認したい場合)
 export TARGET_SA_EMAIL=$RUNTIME_SA
@@ -284,8 +284,8 @@ PowerShellから直接gcloudコマンドを実行して確認:
 ```powershell
 # 環境変数設定
 $env:EO_GCP_PROJECT_ID = "<GCPプロジェクトID>"
-$env:DEPLOY_SA = "eo-gcp-sa-d01-deploy-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-$env:RUNTIME_SA = "eo-gcp-sa-d01-runtime-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$env:DEPLOY_SA = "eo-gsa-d01-deploy-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$env:RUNTIME_SA = "eo-gsa-d01-runtime-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 
 # Deployer SAのプロジェクトレベルロール確認
 gcloud projects get-iam-policy $env:EO_GCP_PROJECT_ID `
@@ -652,34 +652,34 @@ export EO_GCP_PROJECT_NUMBER=$(gcloud projects describe $EO_GCP_PROJECT_ID --for
 
 # 1. サービスアカウントの作成
 # [Deployer]: デプロイ担当, [OAuth2_Invoker]: OAuth2認証担当, [CloudRun_Runtime]: 実行主体（リフレッシュトークンや照合用リクエストシークレット取得用）
-gcloud iam service-accounts create eo-gcp-sa-d01-deploy-asne1 --display-name="EO GCP Deployer SA (asne1)" --project=$EO_GCP_PROJECT_ID
-gcloud iam service-accounts create eo-gcp-sa-d01-oa2be-inv-asne1 --display-name="EO GCP OAuth2 Invoker SA (asne1)" --project=$EO_GCP_PROJECT_ID
-gcloud iam service-accounts create eo-gcp-sa-d01-runtime-asne1 --display-name="EO GCP Cloud Run Runtime SA (asne1)" --project=$EO_GCP_PROJECT_ID
+gcloud iam service-accounts create eo-gsa-d01-deploy-asne1 --display-name="EO GCP Deployer SA (asne1)" --project=$EO_GCP_PROJECT_ID
+gcloud iam service-accounts create eo-gsa-d01-oa2inv-asne1 --display-name="EO GCP OAuth2 Invoker SA (asne1)" --project=$EO_GCP_PROJECT_ID
+gcloud iam service-accounts create eo-gsa-d01-runtime-asne1 --display-name="EO GCP Cloud Run Runtime SA (asne1)" --project=$EO_GCP_PROJECT_ID
 
 # 2. プロジェクトレベルのロール付与
 # [Deployer SA] への権限（Cloud Run 管理、ビルド、ストレージ等）
-gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/run.admin"
-gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/cloudbuild.builds.editor"
-gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/serviceusage.serviceUsageConsumer"
-gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/storage.admin"
+gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/run.admin"
+gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/cloudbuild.builds.editor"
+gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/serviceusage.serviceUsageConsumer"
+gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/storage.admin"
 # 必須: ソースデプロイ時に cloud-run-source-deploy リポジトリを自動作成するため artifactregistry.repositories.create が必要。roles/artifactregistry.repoAdmin に含まれる。
-gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/artifactregistry.repoAdmin"
+gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/artifactregistry.repoAdmin"
 
 # [CloudRun_Runtime SA] への権限 (Secret Managerアクセス)
-gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gcp-sa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"
+gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID --member="serviceAccount:eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"
 
 # 3. リソースレベル（SA自体）の権限付与 (なりすまし許可 / actAs)
 # [CloudRun_Runtime SA] を [Cloud Build] および [Deployer SA] が「着れる」ようにする（デプロイ時に必要）
 # 注意: Cloud Run で SA を指定してデプロイする場合、実行者（Deployer SA）にこの権限が必要です。
 
 # Cloud Build(Runtime) サービスアカウントへの付与
-gcloud iam service-accounts add-iam-policy-binding eo-gcp-sa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
+gcloud iam service-accounts add-iam-policy-binding eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
     --member="serviceAccount:${EO_GCP_PROJECT_NUMBER}@cloudbuild.gserviceaccount.com" \
     --role="roles/iam.serviceAccountUser" --project=$EO_GCP_PROJECT_ID
 
 # Deployer サービスアカウントへの付与
-gcloud iam service-accounts add-iam-policy-binding eo-gcp-sa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
-    --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+gcloud iam service-accounts add-iam-policy-binding eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
+    --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
     --role="roles/iam.serviceAccountUser" \
     --project=$EO_GCP_PROJECT_ID
 ```
@@ -688,9 +688,9 @@ gcloud iam service-accounts add-iam-policy-binding eo-gcp-sa-d01-runtime-asne1@$
 
 1. **IAM と管理** > **サービス アカウント** を選択
 2. **「サービス アカウントを作成」** をクリックし、以下の3つを作成します：
-   - `eo-gcp-sa-d01-deploy-asne1` (表示名: EO GCP Deployer SA (asne1))
-   - `eo-gcp-sa-d01-oa2be-inv-asne1` (表示名: EO GCP OAuth2 Invoker SA (asne1))
-   - `eo-gcp-sa-d01-runtime-asne1` (表示名: EO GCP Cloud Run Runtime SA (asne1))
+   - `eo-gsa-d01-deploy-asne1` (表示名: EO GCP Deployer SA (asne1))
+   - `eo-gsa-d01-oa2inv-asne1` (表示名: EO GCP OAuth2 Invoker SA (asne1))
+   - `eo-gsa-d01-runtime-asne1` (表示名: EO GCP Cloud Run Runtime SA (asne1))
 3. **プロジェクトレベルのロール付与**:
    - **IAM と管理** > **IAM** を選択し、**「アクセスを許可」**（または **「メンバーを追加」**）をクリック
    - `deploy` [Deployer SA] に **`Cloud Run 管理者`**, **`Cloud Build 編集者`**, **`Service Usage コンシューマ`**, **`ストレージ管理者`**, **`Artifact Registry リポジトリ管理者`** を付与（**Artifact Registry リポジトリ管理者**はソースデプロイ時に `cloud-run-source-deploy` リポジトリを自動作成するために必須。付与しないと `artifactregistry.repositories.create` で 403 になる）
@@ -706,7 +706,7 @@ SA作成後、jsonキーのダウンロードが必要。
 
 ### 1. OAuth2_Invoker の JSONキー発行と n8n 登録
 - **鍵の発行**: 
-  1. `eo-gcp-sa-d01-oa2be-inv-asne1` の詳細画面 > **「鍵」** タブ > **「キーを追加」** > 「新しい鍵を作成」 > **JSON** > 「作成」
+  1. `eo-gsa-d01-oa2inv-asne1` の詳細画面 > **「鍵」** タブ > **「キーを追加」** > 「新しい鍵を作成」 > **JSON** > 「作成」
   2. ダウンロードされたJSONファイルを保管します。
       - ファイル名の後方を`-Oauth2_Invoker-jsonkey-yyyymmdd.json`のように変えておくとわかりやすい。
 - **n8n Credentialsへの設定**: 
@@ -788,7 +788,7 @@ gcloud iam workload-identity-pools providers create-oidc eo-gcp-idp-gh-oidc-wif-
 
 # 3. [Deployer SA] への権限委譲 (GitHub Identities との紐付け)
 gcloud iam service-accounts add-iam-policy-binding \
-  eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
+  eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
   --project=$EO_GCP_PROJECT_ID \
   --role="roles/iam.workloadIdentityUser" \
   --member="principalSet://iam.googleapis.com/projects/${EO_GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/attribute.repository/${EO_GCP_PROJECT_GITHUB_ORG_or_USER}/${EO_GCP_PROJECT_GITHUB_REPO}"
@@ -806,7 +806,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 
 **対処方法2: GUIから設定（推奨）**
 GUIでは権限が異なる場合があるため、以下で設定：
-1. **IAM と管理** > **サービス アカウント** > `eo-gcp-sa-d01-deploy-asne1` を選択
+1. **IAM と管理** > **サービス アカウント** > `eo-gsa-d01-deploy-asne1` を選択
 2. **「アクセス権を持つプリンシパル」** タブ > **「+ アクセスを許可」** をクリック
 3. **新しいプリンシパル**: `principalSet://iam.googleapis.com/projects/${EO_GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/attribute.repository/<Github組織名orユーザー名>/<Githubリポジトリ名>` を入力
 4. **ロール**: `Workload Identity ユーザー` (`roles/iam.workloadIdentityUser`) を選択
@@ -835,7 +835,7 @@ GUIでは権限が異なる場合があるため、以下で設定：
    - **重要**: 右辺の文字列リテラルはシングルクォート（`'`）で囲んでください。
 
 6. **Deployer SA への Workload Identity 権限付与**:
-   - **IAM と管理** > **サービス アカウント** > `eo-gcp-sa-d01-deploy-asne1` を選択
+   - **IAM と管理** > **サービス アカウント** > `eo-gsa-d01-deploy-asne1` を選択
    - **「アクセス権を持つプリンシパル」** タブ > **「+ アクセスを許可」** をクリック
    - **新しいプリンシパル**: `principalSet://iam.googleapis.com/projects/<EO_GCP_PROJECT_NUMBER>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/attribute.repository/<Github組織名orユーザー名>/<Githubリポジトリ名>` を入力（`<EO_GCP_PROJECT_NUMBER>` は実際のプロジェクト番号に置き換え）
    - **ロール**: `Workload Identity ユーザー` (`roles/iam.workloadIdentityUser`) を選択
@@ -846,13 +846,13 @@ GUIでは権限が異なる場合があるため、以下で設定：
 >
 > 1. **GitHub Actions 用の認証 (Workload Identity Federation)**:
 >    - **目的**: GitHub Actions から GCP にデプロイするための認証。
->    - **使用する SA**: **[Deployer SA]** (`eo-gcp-sa-d01-deploy-asne1`)
+>    - **使用する SA**: **[Deployer SA]** (`eo-gsa-d01-deploy-asne1`)
 >    - **構成**: Workload Identity Pool と Provider を使用。GitHub が発行する OIDC ID トークンを GCP STS (Security Token Service) が検証し、デプロイ用 SA の「一時的なアクセストークン」へと動的に実演（交換）します。
 >    - **接続元**: GitHub Actions ➔ **対象**: GCP API (Cloud Run デプロイ操作等)
 >
 > 2. **n8n からのリクエスト認証 (OAuth2 Bearer)**:
 >    - **目的**: n8n ワークフローから Cloud Run サービスを安全に呼び出すための認証。
->    - **使用する SA**: **[OAuth2_Invoker SA]** (`eo-gcp-sa-d01-oa2be-inv-asne1`)
+>    - **使用する SA**: **[OAuth2_Invoker SA]** (`eo-gsa-d01-oa2inv-asne1`)
 >    - **構成**: サービスアカウントの JSONキーを使用。n8n が IAM API から ID Token を取得し、リクエストヘッダーにセットします。
 >    - **接続元**: n8n ➔ **対象**: 稼働中の Cloud Run サービス
 >
@@ -869,8 +869,8 @@ GitHub リポジトリの **Settings** > **Secrets and variables** > **Actions**
 |:---|:---|:---|
 | `EO_GCP_PROJECT_ID` | GCP プロジェクト ID | `<GCPプロジェクトID>` |
 | `EO_GCP_WIF_PROVIDER_PATH` | **WIF プロバイダーの完全なパス**<br>※ID単体ではなく `projects/` から開始 | `projects/<EO_GCP_PROJECT_NUMBER>/locations/global/`<br>`workloadIdentityPools/eo-gcp-pool-wif-d01/`<br>`providers/eo-gcp-idp-gh-oidc-wif-d01` |
-| `EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL` | **デプロイ用 SA** のメールアドレス<br>※[Deployer SA] 用 | `eo-gcp-sa-d01-deploy-asne1@`<br>`<EO_GCP_PROJECT_ID>.iam.gserviceaccount.com` |
-| `EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL` | **Cloud Run 実行用 SA** のメールアドレス<br>※[Runtime SA] 用 | `eo-gcp-sa-d01-runtime-asne1@`<br>`<EO_GCP_PROJECT_ID>.iam.gserviceaccount.com` |
+| `EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL` | **デプロイ用 SA** のメールアドレス<br>※[Deployer SA] 用 | `eo-gsa-d01-deploy-asne1@`<br>`<EO_GCP_PROJECT_ID>.iam.gserviceaccount.com` |
+| `EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL` | **Cloud Run 実行用 SA** のメールアドレス<br>※[Runtime SA] 用 | `eo-gsa-d01-runtime-asne1@`<br>`<EO_GCP_PROJECT_ID>.iam.gserviceaccount.com` |
 
 **WIFプロバイダーパス取得**
 
@@ -889,7 +889,7 @@ gcloud iam workload-identity-pools providers list \
 
 ```
 gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID \
-  --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+  --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/artifactregistry.repoAdmin"
 ```
 
@@ -906,7 +906,7 @@ gcloud artifacts repositories create cloud-run-source-deploy \
 ```
 gcloud iam service-accounts add-iam-policy-binding \
   ${EO_GCP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com \
-  --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+  --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/iam.serviceAccountUser" \
   --project=$EO_GCP_PROJECT_ID
 ```
@@ -923,8 +923,8 @@ gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID \
 
 ```
 gcloud iam service-accounts add-iam-policy-binding \
-  eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
-  --member="serviceAccount:eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+  eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
+  --member="serviceAccount:eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/iam.serviceAccountTokenCreator" \
   --project=$EO_GCP_PROJECT_ID
 ```
@@ -1005,7 +1005,7 @@ flowchart LR
             N225 --> N235 --> N280
         end
         
-        SAO["OAuth2_Invoker SA<br/>(eo-gcp-sa-d01-oa2be-inv-asne1)"]
+        SAO["OAuth2_Invoker SA<br/>(eo-gsa-d01-oa2inv-asne1)"]
         SAO -.->|JSON Key 認証| N235
     end
 
@@ -1043,7 +1043,7 @@ flowchart LR
             Concurrency --> Flask["Flask アプリ<br/>(main.py)"]
         end
         
-        SAR["<b>Runtime SA</b><br/>(eo-gcp-sa-d01-runtime-asne1)"]
+        SAR["<b>Runtime SA</b><br/>(eo-gsa-d01-runtime-asne1)"]
         ServiceNode --> Master
         SAR -.->|Identity| Master
     end
@@ -1168,7 +1168,7 @@ Traffic:
 
 Scaling: Auto (Min: 0, Max: 12)
 
-Last updated on 2026-01-22T04:27:12.501201Z by eo-gcp-sa-d01-deploy-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com:
+Last updated on 2026-01-22T04:27:12.501201Z by eo-gsa-d01-deploy-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com:
   Revision eo-re-d01-cloudrun-asne1-00008-xxx
   Container None
     Image:           asia-northeast1-docker.pkg.dev/<GCPプロジェクトID>/cloud-run-source-deploy/eo-re-d01-cloudrun-asne1@sha256:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1184,7 +1184,7 @@ Last updated on 2026-01-22T04:27:12.501201Z by eo-gcp-sa-d01-deploy-asne1@<GCP�
       Timeout:       240s
       Failure threshold: 1
       Type:          Default
-  Service account:   eo-gcp-sa-d01-runtime-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com
+  Service account:   eo-gsa-d01-runtime-asne1@<GCPプロジェクトID>.iam.gserviceaccount.com
   Concurrency:       80
   Max instances:     10
   Timeout:           300s
@@ -1223,7 +1223,7 @@ OAuth2 Bearerトークン認証を使用するため、Oauth_Invoker SAを使用
 # このService AccountがCloud Runサービスを呼び出せるようになります
 gcloud run services add-iam-policy-binding eo-re-d01-cloudrun-asne1 \
   --region asia-northeast1 \
-  --member="serviceAccount:eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+  --member="serviceAccount:eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
   --role="roles/run.invoker" \
   --project=$EO_GCP_PROJECT_ID
 ```
@@ -1234,7 +1234,7 @@ gcloud run services add-iam-policy-binding eo-re-d01-cloudrun-asne1 \
 2. `eo-re-d01-cloudrun-asne1` を選択
 3. **「アクセス権を持つプリンシパル」** タブを選択
 4. **「+ アクセスを許可」** をクリック
-5. **新しいプリンシパル**: `eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com` を入力
+5. **新しいプリンシパル**: `eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com` を入力
 6. **ロールを割り当てる**: `Cloud Run サービス起動元` (`roles/run.invoker`) を選択
 7. **「保存」** をクリック
 
@@ -1284,7 +1284,7 @@ gcloud run services describe eo-re-d01-cloudrun-asne1 \
 2. **Credential Type**: `Google Service Account API` を選択
 3. **Name**: `EO_RE_GCP_Func_asianortheast1_ServiceAccount` など
 4. **Region**: asne1（`asia-northeast1`）を選択
-5. **Service Account Email**: JSONキー内の`client_email`を入力（例: `eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com`）
+5. **Service Account Email**: JSONキー内の`client_email`を入力（例: `eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com`）
 6. **Private Key**: JSONキー内の`private_key`フィールドを**そのまま**貼り付け（`\n`を含む）
 7. **Set up for use in HTTP Request node**: 有効化
 8. **Scope(s)**: `https://www.googleapis.com/auth/iam` を入力（IAM APIへのアクセス用）
@@ -1303,7 +1303,7 @@ OAuth2 Bearer認証を使用するには、n8nワークフローでID Tokenを�
    ```
    https://iaeodentials.googleapis.com/v1/projects/-/serviceAccounts/<SERVICE_ACCOUNT_EMAIL>:generateIdToken
    ```
-   - `<SERVICE_ACCOUNT_EMAIL>`を実際のOIDCのOauth2_Invoker SAのService Account Emailに置き換え（例: `eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com`）
+   - `<SERVICE_ACCOUNT_EMAIL>`を実際のOIDCのOauth2_Invoker SAのService Account Emailに置き換え（例: `eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com`）
 4. **Authentication**: `Predefined Credential Type`
 5. **Credential Type**: `Google Service Account API`
 6. 上記で作成したCredentialを選択
@@ -1909,7 +1909,7 @@ token = hashlib.sha256(f"{url}{secret}".encode()).hexdigest()
    - **`EO_GCP_WIF_PROVIDER_PATH`** … WIF プロバイダーの完全パス  
      例: `projects/<GCPプロジェクト番号>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/providers/eo-gcp-idp-gh-oidc-wif-d01`
    - **`EO_GCP_RUN_ANE1_DEPLOY_SA_EMAIL`** … デプロイ用 SA のメール  
-     例: `eo-gcp-sa-d01-deploy-asne1@PROJECT_ID.iam.gserviceaccount.com`
+     例: `eo-gsa-d01-deploy-asne1@PROJECT_ID.iam.gserviceaccount.com`
    - **`EO_GCP_PROJECT_ID`** … GCP プロジェクト ID
    - **`EO_GCP_RUN_ANE1_RUNTIME_SA_EMAIL`** … Cloud Run 実行用 SA のメール（ワークフローで `EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL` に使う場合）
 3. 保存後、ワークフローを再実行する。
@@ -2010,7 +2010,7 @@ ERROR: (gcloud.iam.service-accounts.add-iam-policy-binding) PERMISSION_DENIED: P
    - `roles/editor`（プロジェクトエディター）
    - `roles/iam.serviceAccountAdmin`（サービスアカウント管理者）
 2. **GUIから設定（推奨）**: gcloudコマンドではなく、Google Cloud Console GUIから設定:
-   - **IAM と管理** > **サービス アカウント** > `eo-gcp-sa-d01-deploy-asne1` を選択
+   - **IAM と管理** > **サービス アカウント** > `eo-gsa-d01-deploy-asne1` を選択
    - **「アクセス権を持つプリンシパル」** タブ > **「+ アクセスを許可」** をクリックし、**新しいプリンシパル** に `principalSet://iam.googleapis.com/projects/<EO_GCP_PROJECT_NUMBER>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/attribute.repository/<Github組織名orユーザー名>/<Githubリポジトリ名>` を入力
    - **ロール**: `Workload Identity ユーザー` (`roles/iam.workloadIdentityUser`) を選択 > **保存**
 
@@ -2022,25 +2022,25 @@ PERMISSION_DENIED: Permission 'iam.serviceaccounts.actAs' denied on service acco
 ```
 
 **原因と解決方法**:
-- **原因**: Deployer SA (`eo-gcp-sa-d01-deploy-asne1`) に、Runtime SA (`eo-gcp-sa-d01-runtime-asne1`) を「なりすまし（actAs）」する権限が付与されていない
+- **原因**: Deployer SA (`eo-gsa-d01-deploy-asne1`) に、Runtime SA (`eo-gsa-d01-runtime-asne1`) を「なりすまし（actAs）」する権限が付与されていない
   - **解決**: 以下のコマンドで、Runtime SAのリソースレベル権限として、Deployer SAに`roles/iam.serviceAccountUser`を付与:
     ```bash
     export EO_GCP_PROJECT_ID="<GCPプロジェクトID>"
     
     # Deployer SA に Runtime SA の actAs 権限を付与
     gcloud iam service-accounts add-iam-policy-binding \
-      eo-gcp-sa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
-      --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+      eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
+      --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
       --role="roles/iam.serviceAccountUser" \
       --project=$EO_GCP_PROJECT_ID
     ```
   - **確認**: 権限が正しく付与されたか確認:
     ```bash
     gcloud iam service-accounts get-iam-policy \
-      eo-gcp-sa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
+      eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com \
       --project=$EO_GCP_PROJECT_ID
     ```
-    - 出力に`serviceAccount:eo-gcp-sa-d01-deploy-asne1@...`が`roles/iam.serviceAccountUser`ロールで表示されていればOK
+    - 出力に`serviceAccount:eo-gsa-d01-deploy-asne1@...`が`roles/iam.serviceAccountUser`ロールで表示されていればOK
 
 ### エラー: "Permission 'artifactregistry.repositories.create' denied" (デプロイ時)
 
@@ -2057,10 +2057,10 @@ PERMISSION_DENIED: Permission 'artifactregistry.repositories.create' denied on r
   export EO_GCP_PROJECT_ID="<GCPプロジェクトID>"   # 実際のプロジェクトIDに置換
 
   gcloud projects add-iam-policy-binding $EO_GCP_PROJECT_ID \
-    --member="serviceAccount:eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
+    --member="serviceAccount:eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com" \
     --role="roles/artifactregistry.repoAdmin"
   ```
-- **GUI**: **IAM と管理** > **IAM** > 該当プロジェクトで「アクセスを許可」> プリンシパルに `eo-gcp-sa-d01-deploy-asne1@<PROJECT_ID>.iam.gserviceaccount.com`、ロールに「Artifact Registry リポジトリ管理者」を追加。
+- **GUI**: **IAM と管理** > **IAM** > 該当プロジェクトで「アクセスを許可」> プリンシパルに `eo-gsa-d01-deploy-asne1@<PROJECT_ID>.iam.gserviceaccount.com`、ロールに「Artifact Registry リポジトリ管理者」を追加。
 
 ### エラー: "Container failed to start"
 

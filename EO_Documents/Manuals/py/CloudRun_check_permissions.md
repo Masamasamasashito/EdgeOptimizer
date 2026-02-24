@@ -83,9 +83,9 @@ bash check_service_account_permissions.sh
 # 環境変数設定
 $env:EO_GCP_PROJECT_ID = "eo-re-d01-pr-asne1"
 $env:EO_GCP_PROJECT_NUMBER = "<GCPプロジェクト番号>"
-$DEPLOY_SA = "eo-gcp-sa-d01-deploy-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-$RUNTIME_SA = "eo-gcp-sa-d01-runtime-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-$OAUTH2_INVOKER_SA = "eo-gcp-sa-d01-oa2be-inv-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$DEPLOY_SA = "eo-gsa-d01-deploy-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$RUNTIME_SA = "eo-gsa-d01-runtime-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$OAUTH2_INVOKER_SA = "eo-gsa-d01-oa2inv-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 $COMPUTE_DEFAULT_SA = "${env:EO_GCP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 # 1. Deployer SAのプロジェクトレベルロール確認

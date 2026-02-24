@@ -12,9 +12,9 @@ export EO_GCP_CLOUD_RUN_SERVICE_NAME="${EO_GCP_CLOUD_RUN_SERVICE_NAME:-eo-re-d01
 export EO_GCP_REGION="${EO_GCP_REGION:-asia-northeast1}"
 
 # Service Account Email
-export DEPLOY_SA="eo-gcp-sa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-export OAUTH2_INVOKER_SA="eo-gcp-sa-d01-oa2be-inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-export RUNTIME_SA="eo-gcp-sa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export DEPLOY_SA="eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export OAUTH2_INVOKER_SA="eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export RUNTIME_SA="eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 export COMPUTE_DEFAULT_SA="${EO_GCP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 echo "=========================================="

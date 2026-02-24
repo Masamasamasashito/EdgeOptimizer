@@ -92,9 +92,9 @@ eo_gcp_resource_labels
 | リソース種別 | リソース名 | 説明 |
 |-------------|-----------|------|
 | GCP API（8件） | - | cloudfunctions, cloudbuild, artifactregistry, run, secretmanager, compute, iam, iamcredentials |
-| Service Account | `{pj}-gcp-sa-{env}-deploy-{region}` | Deployer SA（GitHub Actions デプロイ用） |
-| Service Account | `{pj}-gcp-sa-{env}-runtime-{region}` | Runtime SA（Cloud Run 実行 + Secret Manager） |
-| Service Account | `{pj}-gcp-sa-{env}-oa2be-inv-{region}` | OAuth2 Invoker SA（n8n 認証用） |
+| Service Account | `{pj}-gsa-{env}-deploy-{region}` | Deployer SA（GitHub Actions デプロイ用） |
+| Service Account | `{pj}-gsa-{env}-runtime-{region}` | Runtime SA（Cloud Run 実行 + Secret Manager） |
+| Service Account | `{pj}-gsa-{env}-oa2inv-{region}` | OAuth2 Invoker SA（n8n 認証用） |
 | IAM Bindings | 複数 | SA ごとのプロジェクトレベル / リソースレベルロール |
 | Secret Manager | `{pj}-{comp}-{env}-secretmng` | 照合用リクエストシークレット（プレースホルダー） |
 | WIF Pool | `{pj}-gcp-pool-wif-{env}` | Workload Identity Pool |
@@ -313,7 +313,7 @@ n8n が Cloud Run を呼び出すための認証キーを発行します。
 
 > **重要**: JSON キーはセキュリティ上 Terraform 管理外としています（state ファイルに秘密鍵を保存しないため）。
 
-1. GCP Console > IAM と管理 > サービス アカウント > `eo-gcp-sa-d01-oa2be-inv-asne1`
+1. GCP Console > IAM と管理 > サービス アカウント > `eo-gsa-d01-oa2inv-asne1`
 2. 「鍵」タブ > 「キーを追加」 > 「新しい鍵を作成」 > **JSON** > 「作成」
 3. ダウンロードされた JSON ファイルを保管
    - ファイル名の後方を `-Oauth2_Invoker-jsonkey-yyyymmdd.json` のように変えておくとわかりやすい
@@ -334,8 +334,8 @@ GitHub リポジトリ > Settings > Secrets and variables > Actions > Repository
 ```
 gcp_project_id      = "eo-re-d01-pr-asne1"
 wif_provider_path   = "projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/providers/eo-gcp-idp-gh-oidc-wif-d01"
-deploy_sa_email     = "eo-gcp-sa-d01-deploy-asne1@eo-re-d01-pr-asne1.iam.gserviceaccount.com"
-runtime_sa_email    = "eo-gcp-sa-d01-runtime-asne1@eo-re-d01-pr-asne1.iam.gserviceaccount.com"
+deploy_sa_email     = "eo-gsa-d01-deploy-asne1@eo-re-d01-pr-asne1.iam.gserviceaccount.com"
+runtime_sa_email    = "eo-gsa-d01-runtime-asne1@eo-re-d01-pr-asne1.iam.gserviceaccount.com"
 ```
 
 **一括確認:**
@@ -384,7 +384,7 @@ terraform output cloud_run_service_url
    - Name: `EO_RE_GCP_RUN_asne1_OAuth2_Invoker_SA`
    - Region: `asia-northeast1`
    - STEP 3-2 でダウンロードした JSON キーの内容を転記
-   - **Service Account Email**: OAuth2 Invoker SA（`eo-gcp-sa-d01-oa2be-inv-asne1`）の JSON キー内 `client_email` の値を入力
+   - **Service Account Email**: OAuth2 Invoker SA（`eo-gsa-d01-oa2inv-asne1`）の JSON キー内 `client_email` の値を入力
    - **Private Key**: JSON キー内の `private_key` フィールドの改行文字（`\n`）を含めた**そのままの形式**で貼り付け
    - **Set up for use in HTTP Request node**: 有効化
    - **Scope(s)**: `https://www.googleapis.com/auth/iam`（IAM API へのアクセス用）
@@ -523,7 +523,7 @@ GCP Cloud Run 固有の設定:
    ```bash
    gcloud run services add-iam-policy-binding eo-re-d01-cloudrun-asne1 \
      --region=asia-northeast1 \
-     --member="serviceAccount:eo-gcp-sa-d01-oa2be-inv-asne1@$EO_GCP_PROJECT_ID.iam.gserviceaccount.com" \
+     --member="serviceAccount:eo-gsa-d01-oa2inv-asne1@$EO_GCP_PROJECT_ID.iam.gserviceaccount.com" \
      --role="roles/run.invoker"
    ```
 
