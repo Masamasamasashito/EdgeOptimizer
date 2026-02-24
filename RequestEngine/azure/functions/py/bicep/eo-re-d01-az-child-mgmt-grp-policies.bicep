@@ -26,84 +26,88 @@ targetScope = 'managementGroup'
 // Parameters
 // ==============================================================================
 
-// --- Policy Settings ---
-@description('Allowed Azure locations for resources')
-param allowedLocations array = [
+// --- Policy Settings (README: EO_AZ_* 環境変数と統一) ---
+@description('ポリシーでデプロイを許可するリージョン。README: EO_AZ_LOCATIONS')
+param EO_AZ_LOCATIONS array = [
   'japaneast'
 ]
 
-@description('Allowed resource types for deployment')
-param allowedResourceTypes array = [
+@description('ポリシーでデプロイを許可するリソースタイプ。README: EO_AZ_RESOURCE_TYPES')
+param EO_AZ_RESOURCE_TYPES array = [
   'Microsoft.Web/sites'
   'Microsoft.Web/serverFarms'
   'Microsoft.KeyVault/vaults'
   'Microsoft.Storage/storageAccounts'
 ]
 
-@description('Enable Application Insights for monitoring (optional)')
-param enableApplicationInsights bool = false
+@description('Enable Application Insights for monitoring (optional). README: EO_AZ_ENABLE_APPLICATION_INSIGHTS')
+param EO_AZ_ENABLE_APPLICATION_INSIGHTS bool = false
+
+@description('デプロイ先リージョン制限用の組み込みポリシー定義 ID。Azure 組み込み "Allowed locations" の ID を指定すること。')
+param EO_AZ_POLICY_REGIONS_DEFINITION_ID string = '<デプロイ先リージョン制限のポリシー定義ID>'
+
+@description('デプロイ可能リソースタイプ制限用の組み込みポリシー定義 ID。Azure 組み込み "Allowed resource types" の ID を指定すること。')
+param EO_AZ_POLICY_RESOURCE_TYPES_DEFINITION_ID string = '<デプロイ可能リソースタイプ制限のポリシー定義ID>'
 
 // ==============================================================================
 // Variables
 // ==============================================================================
+// Management Group: デプロイスコープの名前は managementGroup().name で参照（README: EO_AZ_CHILD_MANAGEMENT_GROUP_ID と一致）
 
-// Management Group name (must match the deployed management group)
-var managementGroupName = 'eo-re-d01-azure-mgmt-group'
+// デプロイ先リージョン制限用ポリシー割り当ての名前（README の EO_AZ_* 命名に合わせる）
+var EO_AZ_POLICY_REGIONS_NAME = 'eo-re-d01-allowed-locations'
+// デプロイ可能リソースタイプ制限用ポリシー割り当ての名前
+var EO_AZ_POLICY_RESOURCE_TYPES_NAME = 'eo-re-d01-allowed-resource-types'
 
-// Policy assignment names
-var allowedLocationsAssignmentName = 'eo-re-d01-allowed-locations'
-var allowedResourceTypesAssignmentName = 'eo-re-d01-allowed-resource-types'
+// 上記パラメータで受け取ったポリシー定義 ID（フルパスで参照）
+var EO_AZ_POLICY_REGIONS_ID = concat('/providers/Microsoft.Authorization/policyDefinitions/', EO_AZ_POLICY_REGIONS_DEFINITION_ID)
+var EO_AZ_POLICY_RESOURCE_TYPES_ID = concat('/providers/Microsoft.Authorization/policyDefinitions/', EO_AZ_POLICY_RESOURCE_TYPES_DEFINITION_ID)
 
-// Built-in Policy Definition IDs
-// Reference: https://learn.microsoft.com/en-us/azure/governance/policy/samples/built-in-policies
-var allowedLocationsPolicyId = '/providers/Microsoft.Authorization/policyDefinitions/e56962a6-4747-49cd-b67b-bf8b01975c4c'
-var allowedResourceTypesPolicyId = '/providers/Microsoft.Authorization/policyDefinitions/a08ec900-254a-4555-9bf5-e42af04b5c5c'
-
-// Conditionally add Application Insights to allowed resource types
-var finalAllowedResourceTypes = enableApplicationInsights
-  ? concat(allowedResourceTypes, ['Microsoft.Insights/components'])
-  : allowedResourceTypes
+// リソースタイプ制限用ポリシーに渡す一覧（Application Insights 有効時は Microsoft.Insights/components を追加）
+var EO_AZ_RESOURCE_TYPES_FOR_ASSIGNMENT = EO_AZ_ENABLE_APPLICATION_INSIGHTS
+  ? concat(EO_AZ_RESOURCE_TYPES, ['Microsoft.Insights/components'])
+  : EO_AZ_RESOURCE_TYPES
 
 // ==============================================================================
 // Resources
 // ==============================================================================
 
 // ============================================================================
-// Policy Assignment: Allowed Locations
+// Policy Assignment: デプロイ先リージョン制限
 // ============================================================================
 resource allowedLocationsPolicy 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
-  name: allowedLocationsAssignmentName
+  name: EO_AZ_POLICY_REGIONS_NAME
   properties: {
-    displayName: 'Allowed locations for ${managementGroupName}'
-    description: '[Azure Policy制限] プロジェクト管理ルールにより、${join(allowedLocations, ', ')} 以外のリージョンへのデプロイは許可されていません。'
-    policyDefinitionId: allowedLocationsPolicyId
+    displayName: 'Allowed locations for ${managementGroup().name}'
+    description: '[Azure Policy制限] プロジェクト管理ルールにより、${join(EO_AZ_LOCATIONS, ', ')} 以外のリージョンへのデプロイは許可されていません。'
+    policyDefinitionId: EO_AZ_POLICY_REGIONS_ID
     enforcementMode: 'Default'
     parameters: {
       listOfAllowedLocations: {
-        value: allowedLocations
+        value: EO_AZ_LOCATIONS
       }
     }
     nonComplianceMessages: [
       {
-        message: '[Azure Policy制限] プロジェクト管理ルールにより、${join(allowedLocations, ', ')} 以外のリージョンへのデプロイは許可されていません。追加が必要な場合、該当管理グループのポリシー設定を確認してください。'
+        message: '[Azure Policy制限] プロジェクト管理ルールにより、${join(EO_AZ_LOCATIONS, ', ')} 以外のリージョンへのデプロイは許可されていません。追加が必要な場合、該当管理グループのポリシー設定を確認してください。'
       }
     ]
   }
 }
 
 // ============================================================================
-// Policy Assignment: Allowed Resource Types
+// Policy Assignment: デプロイ可能リソースタイプ制限
 // ============================================================================
 resource allowedResourceTypesPolicy 'Microsoft.Authorization/policyAssignments@2024-04-01' = {
-  name: allowedResourceTypesAssignmentName
+  name: EO_AZ_POLICY_RESOURCE_TYPES_NAME
   properties: {
-    displayName: 'Allowed resource types for ${managementGroupName}'
+    displayName: 'Allowed resource types for ${managementGroup().name}'
     description: '[Azure Policy制限] プロジェクト管理ルールにより、許可されたリソースタイプ以外はデプロイできません。'
-    policyDefinitionId: allowedResourceTypesPolicyId
+    policyDefinitionId: EO_AZ_POLICY_RESOURCE_TYPES_ID
     enforcementMode: 'Default'
     parameters: {
       listOfResourceTypesAllowed: {
-        value: finalAllowedResourceTypes
+        value: EO_AZ_RESOURCE_TYPES_FOR_ASSIGNMENT
       }
     }
     nonComplianceMessages: [
@@ -125,7 +129,7 @@ output allowedLocationsPolicyAssignmentId string = allowedLocationsPolicy.id
 output allowedResourceTypesPolicyAssignmentId string = allowedResourceTypesPolicy.id
 
 @description('Allowed locations configured')
-output configuredAllowedLocations array = allowedLocations
+output configuredAllowedLocations array = EO_AZ_LOCATIONS
 
 @description('Allowed resource types configured')
-output configuredAllowedResourceTypes array = finalAllowedResourceTypes
+output configuredAllowedResourceTypes array = EO_AZ_RESOURCE_TYPES_FOR_ASSIGNMENT

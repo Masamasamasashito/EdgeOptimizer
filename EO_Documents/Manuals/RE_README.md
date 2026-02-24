@@ -107,7 +107,7 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 - **権限の参照**: GCP Cloud Run のサービスアカウント（Deployer / Compute Engine Default / Runtime / OAuth2 Invoker）のロール・権限一覧と設定手順は [EO_Documents/Manuals/py/CloudRun_README.md](py/CloudRun_README.md) を参照。
 
-個人GCPメール > IAMと管理 > サービスアカウント > `eo-gcp-sa-d01-oa2be-inv-asne1`を選択 > 鍵
+個人GCPメール > IAMと管理 > サービスアカウント > `eo-gsa-d01-oa2inv-asne1`を選択 > 鍵
 
 `********************-xxxxxxxxxxxx.json`
 

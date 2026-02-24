@@ -25,23 +25,23 @@
 // Parameters
 // ==============================================================================
 
-// --- Naming Convention ---
-@description('Project prefix for resource naming (e.g., eo)')
+// --- Naming Convention (EO_Documents/Manuals/py/AZFUNC_BICEP_README.md の環境変数名と統一) ---
+@description('Project prefix (e.g., eo). README: EO_PROJECT')
 @minLength(2)
 @maxLength(10)
-param projectPrefix string = 'eo'
+param EO_PROJECT string = 'eo'
 
-@description('Component identifier (re = Request Engine)')
+@description('Component identifier (re = Request Engine). README: EO_COMPONENT')
 @minLength(2)
 @maxLength(10)
-param component string = 're'
+param EO_COMPONENT string = 're'
 
-@description('Environment identifier (d01 = dev01, p01 = prod01)')
+@description('Environment identifier (d01 = dev01). README: EO_ENV')
 @minLength(2)
 @maxLength(10)
-param environment string = 'd01'
+param EO_ENV string = 'd01'
 
-@description('Region short name for resource naming')
+@description('Region short name. README: EO_REGION_SHORT')
 @allowed([
   'jpe'       // Japan East
   'jpw'       // Japan West
@@ -49,10 +49,30 @@ param environment string = 'd01'
   'wus'       // West US
   'weu'       // West Europe
 ])
-param regionShort string = 'jpe'
+param EO_REGION_SHORT string = 'jpe'
+
+@description('Instance identifier (e.g., 001). README: EO_RE_INSTANCE_ID')
+@minLength(1)
+@maxLength(8)
+param EO_RE_INSTANCE_ID string = '001'
+
+@description('Global project-environment ID for Key Vault/Storage. Max 4 chars recommended. README: EO_GLOBAL_PRJ_ENV_ID')
+@minLength(1)
+@maxLength(6)
+param EO_GLOBAL_PRJ_ENV_ID string = 'a1b2'
+
+@description('Secret service identifier for Key Vault naming (e.g., kv). README: EO_SECRET_SERVICE')
+@minLength(2)
+@maxLength(4)
+param EO_SECRET_SERVICE string = 'kv'
+
+@description('Storage service identifier (e.g., st). README: EO_STORAGE_SERVICE')
+@minLength(2)
+@maxLength(4)
+param EO_STORAGE_SERVICE string = 'st'
 
 // --- Azure Settings ---
-@description('Azure region for deployment')
+@description('Azure region for deployment. README: EO_REGION')
 @allowed([
   'japaneast'
   'japanwest'
@@ -60,58 +80,58 @@ param regionShort string = 'jpe'
   'westus'
   'westeurope'
 ])
-param location string = 'japaneast'
+param EO_REGION string = 'japaneast'
 
-@description('Azure AD Tenant ID')
+@description('Azure AD Tenant ID. README: EO_AZ_ENTRA_TENANT_ID')
 @secure()
-param tenantId string
+param EO_AZ_ENTRA_TENANT_ID string
 
 // --- Function App Settings ---
-@description('Python runtime version')
+@description('Azure Function App の Python ランタイム版。README: EO_AZ_RE_FUNCAPP_PYTHON_VERSION')
 @allowed([
   '3.11'
   '3.12'
   '3.13'
 ])
-param pythonVersion string = '3.13'
+param EO_AZ_RE_FUNCAPP_PYTHON_VERSION string = '3.13'
 
-@description('Function App instance memory size in MB')
+@description('Azure Function App のインスタンスメモリ (MB)。README: EO_AZ_RE_FUNCAPP_INSTANCE_MEMORY_MB')
 @allowed([
   512
   2048
   4096
 ])
-param instanceMemoryMB int = 512
+param EO_AZ_RE_FUNCAPP_INSTANCE_MEMORY_MB int = 512
 
-@description('Maximum instance count for scaling')
+@description('Azure Function App の最大インスタンス数。README: EO_AZ_RE_FUNCAPP_MAXIMUM_INSTANCE_COUNT')
 @minValue(1)
 @maxValue(1000)
-param maximumInstanceCount int = 100
+param EO_AZ_RE_FUNCAPP_MAXIMUM_INSTANCE_COUNT int = 1
 
 // --- Key Vault Settings ---
-@description('Key Vault soft delete retention days')
+@description('Key Vault soft delete retention days. README: EO_SOFT_DELETE_RETENTION_DAYS')
 @minValue(7)
 @maxValue(90)
-param softDeleteRetentionDays int = 7
+param EO_SOFT_DELETE_RETENTION_DAYS int = 7
 
 // ==============================================================================
 // Variables
 // ==============================================================================
 
-// Resource names following naming convention: {project}-{component}-{env}-{resource}-{region}
-var functionAppName = '${projectPrefix}-${component}-${environment}-funcapp-${regionShort}'
-var keyVaultName = '${projectPrefix}-${component}-${environment}-kv-${regionShort}'
-var storageAccountName = '${projectPrefix}${component}${environment}storage'  // No hyphens, max 24 chars
-var appServicePlanName = 'ASP-${projectPrefix}${component}${environment}resourcegrp${regionShort}'
+// Resource names per EO_Documents/Manuals/py/AZFUNC_BICEP_README.md (Key Vault & Storage: 24-char limit, 22-char target for buffer)
+var FUNCTION_APP_NAME = '${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-funcapp-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}'
+var KEY_VAULT_NAME = '${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}-${EO_GLOBAL_PRJ_ENV_ID}'  // e.g. eo-kv-d01-jpe-001-a1b2 (22 chars)
+var STORAGE_ACCOUNT_NAME = '${EO_PROJECT}${EO_COMPONENT}${EO_STORAGE_SERVICE}${EO_ENV}${EO_REGION_SHORT}${EO_RE_INSTANCE_ID}${EO_GLOBAL_PRJ_ENV_ID}'  // No hyphens, max 24 chars; e.g. eorestd01jpe001a1b2 (19 chars)
+var APP_SERVICE_PLAN_NAME = 'ASP-${EO_PROJECT}${EO_COMPONENT}${EO_ENV}resourcegrp${EO_REGION_SHORT}'
 
 // Secret name (hyphens only, no underscores)
-var secretName = 'AZFUNC-REQUEST-SECRET'
+var SECRET_NAME = 'AZFUNC-REQUEST-SECRET'
 
 // Tags
-var commonTags = {
-  Project: projectPrefix
-  Component: component
-  Environment: environment
+var COMMON_TAGS = {
+  Project: EO_PROJECT
+  Component: EO_COMPONENT
+  Environment: EO_ENV
   ManagedBy: 'Bicep'
 }
 
@@ -123,9 +143,9 @@ var commonTags = {
 // Storage Account (for Function App)
 // ============================================================================
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
-  name: storageAccountName
-  location: location
-  tags: commonTags
+  name: STORAGE_ACCOUNT_NAME
+  location: EO_REGION
+  tags: COMMON_TAGS
   sku: {
     name: 'Standard_LRS'
   }
@@ -173,21 +193,21 @@ resource blobService 'Microsoft.Storage/storageAccounts/blobServices@2023-05-01'
 // Key Vault
 // ============================================================================
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: keyVaultName
-  location: location
-  tags: commonTags
+  name: KEY_VAULT_NAME
+  location: EO_REGION
+  tags: COMMON_TAGS
   properties: {
     sku: {
       family: 'A'
       name: 'standard'
     }
-    tenantId: tenantId
+    tenantId: EO_AZ_ENTRA_TENANT_ID
     enableRbacAuthorization: true  // Use Azure RBAC instead of access policies
     enabledForDeployment: false
     enabledForDiskEncryption: false
     enabledForTemplateDeployment: false
     enableSoftDelete: true
-    softDeleteRetentionInDays: softDeleteRetentionDays
+    softDeleteRetentionInDays: EO_SOFT_DELETE_RETENTION_DAYS
     publicNetworkAccess: 'Enabled'
     networkAcls: {
       bypass: 'None'
@@ -199,7 +219,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
 // Key Vault Secret (placeholder value - update after deployment)
 resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   parent: keyVault
-  name: secretName
+  name: SECRET_NAME
   properties: {
     value: 'REPLACE_WITH_N8N_EO_REQUEST_SECRET'
     contentType: 'Request Engine token verification secret. Update with N8N_EO_REQUEST_SECRET value.'
@@ -213,9 +233,9 @@ resource keyVaultSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
 // App Service Plan (Flex Consumption)
 // ============================================================================
 resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
-  name: appServicePlanName
-  location: location
-  tags: commonTags
+  name: APP_SERVICE_PLAN_NAME
+  location: EO_REGION
+  tags: COMMON_TAGS
   sku: {
     name: 'FC1'
     tier: 'FlexConsumption'
@@ -231,9 +251,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
 // Function App
 // ============================================================================
 resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
-  name: functionAppName
-  location: location
-  tags: commonTags
+  name: FUNCTION_APP_NAME
+  location: EO_REGION
+  tags: COMMON_TAGS
   kind: 'functionapp,linux'
   identity: {
     type: 'SystemAssigned'  // Enable Managed Identity for Key Vault access
@@ -249,7 +269,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
       numberOfWorkers: 1
       alwaysOn: false
       http20Enabled: false
-      functionAppScaleLimit: maximumInstanceCount
+      functionAppScaleLimit: EO_AZ_RE_FUNCAPP_MAXIMUM_INSTANCE_COUNT
       minimumElasticInstanceCount: 0
       minTlsVersion: '1.2'
       scmMinTlsVersion: '1.2'
@@ -264,7 +284,7 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
       deployment: {
         storage: {
           type: 'blobcontainer'
-          value: 'https://${storageAccount.name}.blob.${az.environment().suffixes.storage}/app-package-${functionAppName}'
+          value: 'https://${storageAccount.name}.blob.${az.environment().suffixes.storage}/app-package-${FUNCTION_APP_NAME}'
           authentication: {
             type: 'storageaccountconnectionstring'
             storageAccountConnectionStringName: 'DEPLOYMENT_STORAGE_CONNECTION_STRING'
@@ -273,11 +293,11 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
       }
       runtime: {
         name: 'python'
-        version: pythonVersion
+        version: EO_AZ_RE_FUNCAPP_PYTHON_VERSION
       }
       scaleAndConcurrency: {
-        maximumInstanceCount: maximumInstanceCount
-        instanceMemoryMB: instanceMemoryMB
+        maximumInstanceCount: EO_AZ_RE_FUNCAPP_MAXIMUM_INSTANCE_COUNT
+        instanceMemoryMB: EO_AZ_RE_FUNCAPP_INSTANCE_MEMORY_MB
       }
     }
   }
@@ -336,7 +356,7 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
 // Storage Containers (for Function App deployment)
 // ============================================================================
 resource deploymentContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2023-05-01' = {
-  name: '${storageAccount.name}/default/app-package-${functionAppName}'
+  name: '${storageAccount.name}/default/app-package-${FUNCTION_APP_NAME}'
   properties: {
     publicAccess: 'None'
   }

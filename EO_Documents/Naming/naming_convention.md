@@ -1,8 +1,13 @@
 # Edge Optimizer 命名規約
 
+> **最終更新**: 2026-02-24
+> **更新根拠**: `RequestEngine/` 配下の IaC コード（CFn / Bicep / Terraform / Wrangler）の実装を正とし整合化
+
+---
+
 ## 1. DBテーブル設計考慮観点
 
-`RequestEngine/{EO_CLOUD}/{EO_SERVICE}/{EO_CODE_LANG}/instances_conf/*.env` は DBテーブル`eo_re_instances`の1レコードを模した設計。
+`RequestEngine/{EO_CLOUD}/{EO_SERVICE}/{EO_CODE_LANG}/instances_conf/*.env` はDBテーブル `eo_re_instances` の1レコードを模した設計。
 
 - `EO_RE_INSTANCE_UUID`（UUIDv7）がサロゲート主キー
 - 複合キーを避け、全フィールドは属性として保持
@@ -13,7 +18,7 @@
 ### 3NF 正規化設計
 
 ```sql
--- ルックアップテーブル: リージョン ↔ リージョン短縮コードの1:1マッピング
+-- ルックアップテーブル: リージョン ↔ リージョン短縮コードの 1:1 マッピング
 CREATE TABLE eo_regions (
   region       VARCHAR(32) PRIMARY KEY,
   region_short VARCHAR(8)  NOT NULL UNIQUE,
@@ -44,56 +49,58 @@ CREATE TABLE eo_re_instances (
 
 `.env` ファイルに含まれる `EO_REGION_SHORT` は `eo_regions` テーブルから JOIN で導出する非正規化フィールド。
 
+---
+
 ## 2. インスタンス定義スキーマ（instances_conf/*.env）
 
 各 Request Engine インスタンスは `.env` 形式で定義する。
 GitHub Actions ワークフローから `cat instances_conf/{file}.env >> $GITHUB_ENV` で環境変数として読み込む。
 
-### フィールド定義
+### 2.1 フィールド定義
 
-リクエストエンジン1個体に対し、以下のフィールドを定義する。
+**インスタンスレベル変数（instances_conf/*.env に記載）**
 
 | フィールド | 説明 | 例 | 備考 |
 |---|---|---|---|
-| `EO_RE_INSTANCE_UUID` | インスタンス主キー（UUIDv7） | `019503a1-...` | タイムスタンプ+ランダム、時系列ソート可能 |
-| `EO_GLOBAL_PRJ_ENV_ID` | プロジェクト環境固定のユニーク識別子 | `a1b2` | グローバル一意必須リソースの命名に使用(半角英数最大4桁。ハイフンやアンダースコア不可。`md5("my-tenant-secret-salt" + "{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}")`) |
-| `EO_PROJECT` | プロジェクト識別子 | `eo` | 全環境共通 |
-| `EO_COMPONENT` | コンポーネント識別子 | `re` | re = Request Engine |
-| `EO_ENV` | 環境識別子 | `d01` | d01=dev01, p01=prod01 |
-| `EO_CLOUD` | クラウド識別子 | `aws` | aws / azure / gcp / cf |
-| `EO_CODE_LANG` | プログラミング言語識別子 | `py` | py = Python, ts = TypeScript |
-| `EO_CODE_LANG_VER` | プログラミング言語バージョン | `314` | Python 3.14, TypeScript 5.0 |
-| `EO_IAC` | IaC ツール識別子 | `cfn` | cfn / bicep / terraform / wrangler / pulmi / none |
 | `EO_RE_INSTANCE_TYPE` | インスタンス種別 | `lambda` | lambda / funcapp / cloudrun / cfworker |
 | `EO_RE_INSTANCE_ID` | インスタンス番号 | `001` | 同一種別内で一意 |
 | `EO_REGION` | クラウドリージョン（フル） | `ap-northeast-1` | クラウド固有のリージョン名 |
-| `EO_REGION_SHORT` | リージョン短縮コード | `apne1` | 全クラウド統一の短縮形(本来は別テーブル) |
-| `created_at` | レコード作成日時 | `2026-02-16T16:00:00+09:00` | ISO 8601、タイムゾーン付き |
-| `updated_at` | レコード最終更新日時 | `2026-02-16T16:00:00+09:00` | ISO 8601、タイムゾーン付き |
-| `created_by` | 作成者/システムID | `nishilab` | 人間のユーザーID or システム名 |
-| `is_deleted` | 論理削除フラグ | `false` | true/false（物理削除しない運用） |
+| `EO_REGION_SHORT` | リージョン短縮コード | `apne1` | 全クラウド統一の短縮形（§4参照） |
 
-** Azure のみのフィールド **
+**プロジェクトレベルシークレット（`.env` に書かない、シークレット管理で保管）**
+
 | フィールド | 説明 | 例 | 備考 |
 |---|---|---|---|
-| `EO_AZ_TENANT_ID` | Azure AD テナント ID | `1234567890` | Azure AD テナント ID |
-| `EO_AZ_SUBSC_ID` | Azure サブスクリプションID | `1234567890` | Azure サブスクリプションID |
+| `EO_ORIGINAL_SALT` | `EO_GLOBAL_PRJ_ENV_ID` 生成に使うソルト | `my-tenant-secret-salt` | **絶対に `.env` や Git に含めない。** GitHub Secrets / Secrets Manager 等で管理。紛失すると `EO_GLOBAL_PRJ_ENV_ID` を再生成不能になる。 |
+| `EO_GLOBAL_PRJ_ENV_ID` | プロジェクト環境固定のユニーク識別子 | `a1b2` | `md5(EO_ORIGINAL_SALT + "{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}").substring(0, 4)` で生成。Azure KV / Storage Account 命名に使用（§3参照）。 |
 
+> [!CAUTION]
+> `EO_ORIGINAL_SALT` を紛失すると `EO_GLOBAL_PRJ_ENV_ID` を同じ値で再生成できなくなる。
+> Azure Key Vault / Storage Account はこのIDを含む名前で既にデプロイ済みのため、
+> IDが変わると**リソースの再作成（= データ消失）**が必要になる。
+> 必ず GitHub Secrets または Secrets Manager に保存し、バックアップを取ること。
 
+> [!NOTE]
+> **現在の `.env` ファイルに含まれるフィールドはインスタンスレベルの4項目のみ。**
+> DBテーブル設計上のフィールド（`EO_RE_INSTANCE_UUID`, `EO_PROJECT` 等）は
+> ワークフローや IaC テンプレートのパラメータとして別途管理する。
 
-### クラウド4種の定義例
+### 2.2 ディレクトリパス → IaC の対応
+
+| クラウド | ディレクトリ | IaC | .env ファイル名 |
+|---|---|---|---|
+| AWS | `RequestEngine/aws/lambda/py/` | CloudFormation (`CFn/`) | `lambda{NNN}.env` |
+| Azure | `RequestEngine/azure/functions/py/` | Bicep (`bicep/`) | `funcapp{NNN}.env` |
+| GCP | `RequestEngine/gcp/cloudrun/py/` | Terraform (`terraform/`) | `cloudrun{NNN}.env` |
+| CF | `RequestEngine/cf/workers/ts/` | Wrangler (`funcfiles/wrangler.toml`) | `cfworker{NNN}.env` |
+
+### 2.3 クラウド4種の実際の .env 定義
 
 **AWS Lambda** (`RequestEngine/aws/lambda/py/instances_conf/lambda001.env`)
 ```env
-EO_RE_INSTANCE_UUID=<UUIDv7>
-EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
-EO_PROJECT=eo
-EO_COMPONENT=re
-EO_ENV=d01
-EO_CLOUD=aws
-EO_CODE_LANG=py
-EO_CODE_LANG_VER=3.14
-EO_IAC=cfn
+# Referenced by (この定義値を使用するファイル):
+#   .github/workflows/deploy-py-to-aws-lambda.yml (LAMBDA_FUNCTION_NAME, aws-region)
+#   RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml (パラメータ化済み)
 EO_RE_INSTANCE_TYPE=lambda
 EO_RE_INSTANCE_ID=001
 EO_REGION=ap-northeast-1
@@ -102,15 +109,9 @@ EO_REGION_SHORT=apne1
 
 **Azure Functions** (`RequestEngine/azure/functions/py/instances_conf/funcapp001.env`)
 ```env
-EO_RE_INSTANCE_UUID=<UUIDv7>
-EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
-EO_PROJECT=eo
-EO_COMPONENT=re
-EO_ENV=d01
-EO_CLOUD=azure
-EO_CODE_LANG=py
-EO_CODE_LANG_VER=3.13
-EO_IAC=bicep
+# Referenced by (この定義値を使用するファイル):
+#   .github/workflows/deploy-py-to-az-function.yml (FUNCTION_APP_NAME, RESOURCE_GROUP)
+#   RequestEngine/azure/functions/py/bicep/eo-re-d01-azure-funcapp.bicep (パラメータ化済み)
 EO_RE_INSTANCE_TYPE=funcapp
 EO_RE_INSTANCE_ID=001
 EO_REGION=japaneast
@@ -119,15 +120,10 @@ EO_REGION_SHORT=jpe
 
 **GCP Cloud Run** (`RequestEngine/gcp/cloudrun/py/instances_conf/cloudrun001.env`)
 ```env
-EO_RE_INSTANCE_UUID=<UUIDv7>
-EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
-EO_PROJECT=eo
-EO_COMPONENT=re
-EO_ENV=d01
-EO_CLOUD=gcp
-EO_CODE_LANG=py
-EO_CODE_LANG_VER=3.13
-EO_IAC=terraform
+# Referenced by (この定義値を使用するファイル):
+#   .github/workflows/deploy-py-to-gcp-cloudrun.yml (EO_GCP_CLOUD_RUN_SERVICE_NAME, EO_GCP_REGION)
+#   RequestEngine/gcp/cloudrun/py/terraform/cloud_run.tf (サービス名構築に使用)
+#   RequestEngine/gcp/cloudrun/py/terraform/main.tf (name_prefix + EO_REGION_SHORT)
 EO_RE_INSTANCE_TYPE=cloudrun
 EO_RE_INSTANCE_ID=001
 EO_REGION=asia-northeast1
@@ -136,187 +132,346 @@ EO_REGION_SHORT=asne1
 
 **Cloudflare Workers** (`RequestEngine/cf/workers/ts/instances_conf/cfworker001.env`)
 ```env
-EO_RE_INSTANCE_UUID=<UUIDv7>
-EO_GLOBAL_PRJ_ENV_ID=<任意ユニーク値>
-EO_PROJECT=eo
-EO_COMPONENT=re
-EO_ENV=d01
-EO_CLOUD=cf
-EO_CODE_LANG=ts
-EO_CODE_LANG_VER=5.0
-EO_IAC=none
+# Referenced by (この定義値を使用するファイル):
+#   .github/workflows/deploy-ts-to-cf-worker.yml (wrangler.toml name)
 EO_RE_INSTANCE_TYPE=cfworker
 EO_RE_INSTANCE_ID=001
 EO_REGION=global
 EO_REGION_SHORT=global
 ```
 
+---
+
 ## 3. EO_GLOBAL_PRJ_ENV_ID
 
 プロジェクト環境ごとに固定する任意のユニーク識別子。
 グローバル一意が必須なリソース名（Azure Key Vault, Azure Storage Account）に埋め込んで衝突を防止する。
 
-### 文字数制約の逆算
+### 3.1 文字数制約の逆算
 
 **Azure Key Vault（24文字制限）**
 
-| パターン | `{EO_PROJECT}-kv-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}` |
+| パターン | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}` |
 |---|---|
+| Bicep変数名 | `KEY_VAULT_NAME` |
 | 具体例 | `eo-kv-d01-jpe-001-a1b2` (22文字) |
-| 内訳 | `eo`(2) + `-`(1) + `kv`(2) + `-`(1) + `d01`(3) + `-`(1) + `jpe`(3) + `-`(1) + `001`(3) + `-`(1) + `a1b2`(4) = 22文字 |
+| 内訳 | `eo`(2) + `-kv`(3) + `-d01`(4) + `-jpe`(4) + `-001`(4) + `-a1b2`(5) = 22文字 |
 | 文字種 | 小文字英数字 + ハイフン |
+
+> **`EO_SECRET_SERVICE` = `kv`（Bicep パラメータ、デフォルト値）**
 
 **Azure Storage Account（24文字制限、ハイフン不可）**
 
-| パターン | `{EO_PROJECT}rest{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}` |
+| パターン | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}` |
 |---|---|
+| Bicep変数名 | `STORAGE_ACCOUNT_NAME` |
 | 具体例 | `eorestd01jpe001a1b2` (19文字) |
-| 内訳 | `eo`(2) + `rest`(4) + `d01`(3) + `jpe`(3) + `001`(3) + `a1b2`(4) = 19文字 |
+| 内訳 | `eo`(2) + `re`(2) + `st`(2) + `d01`(3) + `jpe`(3) + `001`(3) + `a1b2`(4) = 19文字 |
 | 文字種 | 小文字英数字のみ（ハイフン不可） |
+
+> **`EO_STORAGE_SERVICE` = `st`（Bicep パラメータ、デフォルト値）**
 
 **運用規約: `EO_GLOBAL_PRJ_ENV_ID` 最大4文字、小文字英数字のみ（ハイフン不可）**
 
 Storage Account のハイフン不可制約に合わせ、かつ Key Vault の6文字上限に対しバッファ2文字を確保。
 
+生成方法例: `md5("my-salt" + "{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}").substring(0, 4)`
 例: `a1b2`, `x9k3`
 
-### 対象リソース
+### 3.2 対象リソース
 
-| 対象 | 理由 |
-|---|---|
-| Azure Key Vault | グローバル一意の DNS 名 |
-| Azure Storage Account | グローバル一意の DNS 名 |
+| 対象 | 配置スコープ | DNS名前空間 | `EO_GLOBAL_PRJ_ENV_ID` 必要性 |
+|---|---|---|---|
+| **Azure Key Vault** | リージョン配置 | **グローバル一意** (`{name}.vault.azure.net`) | ✅ 必須 |
+| **Azure Storage Account** | リージョン配置 | **グローバル一意** (`{name}.blob.core.windows.net`) | ✅ 必須 |
+
+> [!NOTE]
+> **リージョン配置 ≠ リージョン内一意**
+>
+> Azure Key Vault・Storage Account はリソース自体は指定リージョンに物理配置されるが、
+> **DNS 名前空間は Azure 全リージョン・全テナントを跨いだグローバル空間**になっている。
+> つまり `eo-kv-d01-jpe-001` というシンプルな名前は自分以外の誰かが既に使用していると作成できない。
+>
+> `EO_GLOBAL_PRJ_ENV_ID` を末尾に付加することで、他テナントとの衝突を回避する。
+
+**比較: リージョン内一意で足りるリソース（`EO_GLOBAL_PRJ_ENV_ID` 不使用）**
+
+| クラウド | リソース | 一意スコープ |
+|---|---|---|
+| AWS | Lambda 関数 | アカウント + リージョン内 |
+| AWS | IAM Role / Policy | アカウント内（グローバルだが非 DNS） |
+| AWS | Secrets Manager | アカウント + リージョン内 |
+| GCP | Cloud Run Service | プロジェクト + リージョン内 |
+| GCP | Service Account | プロジェクト内 |
+| GCP | Secret Manager | プロジェクト内 |
+| Azure | Function App | サブスクリプション内（※ デフォルトホスト名は `.azurewebsites.net` でグローバル一意だが Bicep で明示的に管理） |
+| Cloudflare | Worker | アカウント内 |
 
 AWS, GCP, Cloudflare のリソースはプロジェクト/リージョン内で一意であれば十分なため不使用。
+
+---
 
 ## 4. リージョン短縮コード
 
 全クラウド統一の短縮形。文字制限の厳しいリソース名でも使用可能な長さに統一。
 
-| クラウド | フルリージョン | EO_REGION_SHORT |
+### AWS
+
+| フルリージョン | EO_REGION_SHORT | 拠点 |
 |---|---|---|
-| AWS | ap-northeast-1 | `apne1` |
-| AWS | ap-northeast-3 | `apne3` |
-| AWS | us-east-1 | `use1` |
-| AWS | us-west-2 | `usw2` |
-| Azure | japaneast | `jpe` |
-| Azure | eastus | `eus` |
-| Azure | westeurope | `weu` |
-| GCP | asia-northeast1 | `asne1` |
-| GCP | asia-northeast2 | `asne2` |
-| GCP | asia-northeast3 | `asne3` |
-| GCP | asia-southeast1 | `asse1` |
-| GCP | us-east1 | `use1` |
-| GCP | us-west1 | `usw1` |
-| GCP | europe-west1 | `euw1` |
-| Cloudflare | global | `global` |
+| ap-northeast-1 | `apne1` | Tokyo |
+| ap-northeast-2 | `apne2` | Seoul |
+| ap-northeast-3 | `apne3` | Osaka |
+| ap-southeast-1 | `apse1` | Singapore |
+| us-east-1 | `use1` | N. Virginia |
+| us-west-2 | `usw2` | Oregon |
+| eu-west-1 | `euw1` | Ireland |
 
-## 5. リソース命名パターン
+> **CFn `AllowedValues`**: `apne1, apne2, apne3, apse1, use1, usw2, euw1`
 
-### 5.1 基本パターン（文字制限に余裕のあるリソース）
+### Azure
 
-```
-{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_RE_INSTANCE_TYPE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}
-```
-展開例: `eo-re-d01-lambda-apne1-001`
-
-### 5.2 AWS リソース
-
-| リソース | パターン | 例 | 制限 |
-|---|---|---|---|
-| Lambda 関数 | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-lambda-apne1-001` | 64文字 |
-| Lambda Log Group | `/aws/lambda/{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `/aws/lambda/eo-re-d01-lambda-apne1-001` | |
-| Secrets Manager | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-secretsmng-{EO_REGION_SHORT}` | `eo-re-d01-secretsmng-apne1` | 512文字 |
-| IAM Role | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-role` | `eo-re-d01-lambda-apne1-001-role` | 64文字 |
-| IAM Policy | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{purpose}-iamp` | `eo-re-d01-lambda-apne1-001-basic-exec-iamp` | 128文字 |
-| IAM User | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-iamu` | `eo-re-d01-lambda-apne1-001-iamu` | 64文字 |
-| GH Actions Role | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-lambda-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-ghactions-deploy-iamr` | `eo-re-d01-lambda-apne1-001-ghactions-deploy-iamr` | 64文字 |
-| OIDC Provider Tag | `{EO_PROJECT}-ghactions-idp-request-engine-lambda-aws-{EO_REGION_SHORT}` | `eo-ghactions-idp-request-engine-lambda-aws-apne1` | |
-
-### 5.3 Azure リソース
-
-| リソース | パターン | 例 | 制限 |
-|---|---|---|---|
-| Function App | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-funcapp-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-funcapp-jpe-001` | 60文字 |
-| Resource Group | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-resourcegroup-{EO_REGION_SHORT}` | `eo-re-d01-resourcegroup-jpe` | 90文字 |
-| **Key Vault** | `{EO_PROJECT}-kv-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}` | `eo-kv-d01-jpe-001-a1b2` | **24文字** |
-| **Storage Account** | `{EO_PROJECT}rest{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}` | `eorestd01jpe001a1b2` | **24文字** |
-| Key Vault Secret | `AZFUNC-REQUEST-SECRET` | `AZFUNC-REQUEST-SECRET` | 127文字 |
-
-> Key Vault と Storage Account はグローバル一意が必須のため `EO_GLOBAL_PRJ_ENV_ID` を末尾に付与。
-> Storage Account はハイフン不可のため全結合。
-> Key Vault は `EO_COMPONENT` をタグに退避し、名前から省略。
-
-### 5.4 GCP リソース
-
-| リソース | パターン | 例 | 制限 |
-|---|---|---|---|
-| Cloud Run Service | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-cloudrun-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-cloudrun-asne1-001` | 63文字 |
-| **Service Account** | `{EO_PROJECT}-gsa-{EO_ENV}-{role}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | 下記参照 | **30文字** |
-| SA (Deployer) | `{EO_PROJECT}-gsa-{EO_ENV}-deploy-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-deploy-asne1-001` (26文字) | 30文字 |
-| SA (Runtime) | `{EO_PROJECT}-gsa-{EO_ENV}-runtime-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-runtime-asne1-001` (27文字) | 30文字 |
-| SA (OAuth2 Invoker) | `{EO_PROJECT}-gsa-{EO_ENV}-oa2inv-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-gsa-d01-oa2inv-asne1-001` (26文字) | 30文字 |
-| Artifact Registry | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-ar-{EO_REGION_SHORT}` | `eo-re-d01-ar-asne1` | 63文字 |
-| Secret Manager | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-secretmng` | `eo-re-d01-secretmng` | 255文字 |
-| WIF Pool | `{EO_PROJECT}-gcp-pool-wif-{EO_ENV}` | `eo-gcp-pool-wif-d01` | 32文字 |
-| WIF IdP | `{EO_PROJECT}-gcp-idp-gh-oidc-wif-{EO_ENV}` | `eo-gcp-idp-gh-oidc-wif-d01` | 32文字 |
-
-> GCP SA は `labels` 非対応（hashicorp/google v6.50.0 で確認済み）。
-> 命名メタデータは `display_name`（100文字）+ `description`（256文字）で保持する。
-
-### 5.5 Cloudflare Workers リソース
-
-| リソース | パターン | 例 | 制限 |
-|---|---|---|---|
-| Worker 名 | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-cfworker-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-cfworker-global-001` | |
-
-## 6. タグ / ラベルスキーマ
-
-全クラウドのリソースに統一の `eo_` プレフィックスタグを付与する。
-
-### 6.1 共通タグ定義
-
-| タグキー | 説明 | 値の例 |
+| フルリージョン | EO_REGION_SHORT | 拠点 |
 |---|---|---|
-| `eo_project` | プロジェクト識別子 | `eo` |
-| `eo_component` | コンポーネント識別子 | `re` |
-| `eo_env` | 環境識別子 | `d01` |
-| `eo_iac` | IaC ツール | `cfn` / `bicep` / `terraform` / `none` |
-| `eo_re_instance_type` | インスタンス種別 | `lambda` / `funcapp` / `cloudrun` / `cfworker` |
-| `eo_re_instance_id` | インスタンス番号 | `001` |
-| `eo_region_short` | リージョン短縮 | `apne1` / `jpe` / `asne1` / `global` |
-| `eo_re_instance_uuid` | UUIDv7 主キー | `019503a1-...` |
-| `eo_global_prj_env_id` | グローバルプロジェクト環境ID | `a1b2` |
+| japaneast | `jpe` | Tokyo |
+| japanwest | `jpw` | Osaka |
+| eastus | `eus` | Virginia |
+| westus | `wus` | California |
+| westeurope | `weu` | Netherlands |
 
-### 6.2 クラウド別対応状況
+> **Bicep `@allowed`**: `jpe, jpw, eus, wus, weu`
 
-| クラウド | タグ/ラベル機能 | 対応方法 |
+### GCP
+
+| フルリージョン | EO_REGION_SHORT | 拠点 |
 |---|---|---|
-| **AWS** | Tags（全リソース対応） | 上記タグをそのまま付与 |
-| **Azure** | Tags（全リソース対応） | 上記タグをそのまま付与（Key Vault 含む） |
-| **GCP** | Labels（一部リソース） | Cloud Run, Artifact Registry 等はラベル付与 |
-| **GCP SA** | Labels **非対応** | `display_name` + `description` で代替 |
-| **Cloudflare** | タグ機能なし | wrangler.toml 内コメントで記録 |
+| asia-northeast1 | `asne1` | Tokyo |
+| asia-northeast2 | `asne2` | Osaka |
+| asia-northeast3 | `asne3` | Seoul |
+| asia-southeast1 | `asse1` | Singapore |
+| us-east1 | `use1` | S. Carolina |
+| us-west1 | `usw1` | Oregon |
+| europe-west1 | `euw1` | Belgium |
 
-### 6.3 GCP SA のメタデータ代替
+> **Terraform `validation`**: `asne1, asne2, asne3, asse1, use1, usw2, euw1`
 
-GCP Service Account は `labels` 非対応のため、`display_name` + `description` で命名メタデータを保持する。
+### Cloudflare Workers
+
+| フルリージョン | EO_REGION_SHORT | 拠点 |
+|---|---|---|
+| global | `global` | Global Edge |
+
+---
+
+## 5. リソース命名パターン（IaCコード実装準拠）
+
+### 5.1 共通 Locals パターン（GCP Terraform）
 
 ```hcl
-resource "google_service_account" "deployer" {
-  account_id   = "eo-gsa-d01-deploy-asne1-001"
-  display_name = "EO GCP Deployer SA (asne1-001)"
-  description  = "eo_project=eo, eo_component=re, eo_env=d01, eo_re_instance_type=cloudrun, eo_re_instance_id=001, eo_region_short=asne1"
+# main.tf
+locals {
+  name_prefix  = "${var.project_prefix}-${var.component}-${var.environment}"
+  # 例: eo-re-d01
+  region_short = var.region_short
 }
 ```
 
+基本パターン: `{name_prefix}-{resource}-{region_short}`
+
+---
+
+### 5.2 AWS リソース（CloudFormation）
+
+IaC: `RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml`
+
+| リソース | パターン | 例 | 文字制限 |
+|---|---|---|---|
+| **Lambda 関数** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}` | `eo-re-d01-lambda-apne1` | 64文字 |
+| **Lambda Log Group** | `/aws/lambda/{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}` | `/aws/lambda/eo-re-d01-lambda-apne1` | — |
+| **Lambda Layer** | `{ProjectPrefix}-{Component}-{Environment}-lambda-python-slim-layer` | `eo-re-d01-lambda-python-slim-layer` | 自動採番あり |
+| **Secrets Manager** | `{ProjectPrefix}-{Component}-{Environment}-secretsmng-{RegionShort}` | `eo-re-d01-secretsmng-apne1` | 512文字 |
+| **IAM Role (Lambda実行)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-role` | `eo-re-d01-lambda-apne1-role` | 64文字 |
+| **IAM Policy (基本実行)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-basic-exec-iamp` | `eo-re-d01-lambda-apne1-basic-exec-iamp` | 128文字 |
+| **IAM Policy (SM アクセス)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-role-iamp` | `eo-re-d01-lambda-apne1-role-iamp` | 128文字 |
+| **IAM User (n8n呼び出し)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-iamu` | `eo-re-d01-lambda-apne1-iamu` | 64文字 |
+| **IAM Policy (n8n invoke)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-access-key-iamp` | `eo-re-d01-lambda-apne1-access-key-iamp` | 128文字 |
+| **IAM Role (GH Actions)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-ghactions-deploy-iamr` | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr` | 64文字 |
+| **IAM Policy (GH Actions)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-ghactions-deploy-iamr-iamp` | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr-iamp` | 128文字 |
+| **OIDC Provider Tag** | `{ProjectPrefix}-ghactions-idp-request-engine-lambda-aws-{RegionShort}` | `eo-ghactions-idp-request-engine-lambda-aws-apne1` | — |
+| **CFn スタック** | `eo-aws-cfnstack` | `eo-aws-cfnstack` | — |
+
+> [!NOTE]
+> Lambda 関数名には `EO_RE_INSTANCE_ID`（`001` 等）を含まない。
+> インスタンス識別は `EO_REGION_SHORT` で行う（リージョン = 1インスタンスが前提）。
+
+---
+
+### 5.3 Azure リソース（Bicep）
+
+IaC: `RequestEngine/azure/functions/py/bicep/eo-re-d01-azure-funcapp.bicep`
+
+| リソース | パターン（Bicep変数） | 例 | 文字制限 |
+|---|---|---|---|
+| **Function App** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-funcapp-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-funcapp-jpe-001` | 60文字 |
+| **App Service Plan** | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}` | `ASP-eoredreourcegroup-resourcegrpjpe` | — |
+| **Key Vault** | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}` | `eo-kv-d01-jpe-001-a1b2` | **24文字** |
+| **Storage Account** | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}` | `eorestd01jpe001a1b2` | **24文字** |
+| **Key Vault Secret** | `AZFUNC-REQUEST-SECRET` | `AZFUNC-REQUEST-SECRET` | 127文字 |
+| **Entra ID App (GH Actions)** | `eo-ghactions-deploy-entra-app-azfunc-{EO_REGION_SHORT}` | `eo-ghactions-deploy-entra-app-azfunc-jpe` | — |
+| **Resource Group** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-resourcegroup-{EO_REGION_SHORT}` | `eo-re-d01-resourcegroup-jpe` | 90文字 |
+
+> [!NOTE]
+> Key Vault と Storage Account はグローバル一意が必須のため `EO_GLOBAL_PRJ_ENV_ID` を末尾に付与。
+> Storage Account はハイフン不可のため全結合。
+> App Service Plan 名は Bicep `variables` 内で自動生成（`ASP-` プレフィックス固定）。
+
+---
+
+### 5.4 GCP リソース（Terraform）
+
+IaC: `RequestEngine/gcp/cloudrun/py/terraform/`
+
+| リソース | パターン（Terraform） | 例 | 文字制限 |
+|---|---|---|---|
+| **Cloud Run Service** | `{name_prefix}-cloudrun-{region_short}` | `eo-re-d01-cloudrun-asne1` | 63文字 |
+| **Artifact Registry** | `{name_prefix}-ar-{region_short}` ※ | `eo-re-d01-ar-asne1` | 63文字 |
+| **Secret Manager** | `{name_prefix}-secretmng` | `eo-re-d01-secretmng` | 255文字 |
+| **Secret キー名** | `CLOUDRUN_REQUEST_SECRET` | `CLOUDRUN_REQUEST_SECRET` | — |
+| **SA (Deployer)** | `{project_prefix}-gsa-{environment}-deploy-{region_short}` | `eo-gsa-d01-deploy-asne1` | **30文字** |
+| **SA (Runtime)** | `{project_prefix}-gsa-{environment}-runtime-{region_short}` | `eo-gsa-d01-runtime-asne1` | **30文字** |
+| **SA (OAuth2 Invoker)** | `{project_prefix}-gsa-{environment}-oa2inv-{region_short}` | `eo-gsa-d01-oa2inv-asne1` | **30文字** |
+| **WIF Pool** | `{project_prefix}-gcp-pool-wif-{environment}` | `eo-gcp-pool-wif-d01` | 32文字 |
+| **WIF IdP** | `{project_prefix}-gcp-idp-gh-oidc-wif-{environment}` | `eo-gcp-idp-gh-oidc-wif-d01` | 32文字 |
+
+> [!IMPORTANT]
+> **GCP Service Account の命名変更（2026-02-24更新）**
+> - 旧: `eo-gsa-{env}-{role}-{region_short}` （例: `eo-gsa-d01-runtime-asne1-001`）
+> - **新: `eo-gsa-{env}-{role}-{region_short}`** （例: `eo-gsa-d01-runtime-asne1`）
+>
+> `EO_RE_INSTANCE_ID`（`001` 等）は SA 名から除去済み。
+
+**SA の文字数確認（30文字制限）:**
+
+| SA | 例 | 文字数 | 余裕 |
+|---|---|---|---|
+| Deployer | `eo-gsa-d01-deploy-asne1` | 23文字 | 7文字 ✅ |
+| Runtime | `eo-gsa-d01-runtime-asne1` | 24文字 | 6文字 ✅ |
+| OAuth2 Invoker | `eo-gsa-d01-oa2inv-asne1` | 23文字 | 7文字 ✅ |
+
+> [!NOTE]
+> GCP SA は `labels` 非対応。命名メタデータは `display_name`（100文字）+ `description`（256文字）で保持。
+>
+> ```hcl
+> resource "google_service_account" "runtime" {
+>   account_id   = "eo-gsa-d01-runtime-asne1"
+>   display_name = "EO GCP Cloud Run Runtime SA (asne1)"
+>   description  = "Cloud Run runtime identity with Secret Manager access"
+> }
+> ```
+
+---
+
+### 5.5 Cloudflare Workers（Wrangler）
+
+IaC: `RequestEngine/cf/workers/ts/funcfiles/wrangler.toml`（または `wrangler.jsonc`）
+
+| リソース | パターン | 例 |
+|---|---|---|
+| **Worker 名** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-cfworker-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-cfworker-global-001` |
+
+> Cloudflare にはタグ機能がないため、命名メタデータは `wrangler.toml` 内コメントで管理。
+
+---
+
+## 6. タグ / ラベルスキーマ
+
+### 6.1 共通タグ定義
+
+全クラウドのリソースに統一の `eo_` プレフィックス（またはキャメルケース）タグを付与する。
+
+**AWS Tags（CFn）:**
+
+```yaml
+Tags:
+  - Key: Name
+    Value: !Sub "..."
+  - Key: Project
+    Value: !Ref ProjectPrefix     # eo
+  - Key: Environment
+    Value: !Ref Environment       # d01
+```
+
+**Azure Tags（Bicep）:**
+
+```bicep
+var COMMON_TAGS = {
+  Project:     EO_PROJECT      // eo
+  Component:   EO_COMPONENT    // re
+  Environment: EO_ENV          // d01
+  ManagedBy:   'Bicep'
+}
+```
+
+**GCP Labels（Terraform）:**
+
+```hcl
+locals {
+  eo_gcp_resource_labels = {
+    project     = var.project_prefix   # eo
+    component   = var.component        # re
+    environment = var.environment      # d01
+    managed-by  = "terraform"
+  }
+}
+```
+
+### 6.2 クラウド別タグ/ラベル対応
+
+| クラウド | タグ/ラベル機能 | 対応方法 |
+|---|---|---|
+| **AWS** | Tags（全リソース対応） | `Name`, `Project`, `Environment` を付与 |
+| **Azure** | Tags（全リソース対応） | `COMMON_TAGS` 変数でまとめて付与 |
+| **GCP** | Labels（リソース依存） | `eo_gcp_resource_labels` でまとめて付与 |
+| **GCP SA** | Labels **非対応** | `display_name` + `description` で代替 |
+| **Cloudflare** | タグ機能なし | `wrangler.toml` 内コメントで記録 |
+
+---
+
 ## 7. 文字数制約サマリー
 
-| リソース | 制限 | ボトルネック | 対策 |
-|---|---|---|---|
-| Azure Key Vault 名 | **24文字** | EO_GLOBAL_PRJ_ENV_ID 最大6文字 | `EO_COMPONENT` をタグに退避、EO_GLOBAL_PRJ_ENV_ID 運用上限4文字 |
-| Azure Storage Account 名 | **24文字** | ハイフン不可 | 全結合、EO_GLOBAL_PRJ_ENV_ID 運用上限4文字 |
-| GCP Service Account ID | **30文字** | Labels 非対応 | `display_name` + `description` で代替 |
-| GCP WIF Pool/Provider ID | 32文字 | | リージョン不含パターン |
-| AWS IAM Role 名 | 64文字 | | 基本パターンで収まる |
-| AWS IAM Policy 名 | 128文字 | | 基本パターンで収まる |
+| リソース | 制限 | 現在の例 | 文字数 | 余裕 |
+|---|---|---|---|---|
+| **Azure Key Vault** | **24文字** | `eo-kv-d01-jpe-001-a1b2` | 22文字 | 2文字 |
+| **Azure Storage Account** | **24文字** | `eorestd01jpe001a1b2` | 19文字 | 5文字 |
+| **GCP SA (Deployer)** | **30文字** | `eo-gsa-d01-deploy-asne1` | 23文字 | 7文字 |
+| **GCP SA (Runtime)** | **30文字** | `eo-gsa-d01-runtime-asne1` | 24文字 | 6文字 |
+| **GCP SA (OAuth2 Invoker)** | **30文字** | `eo-gsa-d01-oa2inv-asne1` | 23文字 | 7文字 |
+| **GCP WIF Pool/IdP** | 32文字 | `eo-gcp-idp-gh-oidc-wif-d01` | 27文字 | 5文字 |
+| **AWS IAM Role** | 64文字 | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr` | 44文字 | 20文字 |
+| **AWS IAM Policy** | 128文字 | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr-iamp` | 49文字 | 79文字 |
+| **Azure Function App** | 60文字 | `eo-re-d01-funcapp-jpe-001` | 25文字 | 35文字 |
+| **Cloud Run Service** | 63文字 | `eo-re-d01-cloudrun-asne1` | 24文字 | 39文字 |
+
+> [!NOTE]
+> **GCP SA** は `gcp-sa`→`gsa`、`oa2be-inv`→`oa2inv` の短縮により、いずれも 30文字以内に収まっている。`EO_ENV` を 4文字以上にする場合は文字数再確認すること。
+
+---
+
+## 8. GCP プロジェクト命名
+
+`variables.tf` で `gcp_project_id` の validation パターンが定義されている。
+
+```hcl
+validation {
+  condition     = can(regex("^[a-z][a-z0-9-]{4,28}[a-z0-9]$", var.gcp_project_id))
+  error_message = "gcp_project_id must be 6-30 characters, lowercase, numbers, and hyphens."
+}
+```
+
+**推奨命名パターン:**
+
+| パターン | 例 | 文字数 |
+|---|---|---|
+| `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-pr-{EO_REGION_SHORT}` | `eo-re-d01-pr-asne1` | 18文字 ✅ |
+
+`-pr-` は "project" の略。

@@ -19,11 +19,10 @@ permissions:
   id-token: write # OIDC認証に必須
   contents: read  # リポジトリの読み取りに必須
 
-# Request Engine Instance config: ../../RequestEngine/azure/functions/py/instances_conf/funcapp001.env
-# Resource name pattern: eo-re-d01-funcapp-{re_region_short}
+# 命名は EO_Documents/Manuals/py/AZFUNC_BICEP_README.md の export およびリソース名パターンに合わせる
 env:
-  FUNCTION_APP_NAME: eo-re-d01-funcapp-jpe
-  RESOURCE_GROUP: eo-re-d01-resource-group-jpe
+  EO_AZ_RE_FUNCAPP_NAME: eo-re-d01-funcapp-jpe-001
+  EO_AZ_RE_RESOURCE_GROUP: eo-re-d01-resource-grp-jpe
 
 jobs:
   deploy:
@@ -136,13 +135,13 @@ jobs:
       - name: Deploy to Azure Functions
         working-directory: ./deploy_package
         run: |
-          func azure functionapp publish ${{ env.FUNCTION_APP_NAME }} --python
+          func azure functionapp publish ${{ env.EO_AZ_RE_FUNCAPP_NAME }} --python
 
           # Set EO_AZ_RE_KEYVAULT_URL app setting explicitly
           if [ -n "${{ secrets.EO_AZ_RE_KEYVAULT_URL }}" ]; then
             az functionapp config appsettings set \
-              --name ${{ env.FUNCTION_APP_NAME }} \
-              --resource-group ${{ env.RESOURCE_GROUP }} \
+              --name ${{ env.EO_AZ_RE_FUNCAPP_NAME }} \
+              --resource-group ${{ env.EO_AZ_RE_RESOURCE_GROUP }} \
               --settings "EO_AZ_RE_KEYVAULT_URL=${{ secrets.EO_AZ_RE_KEYVAULT_URL }}" \
               --output none
           fi
