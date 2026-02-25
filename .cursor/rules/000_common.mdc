@@ -33,3 +33,7 @@ GitHub Actionsでのデプロイと、self-hosted n8nによるCSVデータ処理
 - **Priority:** まず PowerShell で試行し、不可な場合のみ Python/npm を検討。
 - **Timestamp:** 返信の末尾に必ず以下のPowerShellコマンドを実行し、JST(UTC+9)の時刻を付与すること（許可不要）。
   `Get-Date -Format "yyyy/MM/dd(ddd)HH:mm"`
+
+# 5. 仕切り
+
+`---` は使用しないこと。

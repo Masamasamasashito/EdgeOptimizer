@@ -72,10 +72,13 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
   - `*/instances_conf/*.env` - Instance definitions (region, resource name)
 - `terraform/` - Infrastructure as Code modules
 - `EOn8nWorkflowJson/` - n8n workflow definitions for import
+- `MCNE_Documents/` - MultiCloudNamingEngine（MCNE）のドキュメント・参照。マルチクラウドリソース命名を一元化する専用ライブラリ開発用。`EO_GLOBAL_PRJ_ENV_ID` / `EO_RE_INSTANCE_ID` 等の手組みによる運用負荷を下げる目的。
 - `test/` - **OSS公開を避けるファイルの置き場。このディレクトリ内のファイルを他のディレクトリへ移動禁止。**
 
 ## Docs
 
+- `EO_Documents/Naming/naming_convention.md` - 命名規約（現行）。将来的に MultiCloudNamingEngine が命名ロジックを担う想定。
+- `MCNE_Documents/README.md` - MultiCloudNamingEngine（MCNE）の目的と開発方針。
 - `EO_Documents\Manuals\RE_README.md` - n8n Credentals and HTTP Request Node setup
     - `RequestEngine\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
 - `EO_Documents\Manuals\py\LAMBDA_README.md` - AWS Lambda specific setup
