@@ -86,14 +86,16 @@ export EO_AZ_LOCATIONS='["japaneast"]'
 export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 ```
 
+**`EO_RE_INSTANCE_ID` をリソース名に含める基準**は [naming_convention.md](../../Naming/naming_convention.md) の **§2.4** を参照。Azure の Function App / Key Vault / Storage は一意スコープがグローバルのため、いずれも `EO_RE_INSTANCE_ID` を含める。
+
 デフォルトパラメータ（`eo-re-d01-funcapp-jpe-001`）の文字制約：
 
 | リソース種別 | リソース名パターン | グローバル一意命名 | 文字制約 |
 |-------------|-------------------|---------------|----------|
 | Function App | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}`<br>デフォルト: `eo-re-d01-funcapp-jpe-001` | ✅ 必須 | 2-60文字、英数字とハイフン |
 | App Service Plan | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}`<br>デフォルト: `ASP-eored01resourcegrpjpe`(25文字) | - | 1-40文字、英数字とハイフン |
-| Storage Account | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}`<br>デフォルト:`eorestd01jpe001a1b2`（19文字） | ✅ 必須 | 3-24文字、**英小文字と数字のみ**（ハイフン不可） |
-| Key Vault | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}`<br>デフォルト:`eo-kv-d01-jpe-001-a1b2`（22文字。24文字制限に対し2文字バッファ） | ✅ 必須 | 3-24文字、英数字とハイフン、英字で開始 |
+| Storage Account | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}`<br>デフォルト:`eorestd01jpea1b2001`（19文字） | ✅ 必須 | 3-24文字、**英小文字と数字のみ**（ハイフン不可） |
+| Key Vault | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}`<br>デフォルト:`eo-kv-d01-jpe-a1b2-001`（22文字。24文字制限に対し2文字バッファ） | ✅ 必須 | 3-24文字、英数字とハイフン、英字で開始 |
 | Key Vault Secret | `{EO_AZFUNC_REQUEST_SECRET_NAME}`<br>デフォルト:`AZFUNC-REQUEST-SECRET` | - | 1-127文字、英数字とハイフン |
 | RBAC 割り当て | Function App → Key Vault シークレットユーザー | - | - |
 
@@ -101,10 +103,10 @@ export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 
 以下のリソースは文字制約に注意しながら **Azure 全体でグローバルに一意** である必要があります：
 
-- **Key Vault**: `https://{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}.vault.azure.net/` の `{name}` 部分
-    - EX) `https://eo-kv-d01-jpe-001-a1b2.vault.azure.net/`
-- **Storage Account**: `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}.blob.core.windows.net` の `{name}` 部分
-    - EX) `eorestd01jpe001a1b2.blob.core.windows.net`
+- **Key Vault**: `https://{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}.vault.azure.net/` の `{name}` 部分
+    - EX) `https://eo-kv-d01-jpe-a1b2-001.vault.azure.net/`
+- **Storage Account**: `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}.blob.core.windows.net` の `{name}` 部分
+    - EX) `eorestd01jpea1b2001.blob.core.windows.net`
     - ハイフン不可
 - **Function App**: `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}.azurewebsites.net`
     - EX) `eo-re-d01-funcapp-jpe-001.azurewebsites.net`
@@ -149,7 +151,7 @@ export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 
 **「ユーザー アクセス管理者 (User Access Administrator)」確認**
 
-1. Azure > サブスクリプション > サブスクリプション > アクセス制御(IAM) > ロールの割り当て
+1. Azure > サブスクリプション > (上量課金など)サブスクリプション > アクセス制御(IAM) > ロールの割り当て
 2. 対象のユーザーの役割が「ユーザー  アクセス管理者 (User Access Administrator)」になっていることを確認
 3. 対象のユーザーのスコープが「ルート（継承済み）」になっていることを確認
 
@@ -496,7 +498,7 @@ az bicep build --file "${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-azure-funcapp.bic
 
 Azure Portal で自分に権限を付与します。
 
-1. Key Vault > `${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}-${EO_GLOBAL_PRJ_ENV_ID}` > アクセス制御 (IAM)
+1. Key Vault > `${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}` > アクセス制御 (IAM)
 2. 「+ 追加」> 「ロールの割り当ての追加」
 3. ロール: `キー コンテナー シークレット責任者`（Key Vault Secrets Officer）
     - `シークレットの読み取り・書き込み・削除（管理者用）`
@@ -506,7 +508,7 @@ Azure Portal で自分に権限を付与します。
 
 ### 3-2. Key Vault シークレットの更新
 
-1. Azure Portal > Key Vault > `${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}-${EO_GLOBAL_PRJ_ENV_ID}`
+1. Azure Portal > Key Vault > `${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}`
 2. オブジェクト > シークレット > `AZFUNC-REQUEST-SECRET`
 3. 「+ 新しいバージョン」をクリック
 4. シークレット値: `EO_Infra_Docker/.env` の `N8N_EO_REQUEST_SECRET` の値
@@ -515,7 +517,7 @@ Azure Portal で自分に権限を付与します。
 **Bash（Linux / macOS / Git Bash / WSL）:**
 ```bash
 az keyvault secret set \
-  --vault-name "${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}-${EO_GLOBAL_PRJ_ENV_ID}" \
+  --vault-name "${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}" \
   --name $EO_AZFUNC_REQUEST_SECRET_NAME \
   --value '<N8N_EO_REQUEST_SECRET の値>'
 ```
@@ -655,7 +657,7 @@ az provider register --namespace Microsoft.KeyVault
 2. または論理削除された Key Vault を完全削除:
    ```bash
    # Bash / PowerShell 共通
-   az keyvault purge --name ${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}-${EO_GLOBAL_PRJ_ENV_ID} --location ${EO_REGION}
+   az keyvault purge --name ${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID} --location ${EO_REGION}
    ```
 
 ### Function App から Key Vault にアクセスできない

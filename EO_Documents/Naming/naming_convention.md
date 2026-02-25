@@ -3,6 +3,8 @@
 > **最終更新**: 2026-02-24
 > **更新根拠**: `RequestEngine/` 配下の IaC コード（CFn / Bicep / Terraform / Wrangler）の実装を正とし整合化
 
+**命名の運用負荷低減**: `EO_GLOBAL_PRJ_ENV_ID` と `EO_RE_INSTANCE_ID` を各リソース・クラウドごとに手で組み合わせると運用負荷が高いため、**`MCNE_Documents/`**（MultiCloudNamingEngine）で命名ロジックを専用ライブラリに集約する方針。本ドキュメントは現行ルールの正本であり、将来は当該ライブラリが命名を生成し、IaC 等から参照する想定。概要は [MCNE_Documents/README.md](../../MCNE_Documents/README.md) を参照。
+
 ---
 
 ## 1. DBテーブル設計考慮観点
@@ -140,33 +142,46 @@ EO_REGION=global
 EO_REGION_SHORT=global
 ```
 
----
+### 2.4 EO_GLOBAL_PRJ_ENV_ID と EO_RE_INSTANCE_ID のリソース名付与基準
+
+`EO_RE_INSTANCE_ID` は `RequestEngine/aws/lambda/py/instances_conf/*.env` や `RequestEngine/azure/functions/py/instances_conf/*.env` など、各クラウドの `RequestEngine/*/*/*/instances_conf/*.env` に存在する。基本的にクラウドとリージョンの中でRequestEngine自体に付与するインスタンスIDであり、リソース名の最後尾に付与することで、リソースのグローバルなユニーク識別子とする。
+
+
+変数表現例）AzureのFunction App`{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` となり、`EO_RE_INSTANCE_ID`
+
+実名例）AzureのFunction App`eo-re-d01-funcapp-jpe-001`
+
+- **付与する**: コンピュート／関数リソース（Lambda 関数名、Function App、Cloud Run サービス、Worker 名など）— クラウドを問わずリクエストエンジンすべて
+- **付与しない**: シークレットサービス（Key Vault、Secrets Manager 等）とストレージ（Storage Account、S3 等）— クラウドを問わず
+
 
 ## 3. EO_GLOBAL_PRJ_ENV_ID
 
 プロジェクト環境ごとに固定する任意のユニーク識別子。
 グローバル一意が必須なリソース名（Azure Key Vault, Azure Storage Account）に埋め込んで衝突を防止する。
 
+**順序の原則**: リクエストエンジンは **`EO_GLOBAL_PRJ_ENV_ID` を `EO_RE_INSTANCE_ID` の直前に付与する**（`…-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` または `…{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}`）。
+
 ### 3.1 文字数制約の逆算
 
 **Azure Key Vault（24文字制限）**
 
-| パターン | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}` |
+| パターン | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` |
 |---|---|
 | Bicep変数名 | `KEY_VAULT_NAME` |
-| 具体例 | `eo-kv-d01-jpe-001-a1b2` (22文字) |
-| 内訳 | `eo`(2) + `-kv`(3) + `-d01`(4) + `-jpe`(4) + `-001`(4) + `-a1b2`(5) = 22文字 |
+| 具体例 | `eo-kv-d01-jpe-a1b2-001` (22文字) |
+| 内訳 | `eo`(2) + `-kv`(3) + `-d01`(4) + `-jpe`(4) + `-a1b2`(5) + `-001`(4) = 22文字 |
 | 文字種 | 小文字英数字 + ハイフン |
 
 > **`EO_SECRET_SERVICE` = `kv`（Bicep パラメータ、デフォルト値）**
 
 **Azure Storage Account（24文字制限、ハイフン不可）**
 
-| パターン | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}` |
+| パターン | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}` |
 |---|---|
 | Bicep変数名 | `STORAGE_ACCOUNT_NAME` |
-| 具体例 | `eorestd01jpe001a1b2` (19文字) |
-| 内訳 | `eo`(2) + `re`(2) + `st`(2) + `d01`(3) + `jpe`(3) + `001`(3) + `a1b2`(4) = 19文字 |
+| 具体例 | `eorestd01jpea1b2001` (19文字) |
+| 内訳 | `eo`(2) + `re`(2) + `st`(2) + `d01`(3) + `jpe`(3) + `a1b2`(4) + `001`(3) = 19文字 |
 | 文字種 | 小文字英数字のみ（ハイフン不可） |
 
 > **`EO_STORAGE_SERVICE` = `st`（Bicep パラメータ、デフォルト値）**
@@ -192,7 +207,7 @@ Storage Account のハイフン不可制約に合わせ、かつ Key Vault の6�
 > **DNS 名前空間は Azure 全リージョン・全テナントを跨いだグローバル空間**になっている。
 > つまり `eo-kv-d01-jpe-001` というシンプルな名前は自分以外の誰かが既に使用していると作成できない。
 >
-> `EO_GLOBAL_PRJ_ENV_ID` を末尾に付加することで、他テナントとの衝突を回避する。
+> `EO_GLOBAL_PRJ_ENV_ID` を **`EO_RE_INSTANCE_ID` の直前に**付加することで、他テナントとの衝突を回避し、リクエストエンジン全体で順序を統一する。
 
 **比較: リージョン内一意で足りるリソース（`EO_GLOBAL_PRJ_ENV_ID` 不使用）**
 
@@ -301,8 +316,8 @@ IaC: `RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml`
 | **CFn スタック** | `eo-aws-cfnstack` | `eo-aws-cfnstack` | — |
 
 > [!NOTE]
-> Lambda 関数名には `EO_RE_INSTANCE_ID`（`001` 等）を含まない。
-> インスタンス識別は `EO_REGION_SHORT` で行う（リージョン = 1インスタンスが前提）。
+> Lambda などの各クラウドのサーバレス関数名には `EO_RE_INSTANCE_ID`（`001` 等）を最後尾に含む。
+> 1リージョン = 1インスタンス前提ではない。1リージョン=複数インスタンスの場合もありうる。）。
 
 ---
 
@@ -310,18 +325,20 @@ IaC: `RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml`
 
 IaC: `RequestEngine/azure/functions/py/bicep/eo-re-d01-azure-funcapp.bicep`
 
+**§2.4 に従い** Function App / Key Vault / Storage Account の名前は一意スコープがグローバルのため、いずれも `EO_GLOBAL_PRJ_ENV_ID-EO_RE_INSTANCE_ID` を含める。
+
 | リソース | パターン（Bicep変数） | 例 | 文字制限 |
 |---|---|---|---|
 | **Function App** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-funcapp-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-funcapp-jpe-001` | 60文字 |
-| **App Service Plan** | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}` | `ASP-eoredreourcegroup-resourcegrpjpe` | — |
-| **Key Vault** | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}-{EO_GLOBAL_PRJ_ENV_ID}` | `eo-kv-d01-jpe-001-a1b2` | **24文字** |
-| **Storage Account** | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_RE_INSTANCE_ID}{EO_GLOBAL_PRJ_ENV_ID}` | `eorestd01jpe001a1b2` | **24文字** |
+| **App Service Plan** | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}` | `ASP-eored01reourcegrpjpe` | — |
+| **Key Vault** | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` | `eo-kv-d01-jpe-a1b2-001` | **24文字** |
+| **Storage Account** | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}` | `eorestd01jpea1b2001` | **24文字** |
 | **Key Vault Secret** | `AZFUNC-REQUEST-SECRET` | `AZFUNC-REQUEST-SECRET` | 127文字 |
 | **Entra ID App (GH Actions)** | `eo-ghactions-deploy-entra-app-azfunc-{EO_REGION_SHORT}` | `eo-ghactions-deploy-entra-app-azfunc-jpe` | — |
 | **Resource Group** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-resourcegroup-{EO_REGION_SHORT}` | `eo-re-d01-resourcegroup-jpe` | 90文字 |
 
 > [!NOTE]
-> Key Vault と Storage Account はグローバル一意が必須のため `EO_GLOBAL_PRJ_ENV_ID` を末尾に付与。
+> Key Vault と Storage Account はグローバル一意が必須のため `EO_GLOBAL_PRJ_ENV_ID` を **`EO_RE_INSTANCE_ID` の直前に**付与（§3 の順序の原則）。
 > Storage Account はハイフン不可のため全結合。
 > App Service Plan 名は Bicep `variables` 内で自動生成（`ASP-` プレフィックス固定）。
 
@@ -344,11 +361,13 @@ IaC: `RequestEngine/gcp/cloudrun/py/terraform/`
 | **WIF IdP** | `{project_prefix}-gcp-idp-gh-oidc-wif-{environment}` | `eo-gcp-idp-gh-oidc-wif-d01` | 32文字 |
 
 > [!IMPORTANT]
-> **GCP Service Account の命名変更（2026-02-24更新）**
-> - 旧: `eo-gsa-{env}-{role}-{region_short}` （例: `eo-gsa-d01-runtime-asne1-001`）
-> - **新: `eo-gsa-{env}-{role}-{region_short}`** （例: `eo-gsa-d01-runtime-asne1`）
+> **GCP Service Account の命名（§2.4 に準拠）**
+> - パターン: `eo-gsa-{env}-{role}-{region_short}`（例: `eo-gsa-d01-runtime-asne1`）
+> - 一意スコープがプロジェクト内のため、リソース名に `EO_RE_INSTANCE_ID` は含めない。
 >
-> `EO_RE_INSTANCE_ID`（`001` 等）は SA 名から除去済み。
+> [!NOTE]
+> **§2.4 に従い** Cloud Run サービス名・SA 名には `EO_RE_INSTANCE_ID` を含めない。
+> 一意スコープがプロジェクト＋リージョン（またはプロジェクト内）であり、「1リージョン1インスタンス」を前提とする。
 
 **SA の文字数確認（30文字制限）:**
 
@@ -374,6 +393,8 @@ IaC: `RequestEngine/gcp/cloudrun/py/terraform/`
 ### 5.5 Cloudflare Workers（Wrangler）
 
 IaC: `RequestEngine/cf/workers/ts/funcfiles/wrangler.toml`（または `wrangler.jsonc`）
+
+**§2.4 に従い** Worker 名は一意スコープがアカウント内で名前で識別するため、`EO_RE_INSTANCE_ID` を含める。
 
 | リソース | パターン | 例 |
 |---|---|---|
