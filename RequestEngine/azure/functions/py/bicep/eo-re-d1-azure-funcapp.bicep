@@ -119,7 +119,7 @@ param EO_SOFT_DELETE_RETENTION_DAYS int = 7
 // ==============================================================================
 
 // Resource names per EO_Documents/Manuals/py/AZFUNC_BICEP_README.md (Key Vault & Storage: 24-char limit, 22-char target for buffer)
-var FUNCTION_APP_NAME = '${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-funcapp-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}'
+var FUNCTION_APP_NAME = '${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-funcapp-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}'  // e.g. eo-re-d1-funcapp-jpe-a1b2-001 (globally unique hostname)
 var KEY_VAULT_NAME = '${EO_PROJECT}-${EO_SECRET_SERVICE}-${EO_ENV}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}'  // e.g. eo-kv-d1-jpe-a1b2-001 (22 chars)
 var STORAGE_ACCOUNT_NAME = '${EO_PROJECT}${EO_COMPONENT}${EO_STORAGE_SERVICE}${EO_ENV}${EO_REGION_SHORT}${EO_GLOBAL_PRJ_ENV_ID}${EO_RE_INSTANCE_ID}'  // No hyphens, max 24 chars; e.g. eorestd1jpea1b2001 (19 chars)
 var APP_SERVICE_PLAN_NAME = 'ASP-${EO_PROJECT}${EO_COMPONENT}${EO_ENV}resourcegrp${EO_REGION_SHORT}'

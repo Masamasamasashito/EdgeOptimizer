@@ -86,13 +86,13 @@ export EO_AZ_LOCATIONS='["japaneast"]'
 export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 ```
 
-**`EO_RE_INSTANCE_ID` をリソース名に含める基準**は [naming_convention.md](../../Naming/naming_convention.md) の **§2.4** を参照。Azure の Function App / Key Vault / Storage は一意スコープがグローバルのため、いずれも `EO_RE_INSTANCE_ID` を含める。
+**`EO_RE_INSTANCE_ID` をリソース名に含める基準**は [SchemaDesign_DbNormalization.md](../SchemaDesign_DbNormalization.md) の **§2.4** を参照。Azure の Function App / Key Vault / Storage は一意スコープがグローバルのため、いずれも `EO_RE_INSTANCE_ID` を含める。
 
-デフォルトパラメータ（`eo-re-d1-funcapp-jpe-001`）の文字制約：
+リクエストエンジン Azure Function App のデフォルトパラメータ（`eo-re-d1-funcapp-jpe-a1b2-001`）の文字制約：
 
 | リソース種別 | リソース名パターン | グローバル一意命名 | 文字制約 |
 |-------------|-------------------|---------------|----------|
-| Function App | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}`<br>デフォルト: `eo-re-d1-funcapp-jpe-001` | ✅ 必須 | 2-60文字、英数字とハイフン |
+| Function App | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}`<br>デフォルト: `eo-re-d1-funcapp-jpe-a1b2-001` | ✅ 必須 | 2-60文字、英数字とハイフン |
 | App Service Plan | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}`<br>デフォルト: `ASP-eored1resourcegrpjpe`(25文字) | - | 1-40文字、英数字とハイフン |
 | Storage Account | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}`<br>デフォルト:`eorestd1jpea1b2001`（19文字） | ✅ 必須 | 3-24文字、**英小文字と数字のみ**（ハイフン不可） |
 | Key Vault | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}`<br>デフォルト:`eo-kv-d1-jpe-a1b2-001`（22文字。24文字制限に対し2文字バッファ） | ✅ 必須 | 3-24文字、英数字とハイフン、英字で開始 |
@@ -108,8 +108,8 @@ export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 - **Storage Account**: `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}.blob.core.windows.net` の `{name}` 部分
     - EX) `eorestd1jpea1b2001.blob.core.windows.net`
     - ハイフン不可
-- **Function App**: `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}.azurewebsites.net`
-    - EX) `eo-re-d1-funcapp-jpe-001.azurewebsites.net`
+- **Function App**: `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}.azurewebsites.net`
+    - EX) `eo-re-d1-funcapp-jpe-a1b2-001.azurewebsites.net`
 
 **Key Vault / Storage の文字数**: いずれも Azure 制限は 24 文字。2 文字バッファを残すため、実質 22 文字以内を推奨。デフォルトでは Key Vault 22 文字・Storage 19 文字。`EO_GLOBAL_PRJ_ENV_ID` は 4 文字以内にすると 22 文字を超えにくい。
 
@@ -583,7 +583,7 @@ Bicep で作成した Function App にはまだ関数コードがありません
 
 ### 5-2. デプロイ結果の確認
 
-1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-001）
+1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-a1b2-001）
 2. 左サイドバー > **関数** をクリック
 3. `requestengine_func` が表示されていれば成功
 
@@ -594,7 +594,7 @@ Bicep で作成した Function App にはまだ関数コードがありません
 
 ### 6-1. Function App Key の取得
 
-1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-001）
+1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-a1b2-001）
 2. 関数 > `requestengine_func`
 3. 「関数の URL の取得」> `default` (ファンクション キー) を選択
 4. URL をコピー（`?code=...` まで含む）
@@ -620,12 +620,12 @@ Bicep で作成した Function App にはまだ関数コードがありません
 1. n8n > `280AZ-japaneast RequestEngine KeyVault` ノードを開く
 2. **Parameters** > **URL** に Function App の URL を設定:
    ```
-   https://eo-re-d1-funcapp-jpe-001.azurewebsites.net/api/requestengine_func
+   https://eo-re-d1-funcapp-jpe-a1b2-001.azurewebsites.net/api/requestengine_func
    ```
 3. 「Save」
 
 **URL の確認方法**:
-- Azure Portal > 関数アプリ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-001）> 関数 > `requestengine_func`
+- Azure Portal > 関数アプリ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_GLOBAL_PRJ_ENV_ID}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-a1b2-001）> 関数 > `requestengine_func`
 - 「関数の URL の取得」> `default` (ファンクション キー) の URL から `?code=...` を除いた部分
 
 **認証の補足**:

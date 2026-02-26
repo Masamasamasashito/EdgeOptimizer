@@ -21,7 +21,7 @@ permissions:
 
 # 命名は EO_Documents/Manuals/py/AZFUNC_BICEP_README.md の export およびリソース名パターンに合わせる
 env:
-  EO_AZ_RE_FUNCAPP_NAME: eo-re-d1-funcapp-jpe-001
+  EO_AZ_RE_FUNCAPP_NAME: eo-re-d1-funcapp-jpe-a1b2-001
   EO_AZ_RE_RESOURCE_GROUP: eo-re-d1-resource-grp-jpe
 
 jobs:

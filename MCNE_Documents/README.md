@@ -6,7 +6,7 @@
 - B to BのSaaSとして拡張する場合、既にtenantは本ドキュメントの設計に組み込まれているため、この点においてのみ拡張性があります。
   - 各種省略形の_slugは衝突する可能性がある。別途、テナント分離を優先したRLS (Row-Level Security)が必要。
   - 各種の名前に意味を詰め込みすぎているため、顧客買収、テナント統合、ブランド変更に対する耐性が皆無（物理名の再作成が必要になる）。意味はタグラベルとDBで管理に寄せることも検討。
-  - ResourceTypeは2文字は厳しい。
+  - ServiceTypeは2文字は厳しい。
 - Cloudflareは未対応。
 
 # 背景
@@ -16,7 +16,7 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 # 階層構造の基本
 
 - ユーザー権限ツリー: Tenant ＞ Project ＞ User
-- リソース実体ツリー: Tenant ＞ Project ＞ Environment ＞ Area ＞ Resource
+- リソース実体ツリー: Tenant ＞ Project ＞ Environment ＞ Area ＞ Service
 
 # マルチクラウド(AWS / Azure / GCP )リソース命名制約
 
@@ -61,12 +61,12 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 
 - 特定の1社の企業内としてシングルテナントを想定。
   - S3バケットやAzure Key Vault のようなグローバル一意リソース命名のユニーク確保が重要。
-- issued_resource_namesテーブルは個々のリソースのGlobal Unique KeyとしてTenant、Project、Environment、Area、ResourceTypeなどのUUIDをUUIDv7で保持する。
+- issued_resource_namesテーブルは個々のリソースのGlobal Unique KeyとしてTenant、Project、Environment、Area、ServiceTypeなどのUUIDをUUIDv7で保持する。
 - 「Environment」について、AWSはアカウントIDで環境を区分、AzureはサブスクリプションID(管理リソースグループ)で環境を区分、GCPはプロジェクトで環境を区分。
   - 「Environment」はリソース名にも含み、なおかつタグラベルにも含むのがベストプラクティス。
     - 理由：同一サブスクリプション(Azure)/プロジェクト(GCP)内で prd と dev のストレージアカウントを作る際、名前が重複すると作成できないため。
 - 開発運用のコストを考慮し、各クラウドGUI画面におけるリソース命名の視認フィーリングによる理解の確保は必須
-- Environment、Cloudプロバイダ種別、(エリア短縮スラッグを含む)同一エリア、リソースタイプは世界共通の命名として扱う
+- Environment、Cloudプロバイダ種別、(エリア短縮スラッグを含む)同一エリア、サービスタイプは世界共通の命名として扱う
   - TerraformやPulmiなどのメジャーなIaCツールも参考にする
 - 各セグメントを「リソース名」or「タグラベル」のどちらに記載するか、双方に記載するか、記載しないか基準が必要
   - タグラベルに記載。
@@ -76,7 +76,7 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
     - Project
     - Environment
     - Area
-    - ResourceType
+    - ServiceType
     - Nano ID
 - リソース名のハイフォン有無は、hyphen_allowed : falseリソースグループとhyphen_allowed : trueリソースグループで異なる。
   - hyphen_allowed : falseリソースグループ：ハイフォン無し
@@ -97,8 +97,8 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 
 各セグメントをどこに載せるかは、MCNE では次のように整理する。
 
-- **タグラベルに必ず載せる**: Environment（必要に応じて Tenant / Project / Area / ResourceType も載せる）
-- **リソース名に必ず載せる（ハイフォン無し 用パックの対象）**: Tenant / Project / Environment / Area / ResourceType / Nano ID  
+- **タグラベルに必ず載せる**: Environment（必要に応じて Tenant / Project / Area / ServiceType も載せる）
+- **リソース名に必ず載せる（ハイフォン無し 用パックの対象）**: Tenant / Project / Environment / Area / ServiceType / Nano ID  
   - これらを連結した長さは **MCNE 設計リミット**以内に収める（実機リミット 24 文字のまま使う例では 4+3+2+5+4+6 = 24。バッファを取る場合は MCNE 設計リミットを 22 文字等にし、セグメント長を再配分する）。
 
 # 個別リソース命名シュミレーション
@@ -113,17 +113,17 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 | Project       | project_slug | 3 | `edo`   | 6 |
 | Environment   | environment_slug | 2 | `d1` | 8 |
 | Area        | area_short_slug | 4 | `an01`| 12 |
-| ResourceType  | resource_type_slug | 3 | `lam`  | 15 |
+| ServiceType  | service_type_slug | 3 | `lam`  | 15 |
 | NanoID          | issued_resource_name_nanoid_slug | 6 | `5g4h7b` | 21 |
 
 - hyphen_allowed : falseリソースグループ：ハイフォン無（最大 21 文字）  
-  - `{tenant_slug(3)}{project_slug(3)}{environment_slug(2)}{area_short_slug(4)}{resource_type_slug(3)}{issued_resource_name_nanoid_slug(6)}`  
+  - `{tenant_slug(3)}{project_slug(3)}{environment_slug(2)}{area_short_slug(4)}{service_type_slug(3)}{issued_resource_name_nanoid_slug(6)}`  
   - `nshedod1an01lam5g4h7b` (21文字)
 - hyphen_allowed : trueリソースグループ：ハイフォン有（最大 26 文字）
-  - `{tenant_slug(3)}-{project_slug(3)}-{environment_slug(2)}-{area_short_slug(4)}-{resource_type_slug(3)}-{issued_resource_name_nanoid_slug(6)}`
+  - `{tenant_slug(3)}-{project_slug(3)}-{environment_slug(2)}-{area_short_slug(4)}-{service_type_slug(3)}-{issued_resource_name_nanoid_slug(6)}`
   - `nsh-edo-d1-an01-lam-5g4h7b` (26文字)
 
-※1社内利用前提では、比較的にバッファが大きいため、resource_type_slugのmax_lengthを3文字としている。
+※1社内利用前提では、比較的にバッファが大きいため、service_type_slugのmax_lengthを3文字としている。
 
 ## エリア短縮スラッグ4桁のバリエーション
 
@@ -171,21 +171,21 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 | Project       | project_slug | 3 | `edo`   | 7 |
 | Environment   | environment_slug | 2 | `d1` | 9 |
 | Area        | area_short_slug | 4 | `an01`| 13 |
-| ResourceType  | resource_type_slug | 2 | `lm`  | 15 |
+| ServiceType  | service_type_slug | 2 | `lm`  | 15 |
 | NanoID          | issued_resource_name_nanoid_slug | 7 | `5g4h78b` | 22 |
 
 - hyphen_allowed : falseリソースグループ：ハイフォン無（最大 22 文字）  
-  - `{tenant_slug(4)}{project_slug(3)}{environment_slug(2)}{area_short_slug(4)}{resource_type_slug(2)}{issued_resource_name_nanoid_slug(7)}`  
+  - `{tenant_slug(4)}{project_slug(3)}{environment_slug(2)}{area_short_slug(4)}{service_type_slug(2)}{issued_resource_name_nanoid_slug(7)}`  
   - `nshiedod1an01lm5g4h78b` (22文字)
 - hyphen_allowed : trueリソースグループ：ハイフォン有（最大 27 文字）
-  - `{tenant_slug(4)}-{project_slug(3)}-{environment_slug(2)}-{area_short_slug(4)}-{resource_type_slug(2)}-{issued_resource_name_nanoid_slug(7)}`
+  - `{tenant_slug(4)}-{project_slug(3)}-{environment_slug(2)}-{area_short_slug(4)}-{service_type_slug(2)}-{issued_resource_name_nanoid_slug(7)}`
   - `nshi-edo-d1-an01-lm-5g4h78b` (27文字)
 
 # Multi Cloud Naming Engineの内部処理フロー
 
 MCNEは、以下のロジックで各リソースの「物理名」を生成
 
-1. 入力: tenant_id, project_id, resource_type_id, environment_id, area_id, 発行済みissued_resource_name_id
+1. 入力: tenant_id, project_id, service_type_id, environment_id, area_id, 発行済みissued_resource_name_id
 2. 変換: 内部マッピングテーブルを参照し、エリアを4文字（例: an01）、リソースを3文字（例: lam）に変換。
 3. Nano ID生成: issued_resource_name_id から 6 文字のNano IDを生成。衝突する場合はリトライ試行回数上限5回として、上限回数を超えた場合は7文字のNanoIDとする。
 4. 形式選択(推奨の場合):
@@ -213,28 +213,28 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 | areas | area_id | 主キー | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | UUIDv7 |
 | areas | area_short_slug | エリア短縮スラッグ | an01 | 4文字 | |
 | areas | real_area_name | 実エリア名 | Asia Pacific (Osaka) | | |
-| resource_types | resource_type_id | 主キー | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | UUIDv7 |
-| resource_types | resource_type_slug | リソースタイプ名 | lam | 3文字 | |
-| resource_types | resource_type_display_name | 表示名 | AWS Lambda | | 
+| service_types | service_type_id | 主キー | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | UUIDv7 |
+| service_types | service_type_slug | サービスタイプ名 | lam | 3文字 | |
+| service_types | service_type_display_name | 表示名 | AWS Lambda | | 
 
-**resource_type_constraints（リソース種別×クラウドごとの命名制約）**
+**service_type_constraints（リソース種別×クラウドごとの命名制約）**
 
-クラウド × リソース種別の組み合わせでhyphen_allowed : falseリソースグループとhyphen_allowed : trueリソースグループの制約が異なるため、ハイフォン無しとLengthの命名制約を `resource_types` から分離し、リソース種別とクラウドの組み合わせごとに保持する。
+クラウド × リソース種別の組み合わせでhyphen_allowed : falseリソースグループとhyphen_allowed : trueリソースグループの制約が異なるため、ハイフォン無しとLengthの命名制約を `service_types` から分離し、リソース種別とクラウドの組み合わせごとに保持する。
 
 | テーブル名 | カラム名 | 説明 | 例 | 文字数 | 備考 |
 | --- | --- | --- | --- | --- | --- |
-| resource_type_constraints | resource_type_constraint_id | 主キー | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | UUIDv7 |
-| resource_type_constraints | resource_type_id | リソース種別ID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー → resource_types |
-| resource_type_constraints | cloud_provider_id | クラウドプロバイダID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー → cloud_providers |
-| resource_type_constraints | hyphen_allowed_false_max_length | ハイフォン無し 時の最大文字数 | 22 | - | ハイフォン無し連結の上限。実機リミット以下 |
-| resource_type_constraints | hyphen_allowed_false_min_length | ハイフォン無し 時の最小文字数 | 21 | - | ハイフォン無し連結の下限。実機リミット以下 |
-| resource_type_constraints | hyphen_allowed | ハイフォン許可 | true / false | - | false = ハイフォン無し、true = ハイフォン有り として扱う |
-| resource_type_constraints | lowercase_required  | 小文字必須 | true / false | - |  |
-| resource_type_constraints | global_unique_required | グローバル一意必須 | true / false | - | S3/Storage Account/Key Vault 等は true |
+| service_type_constraints | service_type_constraint_id | 主キー | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | UUIDv7 |
+| service_type_constraints | service_type_id | リソース種別ID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー → service_types |
+| service_type_constraints | cloud_provider_id | クラウドプロバイダID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー → cloud_providers |
+| service_type_constraints | hyphen_allowed_false_max_length | ハイフォン無し 時の最大文字数 | 22 | - | ハイフォン無し連結の上限。実機リミット以下 |
+| service_type_constraints | hyphen_allowed_false_min_length | ハイフォン無し 時の最小文字数 | 21 | - | ハイフォン無し連結の下限。実機リミット以下 |
+| service_type_constraints | hyphen_allowed | ハイフォン許可 | true / false | - | false = ハイフォン無し、true = ハイフォン有り として扱う |
+| service_type_constraints | lowercase_required  | 小文字必須 | true / false | - |  |
+| service_type_constraints | global_unique_required | グローバル一意必須 | true / false | - | S3/Storage Account/Key Vault 等は true |
 
-※(resource_type_id, cloud_provider_id) に Unique 制約を設ける。命名時は issued_resource_names の resource_type_id と cloud_provider_id で本テーブルを参照し、hyphen_allowed_false_max_length / hyphen_allowed_false_min_length / lowercase_required / hyphen_allowed に従って物理名を生成する。
+※(service_type_id, cloud_provider_id) に Unique 制約を設ける。命名時は issued_resource_names の service_type_id と cloud_provider_id で本テーブルを参照し、hyphen_allowed_false_max_length / hyphen_allowed_false_min_length / lowercase_required / hyphen_allowed に従って物理名を生成する。
 
-※エリア短縮スラッグ、リソースタイプ名は、変数マスタが別途必要。各クラウドの実エリア名とエリア短縮スラッグ、リソースタイプ名のマッピングを保持する。
+※エリア短縮スラッグ、サービスタイプ名は、変数マスタが別途必要。各クラウドの実エリア名とエリア短縮スラッグ、サービスタイプ名のマッピングを保持する。
 
 **トランザクションテーブル（発行済リソース名台帳）**
 | テーブル名 | カラム名 | 説明 | 例 | 文字数 | 備考|
@@ -246,7 +246,7 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 | issued_resource_names | project_id | プロジェクトID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | | 外部キー |
 | issued_resource_names | environment_id | 環境ID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | | 外部キー |
 | issued_resource_names | area_id | エリアID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | | 外部キー |
-| issued_resource_names | resource_type_id | リソースタイプID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | | 外部キー |
+| issued_resource_names | service_type_id | サービスタイプID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | | 外部キー |
 | issued_resource_names | cloud_provider_id | クラウドプロバイダID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー参照テーブル: cloud_providers |
 | issued_resource_names | created_by_id | 作成者ID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー参照テーブル: users |
 | issued_resource_names | issued_resource_name_slug | 発行済リソース名 | nshedod1an01lm5g4h78b | 22文字 | **全レコードUnique Index必須** |
@@ -274,7 +274,7 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 
 # hyphen_allowed の設計
 
-- 同じ ResourceType でもクラウドで制約が違う。
+- 同じ ServiceType でもクラウドで制約が違う。
   - 例: S3 → ハイフォン有り、Azure Storage → ハイフォン無し
 - 将来、別クラウドで同種のリソースが ハイフォン無し になる可能性など、大げさとも言われるくらい想定外の事態を考慮しておくべき。
 
@@ -288,7 +288,7 @@ Terraformのaliasや display_name タグで補完することも検討する。
 1. リソース削除時のユニーク制約解除
   - リソース削除時に、ユニーク制約を解除する機能が必要。
 2. physical_name のユニーク保証範囲
-3. resource_type 2文字は将来苦しくないか？
+3. service_type 2文字は将来苦しくないか？
   - 2文字だと、36^2 = 1296通り。
   - 抽象化を丁寧に行えば、1296通りで足りる。
     - 例: AWS Lambda, Azure Functions, GCP Cloud Run は (抽象化)name:fncでid:25 として扱う。

@@ -77,7 +77,8 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 
 ## Docs
 
-- `EO_Documents/Naming/naming_convention.md` - 命名規約（現行）。将来的に MultiCloudNamingEngine が命名ロジックを担う想定。
+- `EO_Documents/Manuals/py/pyIaC_MCNE_Naming.md` - Azure Functions Bicepを軸にしたpyIaCのMCNE 命名寄せ計画
+- `EO_Documents/Manuals/SchemaDesign_DbNormalization.md` - 主にDBスキーマ設計と正規化。将来的に MultiCloudNamingEngine が命名ロジックを担う想定。
 - `MCNE_Documents/README.md` - MultiCloudNamingEngine（MCNE）の目的と開発方針。
 - `EO_Documents\Manuals\RE_README.md` - n8n Credentals and HTTP Request Node setup
     - `RequestEngine\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed

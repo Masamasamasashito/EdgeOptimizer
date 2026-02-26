@@ -147,9 +147,9 @@ EO_REGION_SHORT=global
 `EO_RE_INSTANCE_ID` は `RequestEngine/aws/lambda/py/instances_conf/*.env` や `RequestEngine/azure/functions/py/instances_conf/*.env` など、各クラウドの `RequestEngine/*/*/*/instances_conf/*.env` に存在する。基本的にクラウドとリージョンの中でRequestEngine自体に付与するインスタンスIDであり、リソース名の最後尾に付与することで、リソースのグローバルなユニーク識別子とする。
 
 
-変数表現例）AzureのFunction App`{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` となり、`EO_RE_INSTANCE_ID`
+変数表現例）AzureのFunction App`{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` となり、`EO_RE_INSTANCE_ID`
 
-実名例）AzureのFunction App`eo-re-d1-funcapp-jpe-001`
+実名例）AzureのFunction App`eo-re-d1-funcapp-jpe-a1b2-001`
 
 - **付与する**: コンピュート／関数リソース（Lambda 関数名、Function App、Cloud Run サービス、Worker 名など）— クラウドを問わずリクエストエンジンすべて
 - **付与しない**: シークレットサービス（Key Vault、Secrets Manager 等）とストレージ（Storage Account、S3 等）— クラウドを問わず
@@ -199,6 +199,7 @@ Storage Account のハイフン不可制約に合わせ、かつ Key Vault の6�
 |---|---|---|---|
 | **Azure Key Vault** | リージョン配置 | **グローバル一意** (`{name}.vault.azure.net`) | ✅ 必須 |
 | **Azure Storage Account** | リージョン配置 | **グローバル一意** (`{name}.blob.core.windows.net`) | ✅ 必須 |
+| **Azure Function App** | リージョン配置 | **グローバル一意** (`{name}.azurewebsites.net`) | ✅ 必須 |
 
 > [!NOTE]
 > **リージョン配置 ≠ リージョン内一意**
@@ -219,7 +220,6 @@ Storage Account のハイフン不可制約に合わせ、かつ Key Vault の6�
 | GCP | Cloud Run Service | プロジェクト + リージョン内 |
 | GCP | Service Account | プロジェクト内 |
 | GCP | Secret Manager | プロジェクト内 |
-| Azure | Function App | サブスクリプション内（※ デフォルトホスト名は `.azurewebsites.net` でグローバル一意だが Bicep で明示的に管理） |
 | Cloudflare | Worker | アカウント内 |
 
 AWS, GCP, Cloudflare のリソースはプロジェクト/リージョン内で一意であれば十分なため不使用。
@@ -329,7 +329,7 @@ IaC: `RequestEngine/azure/functions/py/bicep/eo-re-d1-azure-funcapp.bicep`
 
 | リソース | パターン（Bicep変数） | 例 | 文字制限 |
 |---|---|---|---|
-| **Function App** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-funcapp-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d1-funcapp-jpe-001` | 60文字 |
+| **Function App** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-funcapp-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` | `eo-re-d1-funcapp-jpe-a1b2-001` | 60文字 |
 | **App Service Plan** | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}` | `ASP-eored1reourcegrpjpe` | — |
 | **Key Vault** | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` | `eo-kv-d1-jpe-a1b2-001` | **24文字** |
 | **Storage Account** | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}` | `eorestd1jpea1b2001` | **24文字** |
@@ -470,7 +470,7 @@ locals {
 | **GCP WIF Pool/IdP** | 32文字 | `eo-gcp-idp-gh-oidc-wif-d1` | 27文字 | 5文字 |
 | **AWS IAM Role** | 64文字 | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr` | 43文字 | 21文字 |
 | **AWS IAM Policy** | 128文字 | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr-iamp` | 48文字 | 80文字 |
-| **Azure Function App** | 60文字 | `eo-re-d1-funcapp-jpe-001` | 24文字 | 36文字 |
+| **Azure Function App** | 60文字 | `eo-re-d1-funcapp-jpe-a1b2-001` | 29文字 | 31文字 |
 | **Cloud Run Service** | 63文字 | `eo-re-d1-cloudrun-asne1` | 23文字 | 40文字 |
 
 > [!NOTE]
