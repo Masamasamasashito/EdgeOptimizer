@@ -3,8 +3,10 @@
 - マルチクラウド（AWS / Azure / GCP ）・マルチエリアにおけるリソース命名を一元化するための設計ドキュメントです。
 - ID圧縮命名エンジンです。
 - 特定の1社の企業内としてシングルテナントを想定しています。
-- B to BのSaaSとして拡張する場合、既にtenantは本ドキュメントの設計に組み込まれているため、この点においては拡張性があります。
+- B to BのSaaSとして拡張する場合、既にtenantは本ドキュメントの設計に組み込まれているため、この点においてのみ拡張性があります。
   - 各種省略形の_slugは衝突する可能性がある。別途、テナント分離を優先したRLS (Row-Level Security)が必要。
+  - 各種の名前に意味を詰め込みすぎているため、顧客買収、テナント統合、ブランド変更に対する耐性が皆無（物理名の再作成が必要になる）。意味はタグラベルとDBで管理に寄せることも検討。
+  - ResourceTypeは2文字は厳しい。
 - Cloudflareは未対応。
 
 # 背景
@@ -49,7 +51,7 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 - GCP Service Account（**プロジェクト内一意**）
   - 小文字英数字のみ（ハイフォン不可）、3~30文字
 
-グローバル一意必須を加味すると、issued_resource_name_nanoidを「論理的なリソースリソースグループ2文字」+「採番4文字」という命名は不可。
+グローバル一意必須を加味すると、issued_resource_name_nanoidを「論理的なリソースグループ2文字」+「採番4文字」という命名は不可。
 
 # マルチクラウド(AWS / Azure / GCP )リソース命名視認性確保
 
@@ -59,12 +61,12 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 
 - 特定の1社の企業内としてシングルテナントを想定。
   - S3バケットやAzure Key Vault のようなグローバル一意リソース命名のユニーク確保が重要。
-- issued_resource_namesテーブルは個々のリソースのGlobal Unique KeyとしてTenant、Project、Environment、Region、ResourceTypeなどのUUIDをUUIDv7で保持する。
+- issued_resource_namesテーブルは個々のリソースのGlobal Unique KeyとしてTenant、Project、Environment、Area、ResourceTypeなどのUUIDをUUIDv7で保持する。
 - 「Environment」について、AWSはアカウントIDで環境を区分、AzureはサブスクリプションID(管理リソースグループ)で環境を区分、GCPはプロジェクトで環境を区分。
   - 「Environment」はリソース名にも含み、なおかつタグラベルにも含むのがベストプラクティス。
     - 理由：同一サブスクリプション(Azure)/プロジェクト(GCP)内で prd と dev のストレージアカウントを作る際、名前が重複すると作成できないため。
 - 開発運用のコストを考慮し、各クラウドGUI画面におけるリソース命名の視認フィーリングによる理解の確保は必須
-- Environment、Cloudプロバイダ種別、(短縮名を含む)エリア種別、リソースタイプは世界共通の命名でOK。
+- Environment、Cloudプロバイダ種別、(エリア短縮スラッグを含む)同一エリア、リソースタイプは世界共通の命名として扱う
   - TerraformやPulmiなどのメジャーなIaCツールも参考にする
 - 各セグメントを「リソース名」or「タグラベル」のどちらに記載するか、双方に記載するか、記載しないか基準が必要
   - タグラベルに記載。
@@ -89,7 +91,7 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
     - AWS IAM Role
     - AWS IAM Policy
 
-※CloudWatchのログ管理のログリソースグループは、スラッシュが一般的だがハイフォンを採用する。
+※CloudWatchのログ管理のロググループは、スラッシュが一般的だがハイフォンを採用する。
 
 # セグメント配置方針（タグ vs リソース名）
 
@@ -121,23 +123,25 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
   - `{tenant_slug(3)}-{project_slug(3)}-{environment_slug(2)}-{area_short_slug(4)}-{resource_type_slug(3)}-{issued_resource_name_nanoid_slug(6)}`
   - `nsh-edo-d1-an01-lam-5g4h7b` (26文字)
 
-## エリア短縮名4桁のバリエーション
+※1社内利用前提では、比較的にバッファが大きいため、resource_type_slugのmax_lengthを3文字としている。
 
-[地理(2文字：英語)][ゾーン(2文字：数字0から9の10進数)]でクラウドは含めない。
+## エリア短縮スラッグ4桁のバリエーション
+
+[area_prefix(2文字：英語)][area_number(2文字：数字0から9の10進数)]でクラウドはエリアの分類に含めない。
+
+同一地理圏(同一エリア)を area_prefix として集約。
 
 理由：
 - MCNEはクラウド抽象化エンジン
-- エリアは地理概念として統一
-- 後付拡張が可能
+- 同一エリアは同一地理圏として概念を統一
+- 36進数化として後付拡張が可能(エリアのマスタテーブルに36進数フラグを作る)
 
 後付拡張の例：
-- [地理2文字：英語][ゾーン2文字：英数字0から9 + AからZの36進数]
+- [area_prefix(2文字：英語)][area_number(2文字：英数字0から9 + AからZの36進数)]
 
-**Asia Pacific North East 短縮コード紐づけリスト**
+**Asia Pacific North East エリア短縮スラッグの紐づけリスト例**
 
-同一地理圏を同一 prefix に集約。
-
-| クラウド | 実エリア | 短縮コード  |
+| クラウド | 実エリア名 | エリア短縮スラッグ  |
 | --------- | ------------ | ------ |
 | AWS | ap-northeast-1  | `an01` |
 | AWS | ap-northeast-2  | `an02` |
@@ -146,18 +150,16 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 | GCP | asia-northeast2 | `an05` |
 | Azure | japaneast     | `an06` |
 
-**US East 短縮コード紐づけリスト**
+**US East エリア短縮スラッグの紐づけリスト例**
 
-同一地理圏を同一 prefix に集約。
-
-| クラウド | 実エリア | 短縮コード  |
+| クラウド | 実エリア名 | エリア短縮スラッグ  |
 | --------- | ------------ | ------ |
 | AWS | us-east-1 | `ue01` |
 | AWS | us-east-2 | `ue02` |
 | GCP | us-east1 | `ue03` |
 | Azure | eastus | `ue04` |
 
-※これだけでは全然足りないので、開発開始時点で実エリアと短縮コード紐づけリスト作成が必要。
+※例だけでは足りないので、開発開始時点で実エリアとエリア短縮スラッグの紐づけリスト作成が必要。
 
 ## BtoBでSaaSにおける多テナント利用前提における推奨例（実機リミット 24 文字、MCNE 設計リミット 22 文字）
 
@@ -179,7 +181,7 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
   - `{tenant_slug(4)}-{project_slug(3)}-{environment_slug(2)}-{area_short_slug(4)}-{resource_type_slug(2)}-{issued_resource_name_nanoid_slug(7)}`
   - `nshi-edo-d1-an01-lm-5g4h78b` (27文字)
 
-# Muclti Cloud Naming Engineの内部処理フロー
+# Multi Cloud Naming Engineの内部処理フロー
 
 MCNEは、以下のロジックで各リソースの「物理名」を生成
 
@@ -209,8 +211,8 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 | environments | environment_slug | 環境名 | d1 | 2文字 | |
 | environments | environment_display_name | 表示名 | Development1 | | |
 | areas | area_id | 主キー | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | UUIDv7 |
-| areas | area_short_slug | エリア名 | an01 | 4文字 | |
-| areas | area_display_name | 表示名 | Asia Pacific (Osaka) | | |
+| areas | area_short_slug | エリア短縮スラッグ | an01 | 4文字 | |
+| areas | real_area_name | 実エリア名 | Asia Pacific (Osaka) | | |
 | resource_types | resource_type_id | 主キー | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | UUIDv7 |
 | resource_types | resource_type_slug | リソースタイプ名 | lam | 3文字 | |
 | resource_types | resource_type_display_name | 表示名 | AWS Lambda | | 
@@ -232,7 +234,7 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 
 ※(resource_type_id, cloud_provider_id) に Unique 制約を設ける。命名時は issued_resource_names の resource_type_id と cloud_provider_id で本テーブルを参照し、hyphen_allowed_false_max_length / hyphen_allowed_false_min_length / lowercase_required / hyphen_allowed に従って物理名を生成する。
 
-※短縮エリア名、リソースタイプ名は、短縮エリア名、リソースタイプ名の変数マスタが別途必要、各クラウドのエリア名と短縮エリア名、リソースタイプ名とリソースタイプ名のマッピングを保持する。
+※エリア短縮スラッグ、リソースタイプ名は、変数マスタが別途必要。各クラウドの実エリア名とエリア短縮スラッグ、リソースタイプ名のマッピングを保持する。
 
 **トランザクションテーブル（発行済リソース名台帳）**
 | テーブル名 | カラム名 | 説明 | 例 | 文字数 | 備考|
@@ -248,10 +250,9 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 | issued_resource_names | cloud_provider_id | クラウドプロバイダID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー参照テーブル: cloud_providers |
 | issued_resource_names | created_by_id | 作成者ID | xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx | 36 | 外部キー参照テーブル: users |
 | issued_resource_names | issued_resource_name_slug | 発行済リソース名 | nshedod1an01lm5g4h78b | 22文字 | **全レコードUnique Index必須** |
-| issued_resource_names | issued_resource_name_length | 発行済リソース名の長さ | 21 or 22文字 | - | **全レコードUnique Index必須** |
+| issued_resource_names | issued_resource_name_slug_length | 発行済リソース名の長さ | 21 or 22文字 | - | - |
 | issued_resource_names | issued_resource_name_deleted_at | 論理削除 | timestamp | - | - |
 
-※issued_resource_names_strict_length_id と issued_resource_flexible_length_id は、各クラウドの「名称使用可能チェックAPI」を叩くバリデーションが必要。
 ※users テーブルは、ユーザー管理テーブルであり、ユーザーID、ユーザー名、ユーザー表示名、ユーザーメールアドレス、ユーザー権限などを保持する。
 
 # Nano ID 衝突回避戦略
@@ -261,10 +262,15 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 - 7文字: 36^7 ≒ 78B
 - 単一企業なら十分だが、論理削除あり・グローバル一意必須リソースありのため、衝突リスクを明示的に扱う必要がある。
 
-**推奨（仕様書に明文化すべき）**
-- **tenant + project + environment 単位で衝突チェック**を行う。
-- **5回リトライ上限**を設ける。
-- リトライ上限を越えて失敗した場合は**桁増加モード**（例: 6文字→7文字）に切り替える。
+**衝突チェックのスコープ設計**
+
+- global_unique_required = true の場合
+  - 組織外との競合を考慮し、issued_resource_name_slug でクラウドプロバイダのAPIを叩き、衝突チェック
+- global_unique_required = false の場合
+  - 組織内における競合を考慮し、tenant 単位で衝突チェック
+- 共通
+  - **衝突チェック 5回 リトライ上限**
+  - リトライ上限を越えて失敗した場合、**桁増加モード**（例: 6文字→7文字）に切り替える。
 
 # hyphen_allowed の設計
 
@@ -274,26 +280,28 @@ MCNEは、以下のロジックで各リソースの「物理名」を生成
 
 # 課題
 
-抽象化を突き詰めると、ユニーク確保対策の衝突問題を避けやすくなるが、GUI上における人間の運用負荷が高くなる。
+(エリアのように)抽象化を突き詰めると、ユニーク確保対策の衝突問題を避けやすくなるが、GUI上における人間の目で可読性が失われる。
 
-抽象化 と 運用負荷 のバランスを見極める必要がある。
+抽象化 と 運用負荷 のバランスを見極める必要がある
+Terraformのaliasや display_name タグで補完することも検討する。
 
-1. 衝突チェックのスコープ設計
-- global_unique_required = true の場合
-  - 全 issued_resource_name_slug で衝突チェック
-- global_unique_required = false の場合
-  - (tenant_id + project_id + environment_id) 単位で衝突チェック
+1. リソース削除時のユニーク制約解除
+  - リソース削除時に、ユニーク制約を解除する機能が必要。
 2. physical_name のユニーク保証範囲
 3. resource_type 2文字は将来苦しくないか？
   - 2文字だと、36^2 = 1296通り。
   - 抽象化を丁寧に行えば、1296通りで足りる。
     - 例: AWS Lambda, Azure Functions, GCP Cloud Run は (抽象化)name:fncでid:25 として扱う。
   - マスタ管理なら問題ない。
-4. 名前に意味を詰め込みすぎ
-- 以下が発生した場合
+4. 各種の名前に意味を詰め込みすぎ
+- 以下が発生した場合、物理リソース再作成が必要になる。
   1. tenant名変更
   2. project統合
   3. env再設計
   4. area抽象化変更
 
-→ 名前変更＝物理リソース再作成が必要になる
+5. 視認性の確保
+- ハイフォン無しのリソース名は、人間による視認性を下げ、運用負荷を上げる。
+- GUI上ではハイフォンを付与して表示、実際の処理ではハイフォン無しで扱うという機能が必要
+6. Windows VM ホスト名の15文字制限には対応できない
+7. テナント名の枯渇攻撃対策として、tenant_slug　は自動割り当てを検討
