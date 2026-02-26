@@ -95,7 +95,7 @@ exit
 
 1. Lambda > レイヤー > 「レイヤーを作成」
 2. 名前: `eo-re-d1-lambda-python-slim-layer`
-3. 説明:  `Python 3.14 yyyymmdd v1`
+3. 説明:  `Python 3.14.3 yyyymmdd v1`
     - Lambda Layer 作成時に確認したpythonバージョンと、バージョン番号を記載しておく。 バージョン毎に説明文を変えることで、バージョン管理が容易になる。
 4. zip ファイルをアップロード
 5. 互換性のあるアーキテクチャ: `x86_64`
@@ -105,7 +105,7 @@ exit
 
 詳細手順: [LAMBDA_README.md](LAMBDA_README.md) の Section 8-9 参照
 
-### 1-2. GitHub OIDC Provider の確認
+### 1-2. AWS IAM IDプロバイダでGitHub OIDC Provider の確認
 
 Github ActionsでAWSにデプロイする際に、OIDC Providerが必要になります。
 
@@ -117,12 +117,14 @@ AWS IAMのIDプロバイダは、グローバルリソースなので、リー�
 1. AWS コンソール > IAM > ID プロバイダ
 2. `token.actions.githubusercontent.com` が存在するか確認
 
-**既存の場合の対応:**
+**既存で存在する場合の対応:**
 `eo-aws-cfnstack.yml` で以下の2箇所をコメントアウト:
 
 1. `GitHubOIDCProvider` リソース（329-349行目付近）
 2. `GitHubOIDCProviderArn` Output（509-513行目付近）
 
+**既存で存在すしない場合の対応:**
+STEP 2 で`eo-aws-cfnstack.yml` を実行します。
 ---
 
 ## STEP 2: CloudFormation スタックのデプロイ
