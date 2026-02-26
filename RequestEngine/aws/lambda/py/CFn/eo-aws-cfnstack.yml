@@ -15,7 +15,7 @@ Description: >
 #
 # 2. GitHub OIDC Provider (IMPORTANT):
 #    If your AWS account already has a GitHub OIDC Provider (token.actions.githubusercontent.com),
-#    you must REMOVE the GitHubOIDCProvider resource from this template to avoid duplicate error.
+#    set EoCreateGitHubOIDCProvider to "false" and set ExistingGitHubOIDCProviderArn to its ARN.
 #    Check: IAM > Identity providers > token.actions.githubusercontent.com
 #
 # ==============================================================================
@@ -64,6 +64,8 @@ Metadata:
       - Label:
           default: "GitHub Actions OIDC Settings"
         Parameters:
+          - EoCreateGitHubOIDCProvider
+          - ExistingGitHubOIDCProviderArn
           - GitHubOrg
           - EoGitHubRepo
     ParameterLabels:
@@ -95,6 +97,10 @@ Metadata:
         default: "RequestEngine (Lambda) Timeout (min 30s recommended)"
       EoReLambdaMemorySize:
         default: "RequestEngine (Lambda) Memory Size (min 128MB recommended)"
+      EoCreateGitHubOIDCProvider:
+        default: "Create new GitHub OIDC Provider with this AWS account ID? (false if one already exists)"
+      ExistingGitHubOIDCProviderArn:
+        default: "Existing OIDC Provider ARN (required when EoCreateGitHubOIDCProvider is false)"
       GitHubOrg:
         default: "GitHub Organization or Username"
       EoGitHubRepo:
@@ -228,6 +234,27 @@ Parameters:
     Type: String
     Description: "GitHub repository name"
     Default: "your-repo-name"
+
+  EoCreateGitHubOIDCProvider:
+    Type: String
+    Description: "Create a new GitHub OIDC Provider? Set to 'false' if one already exists in this AWS account ID."
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
+
+  ExistingGitHubOIDCProviderArn:
+    Type: String
+    Description: "If EoCreateGitHubOIDCProvider is 'false', provide the existing ARN (e.g., arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com)."
+    Default: ""
+
+# ==============================================================================
+# Conditions
+# ==============================================================================
+Conditions:
+  CreateOIDCResource: !Equals
+    - !Ref EoCreateGitHubOIDCProvider
+    - "true"
 
 # ==============================================================================
 # Resources
@@ -374,15 +401,13 @@ Resources:
               - !Sub "arn:aws:${EoServerlessService}:${EoRegion}:${AWSAccountId}:function:${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}:*"
 
   # ============================================================================
-  # IAM - GitHub Actions OIDC Provider
-  # WARNING: If this OIDC Provider already exists in your account, COMMENT OUT:
-  #   1. This "GitHubOIDCProvider" resource (below)
-  #   2. The "GitHubOIDCProviderArn" output (at the bottom of this file)
-  # to avoid "EntityAlreadyExists" error. Only ONE provider per URL per account.
-  # Check: IAM Console > Identity providers > token.actions.githubusercontent.com
+  # IAM - GitHub Actions OIDC Provider (created only when CreateOIDCResource is true)
+  # When EoCreateGitHubOIDCProvider is "false", use ExistingGitHubOIDCProviderArn instead.
+  # Only ONE provider per URL per AWS account ID. Check: IAM > Identity providers > token.actions.githubusercontent.com
   # ============================================================================
   GitHubOIDCProvider:
     Type: AWS::IAM::OIDCProvider
+    Condition: CreateOIDCResource
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
@@ -410,7 +435,10 @@ Resources:
         Statement:
           - Effect: Allow
             Principal:
-              Federated: !Sub "arn:aws:iam::${AWSAccountId}:oidc-provider/token.actions.githubusercontent.com"
+              Federated: !If
+                - CreateOIDCResource
+                - !Ref GitHubOIDCProvider
+                - !Ref ExistingGitHubOIDCProviderArn
             Action: sts:AssumeRoleWithWebIdentity
             Condition:
               StringEquals:
@@ -554,7 +582,10 @@ Outputs:
       Name: !Sub "${AWS::StackName}-GitHubActionsDeployRoleArn"
 
   GitHubOIDCProviderArn:
-    Description: "GitHub OIDC Provider ARN"
-    Value: !GetAtt GitHubOIDCProvider.Arn
+    Description: "GitHub OIDC Provider ARN (created by stack or existing)"
+    Value: !If
+      - CreateOIDCResource
+      - !Ref GitHubOIDCProvider
+      - !Ref ExistingGitHubOIDCProviderArn
     Export:
       Name: !Sub "${AWS::StackName}-GitHubOIDCProviderArn"
