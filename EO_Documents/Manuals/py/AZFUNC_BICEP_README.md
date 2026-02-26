@@ -113,12 +113,11 @@ export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 
 **Key Vault / Storage の文字数**: いずれも Azure 制限は 24 文字。2 文字バッファを残すため、実質 22 文字以内を推奨。デフォルトでは Key Vault 22 文字・Storage 19 文字。`EO_GLOBAL_PRJ_ENV_ID` は 4 文字以内にすると 22 文字を超えにくい。
 
-**対策**: パラメータを変更して一意の名前を生成してください：
+**対策**: いずれかのパラメータを変更して一意の名前を生成してください：
 - `EO_PROJECT` を変更（例: `eo` → `myeo`）
 - `EO_ENV` を変更（例: `d01` → `dev01`）
 - `EO_GLOBAL_PRJ_ENV_ID` を変更（例: `a1b2` → `x9k3`）。4 文字推奨（Key Vault/Storage の 22 文字バッファのため）
 - または組織固有のプレフィックスを追加
-
 
 
 ## 【参考】Entra ID , Azure 階層構造
