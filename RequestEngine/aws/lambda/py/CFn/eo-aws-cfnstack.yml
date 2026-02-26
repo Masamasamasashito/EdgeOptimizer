@@ -9,7 +9,7 @@ Description: >
 # ==============================================================================
 # 1. Lambda Layer:
 #    Create the Lambda Layer manually before deploying this stack.
-#    Layer ARN format: arn:aws:lambda:{AWSRegion}:{AWSAccountId}:layer:{ProjectPrefix}-{Component}-{Environment}-lambda-py314-slim-layer:{Version}
+#    Layer ARN format: arn:aws:{EoServerlessService}:{EoRegion}:{AWSAccountId}:layer:{EoProject}-{EoComponent}-{EoEnv}-{EoServerlessService}-py314-slim-layer:{Version}
 #    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:eo-re-d1-lambda-python-slim-layer:1
 #    See: EO_Documents/Manuals/py/LAMBDA_README.md (Section 8-9) for layer creation steps.
 #
@@ -25,7 +25,7 @@ Description: >
 #    Replace "REPLACE_WITH_N8N_EO_REQUEST_SECRET" with actual N8N_EO_REQUEST_SECRET from EO_Infra_Docker/.env
 #
 # 2. Create IAM Access Key for n8n (manual creation recommended for security):
-#    IAM Console > Users > {ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-iamu > Security credentials > Create access key
+#    IAM Console > Users > {EoProject}-{EoComponent}-{EoEnv}-{EoServerlessService}-{EoRegionShort}-iamu > Security credentials > Create access key
 #
 # 3. Set GitHub Secrets:
 #    Add GitHubActionsDeployRoleArn output value to GitHub repository secrets
@@ -41,65 +41,90 @@ Metadata:
       - Label:
           default: "Naming Convention Parameters"
         Parameters:
-          - ProjectPrefix
-          - Component
-          - Environment
-          - RegionShort
+          - EoProject
+          - EoComponent
+          - EoEnv
+          - EoRegionShort
+          - EoServerlessService
+          - EoSecretService
+          - EoLambdaRequestSecretName
       - Label:
           default: "AWS Account Settings"
         Parameters:
           - AWSAccountId
-          - AWSRegion
+          - EoRegion
       - Label:
           default: "Lambda Settings"
         Parameters:
-          - PythonRuntime
-          - LambdaLayerName
-          - LambdaLayerVersion
-          - LambdaTimeout
-          - LambdaMemorySize
+          - EoRePythonRuntimeVer
+          - EoReLambdaLayerName
+          - EoReLambdaLayerVer
+          - EoReLambdaTimeout
+          - EoReLambdaMemorySize
       - Label:
           default: "GitHub Actions OIDC Settings"
         Parameters:
           - GitHubOrg
-          - GitHubRepo
+          - EoGitHubRepo
     ParameterLabels:
-      ProjectPrefix:
+      EoProject:
         default: "Project Prefix (e.g., eo)"
-      Component:
-        default: "Component Identifier (e.g., re)"
-      Environment:
-        default: "Environment Identifier (e.g., d1, p01)"
-      RegionShort:
+      EoComponent:
+        default: "EoComponent Identifier (e.g., re)"
+      EoEnv:
+        default: "EoEnv Identifier (e.g., d1, p1)"
+      EoRegionShort:
         default: "Region Short Name (e.g., apne1)"
-      LambdaLayerName:
-        default: "Lambda Layer Name (must exist before deployment)"
+      EoServerlessService:
+        default: "Serverless Service Identifier (lambda = AWS Lambda)"
+      EoSecretService:
+        default: "Secret Service Identifier (secretsmng = AWS Secrets Manager)"
+      EoLambdaRequestSecretName:
+        default: "Lambda Request Secret Name (Not Value)"
+      AWSAccountId:
+        default: "AWS Account ID"
+      EoRegion:
+        default: "AWS Region"
+      EoRePythonRuntimeVer:
+        default: "RequestEngine (Lambda) Python Runtime Version"
+      EoReLambdaLayerName:
+        default: "RequestEngine (Lambda) Layer Name (must exist before deployment)"
+      EoReLambdaLayerVer:
+        default: "RequestEngine (Lambda) Layer Version"
+      EoReLambdaTimeout:
+        default: "RequestEngine (Lambda) Timeout (min 30s recommended)"
+      EoReLambdaMemorySize:
+        default: "RequestEngine (Lambda) Memory Size (min 128MB recommended)"
+      GitHubOrg:
+        default: "GitHub Organization or Username"
+      EoGitHubRepo:
+        default: "GitHub Repository Name"
 
 # ==============================================================================
 # Parameters
 # ==============================================================================
 Parameters:
   # --- Naming Convention ---
-  ProjectPrefix:
+  EoProject:
     Type: String
     Description: "Project prefix for resource naming"
     Default: "eo"
     AllowedPattern: "^[a-z0-9]+$"
     ConstraintDescription: "Lowercase alphanumeric only"
 
-  Component:
+  EoComponent:
     Type: String
-    Description: "Component identifier (re = Request Engine)"
+    Description: "EoComponent identifier (re = Request Engine)"
     Default: "re"
     AllowedPattern: "^[a-z0-9]+$"
 
-  Environment:
+  EoEnv:
     Type: String
-    Description: "Environment identifier (d1 = dev01, p01 = prod01)"
+    Description: "EoEnv identifier (d1 = dev01, p01 = prod01)"
     Default: "d1"
     AllowedPattern: "^[a-z0-9]+$"
 
-  RegionShort:
+  EoRegionShort:
     Type: String
     Description: "Short region name for resource naming"
     Default: "apne1"
@@ -112,6 +137,27 @@ Parameters:
       - "usw2"    # us-west-2 (Oregon)
       - "euw1"    # eu-west-1 (Ireland)
 
+  EoServerlessService:
+    Type: String
+    Description: "Serverless service identifier (lambda = Lambda)"
+    Default: "lambda"
+    AllowedValues:
+      - "lambda"
+
+  EoSecretService:
+    Type: String
+    Description: "Secret service identifier (secretsmng = Secrets Manager)"
+    Default: "secretsmng"
+    AllowedValues:
+      - "secretsmng"
+
+  EoLambdaRequestSecretName:
+    Type: String
+    Description: "Lambda request secret name"
+    Default: "LAMBDA_REQUEST_SECRET"
+    AllowedValues:
+      - "LAMBDA_REQUEST_SECRET"
+
   # --- AWS Account ---
   AWSAccountId:
     Type: String
@@ -120,7 +166,7 @@ Parameters:
     AllowedPattern: "^[0-9]{12}$"
     ConstraintDescription: "Must be a 12-digit AWS Account ID"
 
-  AWSRegion:
+  EoRegion:
     Type: String
     Description: "Target AWS Region"
     Default: "ap-northeast-1"
@@ -134,7 +180,7 @@ Parameters:
       - "eu-west-1"
 
   # --- Lambda Settings ---
-  PythonRuntime:
+  EoRePythonRuntimeVer:
     Type: String
     Description: "Python runtime version"
     Default: "python3.14"
@@ -144,25 +190,25 @@ Parameters:
       - "python3.13"
       - "python3.14"
 
-  LambdaLayerName:
+  EoReLambdaLayerName:
     Type: String
     Description: "Lambda Layer name (MUST exist before deployment). Example: eo-re-d1-lambda-python-slim-layer"
     Default: "eo-re-d1-lambda-python-slim-layer"
 
-  LambdaLayerVersion:
+  EoReLambdaLayerVer:
     Type: Number
     Description: "Lambda Layer version number"
     Default: 1
     MinValue: 1
 
-  LambdaTimeout:
+  EoReLambdaTimeout:
     Type: Number
     Description: "Lambda timeout in seconds (min 30s recommended)"
     Default: 30
     MinValue: 3
     MaxValue: 900
 
-  LambdaMemorySize:
+  EoReLambdaMemorySize:
     Type: Number
     Description: "Lambda memory size in MB"
     Default: 128
@@ -178,7 +224,7 @@ Parameters:
     Description: "GitHub organization or username"
     Default: "your-github-org"
 
-  GitHubRepo:
+  EoGitHubRepo:
     Type: String
     Description: "GitHub repository name"
     Default: "your-repo-name"
@@ -196,15 +242,15 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      LogGroupName: !Sub "/aws/lambda/${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}"
+      LogGroupName: !Sub "/aws/${EoServerlessService}/${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}"
       RetentionInDays: 1
       Tags:
         - Key: Name
-          Value: !Sub "/aws/lambda/${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}"
+          Value: !Sub "/aws/${EoServerlessService}/${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}"
         - Key: Project
-          Value: !Ref ProjectPrefix
-        - Key: Environment
-          Value: !Ref Environment
+          Value: !Ref EoProject
+        - Key: EoEnv
+          Value: !Ref EoEnv
 
   # ============================================================================
   # Secrets Manager - Request Secret for Token Verification
@@ -214,17 +260,17 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      Name: !Sub "${ProjectPrefix}-${Component}-${Environment}-secretsmng-${RegionShort}"
+      Name: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoSecretService}-${EoRegionShort}"
       Description: "N8N Request Secret for token verification (LAMBDA_REQUEST_SECRET)"
       # POST-DEPLOYMENT: Update this value with N8N_EO_REQUEST_SECRET from EO_Infra_Docker/.env
-      SecretString: '{"LAMBDA_REQUEST_SECRET": "REPLACE_WITH_N8N_EO_REQUEST_SECRET"}'
+      SecretString: !Sub '{"${EoLambdaRequestSecretName}": "REPLACE_WITH_N8N_EO_REQUEST_SECRET"}'
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectPrefix}-${Component}-${Environment}-secretsmng-${RegionShort}"
+          Value: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoSecretService}-${EoRegionShort}"
         - Key: Project
-          Value: !Ref ProjectPrefix
-        - Key: Environment
-          Value: !Ref Environment
+          Value: !Ref EoProject
+        - Key: EoEnv
+          Value: !Ref EoEnv
 
   # ============================================================================
   # IAM - Lambda Execution Role
@@ -234,7 +280,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      RoleName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-role"
+      RoleName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-role"
       Path: "/service-role/"
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
@@ -249,7 +295,7 @@ Resources:
         - !Ref LambdaSecretsAccessPolicy
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-role"
+          Value: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-role"
 
   # --- Lambda Basic Execution Policy (CloudWatch Logs) ---
   LambdaBasicExecutionPolicy:
@@ -257,7 +303,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-basic-exec-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-basic-exec-iamp"
       Path: "/service-role/"
       Description: "Basic execution policy for Lambda (CloudWatch Logs)"
       PolicyDocument:
@@ -265,13 +311,13 @@ Resources:
         Statement:
           - Effect: Allow
             Action: logs:CreateLogGroup
-            Resource: !Sub "arn:aws:logs:${AWSRegion}:${AWSAccountId}:*"
+            Resource: !Sub "arn:aws:logs:${EoRegion}:${AWSAccountId}:*"
           - Effect: Allow
             Action:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource:
-              - !Sub "arn:aws:logs:${AWSRegion}:${AWSAccountId}:log-group:/aws/lambda/${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}:*"
+              - !Sub "arn:aws:logs:${EoRegion}:${AWSAccountId}:log-group:/aws/${EoServerlessService}/${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}:*"
 
   # --- Lambda Secrets Manager Access Policy ---
   LambdaSecretsAccessPolicy:
@@ -279,7 +325,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-role-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-role-iamp"
       Path: "/"
       Description: "Policy to allow Lambda to read request secret from Secrets Manager"
       PolicyDocument:
@@ -289,7 +335,7 @@ Resources:
             Effect: Allow
             Action:
               - secretsmanager:GetSecretValue
-            Resource: !Sub "arn:aws:secretsmanager:${AWSRegion}:${AWSAccountId}:secret:${ProjectPrefix}-${Component}-${Environment}-secretsmng-${RegionShort}-*"
+            Resource: !Sub "arn:aws:secretsmanager:${EoRegion}:${AWSAccountId}:secret:${EoProject}-${EoComponent}-${EoEnv}-${EoSecretService}-${EoRegionShort}-*"
 
   # ============================================================================
   # IAM - n8n Access Key User (for Lambda Invocation)
@@ -300,13 +346,13 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      UserName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-iamu"
+      UserName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-iamu"
       Path: "/"
       ManagedPolicyArns:
         - !Ref N8nLambdaInvokePolicy
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-iamu"
+          Value: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-iamu"
 
   # --- n8n Lambda Invoke Policy ---
   N8nLambdaInvokePolicy:
@@ -314,7 +360,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-access-key-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-access-key-iamp"
       Path: "/"
       Description: "Policy for n8n to invoke Lambda function via Access Key"
       PolicyDocument:
@@ -322,10 +368,10 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - lambda:InvokeFunction
+              - !Sub "${EoServerlessService}:InvokeFunction"
             Resource:
-              - !Sub "arn:aws:lambda:${AWSRegion}:${AWSAccountId}:function:${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}"
-              - !Sub "arn:aws:lambda:${AWSRegion}:${AWSAccountId}:function:${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}:*"
+              - !Sub "arn:aws:${EoServerlessService}:${EoRegion}:${AWSAccountId}:function:${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}"
+              - !Sub "arn:aws:${EoServerlessService}:${EoRegion}:${AWSAccountId}:function:${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}:*"
 
   # ============================================================================
   # IAM - GitHub Actions OIDC Provider
@@ -347,7 +393,7 @@ Resources:
         - "2b18947a6a9fc7764fd8b5fb18a863b0c6dac24f"
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectPrefix}-ghactions-idp-request-engine-lambda-aws-${RegionShort}"
+          Value: !Sub "${EoProject}-ghactions-idp-request-engine-${EoServerlessService}-aws-${EoRegionShort}"
 
   # --- GitHub Actions Deploy Role ---
   GitHubActionsDeployRole:
@@ -355,7 +401,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      RoleName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-ghactions-deploy-iamr"
+      RoleName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-ghactions-deploy-iamr"
       Path: "/"
       MaxSessionDuration: 3600
       Description: "Role for GitHub Actions to deploy Lambda function"
@@ -371,12 +417,12 @@ Resources:
                 "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
               StringLike:
                 "token.actions.githubusercontent.com:sub":
-                  - !Sub "repo:${GitHubOrg}/${GitHubRepo}:*"
+                  - !Sub "repo:${GitHubOrg}/${EoGitHubRepo}:*"
       ManagedPolicyArns:
         - !Ref GitHubActionsDeployPolicy
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-ghactions-deploy-iamr"
+          Value: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-ghactions-deploy-iamr"
 
   # --- GitHub Actions Deploy Policy ---
   GitHubActionsDeployPolicy:
@@ -384,7 +430,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}-ghactions-deploy-iamr-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}-ghactions-deploy-iamr-iamp"
       Path: "/"
       Description: "Policy for GitHub Actions to deploy Lambda function"
       PolicyDocument:
@@ -397,7 +443,7 @@ Resources:
               - lambda:UpdateFunctionCode
               - lambda:UpdateFunctionConfiguration
               - lambda:GetFunction
-            Resource: !Sub "arn:aws:lambda:${AWSRegion}:${AWSAccountId}:function:${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}"
+            Resource: !Sub "arn:aws:${EoServerlessService}:${EoRegion}:${AWSAccountId}:function:${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}"
 
   # ============================================================================
   # Lambda Function
@@ -409,13 +455,13 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      FunctionName: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}"
+      FunctionName: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}"
       Description: "Edge Optimizer Request Engine - Lambda"
-      Runtime: !Ref PythonRuntime
+      Runtime: !Ref EoRePythonRuntimeVer
       Handler: lambda_function.lambda_handler
       Role: !GetAtt LambdaExecutionRole.Arn
-      MemorySize: !Ref LambdaMemorySize
-      Timeout: !Ref LambdaTimeout
+      MemorySize: !Ref EoReLambdaMemorySize
+      Timeout: !Ref EoReLambdaTimeout
       Architectures:
         - x86_64
       PackageType: Zip
@@ -432,7 +478,7 @@ Resources:
       # PREREQUISITE: Create this layer before deploying the stack
       # See: EO_Documents/Manuals/py/LAMBDA_README.md
       Layers:
-        - !Sub "arn:aws:lambda:${AWSRegion}:${AWSAccountId}:layer:${LambdaLayerName}:${LambdaLayerVersion}"
+        - !Sub "arn:aws:${EoServerlessService}:${EoRegion}:${AWSAccountId}:layer:${EoReLambdaLayerName}:${EoReLambdaLayerVer}"
       LoggingConfig:
         LogFormat: Text
         LogGroup: !Ref LambdaLogGroup
@@ -445,11 +491,11 @@ Resources:
       RecursiveLoop: Terminate
       Tags:
         - Key: Name
-          Value: !Sub "${ProjectPrefix}-${Component}-${Environment}-lambda-${RegionShort}"
+          Value: !Sub "${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoRegionShort}"
         - Key: Project
-          Value: !Ref ProjectPrefix
-        - Key: Environment
-          Value: !Ref Environment
+          Value: !Ref EoProject
+        - Key: EoEnv
+          Value: !Ref EoEnv
 
 # ==============================================================================
 # Outputs

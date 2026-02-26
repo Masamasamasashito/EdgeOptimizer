@@ -31,7 +31,7 @@
 
 ## 作成されるリソース一覧
 
-デフォルトパラメータ（`eo-re-d1-*-apne1`）の場合：
+デフォルトパラメータ（`eo-re-d1-lambda-apne1`）の場合：
 
 | リソース種別 | リソース名 |
 |-------------|-----------|
@@ -143,11 +143,11 @@ STEP 2 で`eo-aws-cfnstack.yml` を実行します。
 |-----------|-----|------|
 | AWSAccountId | `<AWSアカウントID>` | 12桁のAWSアカウントID |
 | Region Short Name | `apne1` | デプロイ先リージョン（短縮名） |
-| AWSRegion | `ap-northeast-1` | デプロイ先リージョン（フルネーム）  |
-| PythonRuntime | `python3.14` | Lambdaランタイム(小数第2位までを記載してください) |
+| EoRegion | `ap-northeast-1` | デプロイ先リージョン（フルネーム）  |
+| EoRePythonRuntimeVer | `python3.14` | Lambdaランタイム(小数第2位までを記載してください) |
 | GitHubOrg | `your-org` | GitHub組織名またはユーザー名 |
-| GitHubRepo | `your-repo` | リポジトリ名 |
-| LambdaLayerName | `eo-re-d1-lambda-python-slim-layer` | STEP 1-1 で作成した Layer 名 |
+| EoGitHubRepo | `your-repo` | リポジトリ名 |
+| EoReLambdaLayerName | `eo-re-d1-lambda-python-slim-layer` | STEP 1-1 で作成した Layer 名 |
 
 8. 「次へ」> 「次へ」
 9. 「AWS CloudFormation によって IAM リソースが作成される場合があることを承認します」にチェック
@@ -161,10 +161,10 @@ aws cloudformation create-stack \
   --template-body file://eo-aws-cfnstack.yml \
   --parameters \
     ParameterKey=AWSAccountId,ParameterValue=<AWSアカウントID> \
-    ParameterKey=AWSRegion,ParameterValue=ap-northeast-1 \
+    ParameterKey=EoRegion,ParameterValue=ap-northeast-1 \
     ParameterKey=GitHubOrg,ParameterValue=your-org \
-    ParameterKey=GitHubRepo,ParameterValue=your-repo \
-    ParameterKey=LambdaLayerName,ParameterValue=eo-re-d1-lambda-python-slim-layer \
+    ParameterKey=EoGitHubRepo,ParameterValue=your-repo \
+    ParameterKey=EoReLambdaLayerName,ParameterValue=eo-re-d1-lambda-python-slim-layer \
   --capabilities CAPABILITY_NAMED_IAM \
   --region ap-northeast-1
 ```
@@ -333,9 +333,9 @@ github actions workflowでデプロイします。
 
 1. 該当リポジトリのgithub で > (タブ)Actions
 2. (左メニュー)All workflows > (ワークフロー名) Deploy AWS Lambda
-3. Run workflow
-4. (ドロップダウン)main
-5. Run workflow
+3. 「Run workflow ▼」ボタンをクリック
+4. (ドロップダウン)Branch:mainを選択
+5. (緑色ボタン)Run workflow
 6. workflow完了を確認する
 
 ---
@@ -349,22 +349,22 @@ Lambdaだけ実行可能な状態です。Lambda以外を使わない場合、18
 | パラメータ | デフォルト | 説明 |
 |-----------|-----------|------|
 | **命名規則** |||
-| ProjectPrefix | `eo` | プロジェクトプレフィックス |
-| Component | `re` | コンポーネント識別子（Request Engine） |
-| Environment | `d1` | 環境識別子（dev01 等） |
-| RegionShort | `apne1` | リージョン短縮名 |
+| EoProject | `eo` | プロジェクトプレフィックス |
+| EoComponent | `re` | コンポーネント識別子（Request Engine） |
+| EoEnv | `d1` | 環境識別子（dev01 等） |
+| EoRegionShort | `apne1` | リージョン短縮名 |
 | **AWSアカウント** |||
 | AWSAccountId | (入力必須) | 12桁のAWSアカウントID |
-| AWSRegion | `ap-northeast-1` | デプロイ先リージョン |
+| EoRegion | `ap-northeast-1` | デプロイ先リージョン |
 | **Lambda設定** |||
-| PythonRuntime | `python3.14` | Pythonランタイムバージョン |
-| LambdaLayerName | `eo-re-d1-lambda-python-slim-layer` | Lambda Layer 名 |
-| LambdaLayerVersion | `1` | Lambda Layer バージョン |
-| LambdaTimeout | `30` | タイムアウト（秒） |
-| LambdaMemorySize | `128` | メモリサイズ（MB） |
+| EoRePythonRuntimeVer | `python3.14` | リクエストエンジン (Lambda) Pythonランタイムバージョン |
+| EoReLambdaLayerName | `eo-re-d1-lambda-python-slim-layer` | Lambda Layer 名 |
+| EoReLambdaLayerVer | `1` | Lambda Layer バージョン |
+| EoReLambdaTimeout | `30` | タイムアウト（秒） |
+| EoReLambdaMemorySize | `128` | メモリサイズ（MB） |
 | **GitHub Actions** |||
 | GitHubOrg | `your-github-org` | GitHub組織名/ユーザー名 |
-| GitHubRepo | `your-repo-name` | リポジトリ名 |
+| EoGitHubRepo | `your-repo-name` | リポジトリ名 |
 
 ---
 
@@ -388,7 +388,7 @@ Resource handler returned message: "Layer version arn:aws:lambda:... does not ex
 **原因**: Lambda Layer が未作成、または名前/バージョンが一致しない
 **解決**:
 1. Lambda Layer が作成済みか確認
-2. `LambdaLayerName` と `LambdaLayerVersion` パラメータが正しいか確認
+2. `EoReLambdaLayerName` と `EoReLambdaLayerVer` パラメータが正しいか確認
 
 ### IAM ロール/ポリシー名の重複
 
@@ -399,7 +399,7 @@ Resource handler returned message: "Role/Policy with name ... already exists"
 **原因**: 同じ名前のリソースが既に存在
 **解決**:
 1. 既存リソースを削除してから再デプロイ
-2. または `Environment` パラメータを変更（例: `d1` → `d02`）
+2. または `EoEnv` パラメータを変更（例: `d1` → `d02`）
 
 ### Secrets Manager の値が反映されない
 
