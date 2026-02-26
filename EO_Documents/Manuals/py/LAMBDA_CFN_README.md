@@ -66,13 +66,21 @@ Lambda Layer は CloudFormation デプロイ**前**に手動で作成する必�
 # 1. ディレクトリ移動
 cd RequestEngine/aws/lambda/py/localdev
 
-# 2. (ローカルにDockerがインストールされていない場合)WSL2 Ubuntu 起動
+# 2. (ローカルにDockerがインストールされていない場合)WSL2 Ubuntu 起動して、Ubuntu内のdockerを使う
 wsl -d Ubuntu
 
 # 3. Docker Compose で Layer zip 作成
 docker compose run --rm lambda_layer_builder
 
-# 4. 実行結果の初期の方にpythonバージョンが表示される
+# 4. 実行結果の先頭のあたりで以下の様にpythonバージョンが表示される(Docker DesktopのImagesからも確認可能)
+
+docker compose run --rm lambda_layer_builder
+Container localdev-lambda_layer_builder-run-xxxxxxxxxxxx Creating 
+Container localdev-lambda_layer_builder-run-xxxxxxxxxxxx Created 
+================PYTHON VERSION================
+Python 3.14.3
+==============================================
+
 # CFn実行時に必要なため、メモしておく
 # バージョン固定は`EO_RequestEngine/aws/lambda/py/localdev/env.example`を複製した`.env`の`COMMON_LAMBDA_LAYER_DOCKER_IMAGE_TAG`で`python3.14-slim`のように指定可能
 # Edge Optimizer のDockerは、各種バージョンをすべて.envで管理出来るようになっています。
