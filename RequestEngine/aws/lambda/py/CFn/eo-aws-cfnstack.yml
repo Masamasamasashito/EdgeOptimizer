@@ -9,7 +9,7 @@ Description: >
 # ==============================================================================
 # 1. Lambda Layer:
 #    Create the Lambda Layer manually before deploying this stack.
-#    Layer ARN format: arn:aws:{EoServerlessService}:{EoRegion}:{AWSAccountId}:layer:{EoProject}-{EoComponent}-{EoEnv}-{EoServerlessService}-py314-slim-layer:{Version}
+#    Layer ARN format: arn:aws:{EoServerlessService}:{EoRegion}:{AWSAccountId}:layer:{EoProject}-{EoComponent}-{EoEnv}-{EoServerlessService}-python-slim-layer:{Version}
 #    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:eo-re-d1-lambda-python-slim-layer:1
 #    See: EO_Documents/Manuals/py/LAMBDA_README.md (Section 8-9) for layer creation steps.
 #
@@ -57,7 +57,7 @@ Metadata:
           default: "Lambda Settings"
         Parameters:
           - EoRePythonRuntimeVer
-          - EoReLambdaLayerName
+          - EoReLambdaLayerSuffix
           - EoReLambdaLayerVer
           - EoReLambdaTimeout
           - EoReLambdaMemorySize
@@ -87,8 +87,8 @@ Metadata:
         default: "AWS Region"
       EoRePythonRuntimeVer:
         default: "RequestEngine (Lambda) Python Runtime Version"
-      EoReLambdaLayerName:
-        default: "RequestEngine (Lambda) Layer Name (must exist before deployment)"
+      EoReLambdaLayerSuffix:
+        default: "RequestEngine (Lambda) Layer Name Suffix (must exist before deployment)"
       EoReLambdaLayerVer:
         default: "RequestEngine (Lambda) Layer Version"
       EoReLambdaTimeout:
@@ -190,10 +190,10 @@ Parameters:
       - "python3.13"
       - "python3.14"
 
-  EoReLambdaLayerName:
+  EoReLambdaLayerSuffix:
     Type: String
-    Description: "Lambda Layer name (MUST exist before deployment). Example: eo-re-d1-lambda-python-slim-layer"
-    Default: "eo-re-d1-lambda-python-slim-layer"
+    Description: "Lambda Layer Name Suffix (MUST exist before deployment). Example: python-slim-layer"
+    Default: "python-slim-layer"
 
   EoReLambdaLayerVer:
     Type: Number
@@ -478,7 +478,7 @@ Resources:
       # PREREQUISITE: Create this layer before deploying the stack
       # See: EO_Documents/Manuals/py/LAMBDA_README.md
       Layers:
-        - !Sub "arn:aws:${EoServerlessService}:${EoRegion}:${AWSAccountId}:layer:${EoReLambdaLayerName}:${EoReLambdaLayerVer}"
+        - !Sub "arn:aws:${EoServerlessService}:${EoRegion}:${AWSAccountId}:layer:${EoProject}-${EoComponent}-${EoEnv}-${EoServerlessService}-${EoReLambdaLayerSuffix}:${EoReLambdaLayerVer}"
       LoggingConfig:
         LogFormat: Text
         LogGroup: !Ref LambdaLogGroup
@@ -548,7 +548,7 @@ Outputs:
 
   # --- GitHub Actions ---
   GitHubActionsDeployRoleArn:
-    Description: "GitHub Actions Deploy Role ARN (set this in GitHub Secrets as EO_LAMBDA_DEPLOY_AWS_APNE1_ROLE_FOR_GITHUB)"
+    Description: "GitHub Actions Deploy Role ARN (set this in GitHub Secrets as EO_LAMBDA_DEPLOY_AWS_<REGION>_ROLE_FOR_GITHUB)"
     Value: !GetAtt GitHubActionsDeployRole.Arn
     Export:
       Name: !Sub "${AWS::StackName}-GitHubActionsDeployRoleArn"
