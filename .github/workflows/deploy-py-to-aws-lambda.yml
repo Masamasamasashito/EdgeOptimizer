@@ -22,7 +22,7 @@ permissions:
 # Request Engine Instance config: ../../RequestEngine/aws/lambda/py/instances_conf/lambda001.env
 # Resource name pattern: eo-re-d1-lambda-{re_region_short}
 env:
-  PYTHON_VERSION: "3.14"
+  LAMBDA_RUNTIME_PYTHON_VERSION: "3.14"
   LAMBDA_FUNCTION_NAME: eo-re-d1-lambda-apne1
 
 jobs:
@@ -125,4 +125,4 @@ jobs:
           function-name: ${{ env.LAMBDA_FUNCTION_NAME }}
           code-artifacts-dir: ./deploy_package
           handler: lambda_function.lambda_handler
-          runtime: python${{ env.PYTHON_VERSION }}
+          runtime: python${{ env.LAMBDA_RUNTIME_PYTHON_VERSION }}

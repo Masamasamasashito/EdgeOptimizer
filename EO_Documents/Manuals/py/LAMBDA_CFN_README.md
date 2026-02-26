@@ -144,7 +144,7 @@ STEP 2 で`eo-aws-cfnstack.yml` を実行します。
 | AWSAccountId | `<AWSアカウントID>` | 12桁のAWSアカウントID |
 | Region Short Name | `apne1` | デプロイ先リージョン（短縮名） |
 | AWSRegion | `ap-northeast-1` | デプロイ先リージョン（フルネーム）  |
-| PythonRuntime | `python3.14` | Lambdaランタイム |
+| PythonRuntime | `python3.14` | Lambdaランタイム(小数第2位までを記載してください) |
 | GitHubOrg | `your-org` | GitHub組織名またはユーザー名 |
 | GitHubRepo | `your-repo` | リポジトリ名 |
 | LambdaLayerName | `eo-re-d1-lambda-python-slim-layer` | STEP 1-1 で作成した Layer 名 |
@@ -249,6 +249,7 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 ### 5-2. GitHub Actions ワークフローの確認
 
 `.github/workflows/deploy-to-aws-lambda-apne1.yml` が設定済みであることを確認してください。
+同yml内の`LAMBDA_RUNTIME_PYTHON_VERSION`と`LAMBDA_FUNCTION_NAME`に正しい値が入っているか確認してください。これらの値は、`eo-aws-cfnstack.yml` で設定した値と一致している必要があり、`LAMBDA_RUNTIME_PYTHON_VERSION`は小数第2位までを記載してください。
 
 詳細: [LAMBDA_README.md](LAMBDA_README.md) の「github workflow AWS Lambda自動デプロイ」セクション参照
 ---
