@@ -245,7 +245,7 @@ Parameters:
 
   ExistingGitHubOIDCProviderArn:
     Type: String
-    Description: "If EoCreateGitHubOIDCProvider is 'false', provide the existing ARN (e.g., arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com)."
+    Description: "If 'Create new GitHub OIDC Provider with this AWS account ID?' is 'false', provide the existing ARN (e.g., arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com)."
     Default: ""
 
 # ==============================================================================
