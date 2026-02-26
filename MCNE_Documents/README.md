@@ -15,8 +15,8 @@ Edge Optimizerの BtoB SaaS化を前提とした場合にマルチクラウド�
 
 # 階層構造の基本
 
-ユーザー権限ツリー: Tenant ＞ Project ＞ User
-リソース実体ツリー: Tenant ＞ Project ＞ Environment ＞ Area ＞ Resource
+- ユーザー権限ツリー: Tenant ＞ Project ＞ User
+- リソース実体ツリー: Tenant ＞ Project ＞ Environment ＞ Area ＞ Resource
 
 # マルチクラウド(AWS / Azure / GCP )リソース命名制約
 
