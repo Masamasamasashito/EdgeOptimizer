@@ -22,7 +22,7 @@
 #
 # * Dependencies:
 # - GCP Secret Manager (env.EO_GCP_PROJECT_ID) - GCP Project ID
-# - GCP Secret Manager Secret Name: eo-re-d01-secretmng (CLOUDRUN_REQUEST_SECRET_NAME)
+# - GCP Secret Manager Secret Name: eo-re-d1-secretmng (CLOUDRUN_REQUEST_SECRET_NAME)
 # - GCP Secret Manager Secret Key: CLOUDRUN_REQUEST_SECRET (CLOUDRUN_REQUEST_SECRET_KEY_NAME)
 #
 # * Note:
@@ -43,7 +43,7 @@ app = Flask(__name__)
 # ======================================================================
 # GCP Secret Manager Configuration
 # ======================================================================
-CLOUDRUN_REQUEST_SECRET_NAME = os.environ.get("CLOUDRUN_REQUEST_SECRET_NAME", "eo-re-d01-secretmng")
+CLOUDRUN_REQUEST_SECRET_NAME = os.environ.get("CLOUDRUN_REQUEST_SECRET_NAME", "eo-re-d1-secretmng")
 CLOUDRUN_REQUEST_SECRET_KEY_NAME = os.environ.get("CLOUDRUN_REQUEST_SECRET_KEY_NAME", "CLOUDRUN_REQUEST_SECRET")
 
 # ======================================================================

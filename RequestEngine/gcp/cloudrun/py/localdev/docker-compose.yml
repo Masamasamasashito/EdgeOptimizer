@@ -30,7 +30,7 @@ services:
       - PORT=8080
       - EO_CLOUDRUN_REQUEST_SECRET_LOCAL=${EO_CLOUDRUN_REQUEST_SECRET_LOCAL:-your-secret-here}
       - EO_GCP_PROJECT_ID=${EO_GCP_PROJECT_ID:-}
-      - CLOUDRUN_REQUEST_SECRET_NAME=${CLOUDRUN_REQUEST_SECRET_NAME:-eo-re-d01-secretmng}
+      - CLOUDRUN_REQUEST_SECRET_NAME=${CLOUDRUN_REQUEST_SECRET_NAME:-eo-re-d1-secretmng}
     volumes:
       # ローカルディレクトリをgcloudrun_builderコンテナの/appにマウント（編集可能）
       - ../funcfiles:/app

@@ -20,10 +20,10 @@ permissions:
   contents: read  # Required for repository read
 
 # Request Engine Instance config: ../../RequestEngine/aws/lambda/py/instances_conf/lambda001.env
-# Resource name pattern: eo-re-d01-lambda-{re_region_short}
+# Resource name pattern: eo-re-d1-lambda-{re_region_short}
 env:
   PYTHON_VERSION: "3.14"
-  LAMBDA_FUNCTION_NAME: eo-re-d01-lambda-apne1
+  LAMBDA_FUNCTION_NAME: eo-re-d1-lambda-apne1
 
 jobs:
   deploy:

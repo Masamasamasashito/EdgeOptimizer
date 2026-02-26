@@ -6,15 +6,15 @@ set -e
 
 # 環境変数設定
 # すでに環境変数が設定されている場合はそれを使い、設定されていない場合はデフォルト値を使います
-export EO_GCP_PROJECT_ID="${EO_GCP_PROJECT_ID:-eo-re-d01-pr-asne1}"
+export EO_GCP_PROJECT_ID="${EO_GCP_PROJECT_ID:-eo-re-d1-pr-asne1}"
 export EO_GCP_PROJECT_NUMBER="${EO_GCP_PROJECT_NUMBER:-<GCPプロジェクト番号>}"
-export EO_GCP_CLOUD_RUN_SERVICE_NAME="${EO_GCP_CLOUD_RUN_SERVICE_NAME:-eo-re-d01-cloudrun-asne1}"
+export EO_GCP_CLOUD_RUN_SERVICE_NAME="${EO_GCP_CLOUD_RUN_SERVICE_NAME:-eo-re-d1-cloudrun-asne1}"
 export EO_GCP_REGION="${EO_GCP_REGION:-asia-northeast1}"
 
 # Service Account Email
-export DEPLOY_SA="eo-gsa-d01-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-export OAUTH2_INVOKER_SA="eo-gsa-d01-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-export RUNTIME_SA="eo-gsa-d01-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export DEPLOY_SA="eo-gsa-d1-deploy-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export OAUTH2_INVOKER_SA="eo-gsa-d1-oa2inv-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+export RUNTIME_SA="eo-gsa-d1-runtime-asne1@${EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 export COMPUTE_DEFAULT_SA="${EO_GCP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 echo "=========================================="
@@ -197,7 +197,7 @@ echo "3. Deployer SA のリソースレベルロール確認"
 check_resource_level_roles "${DEPLOY_SA}" "Deployer SA" "WIFプリンシパル"
 echo "期待される設定:"
 echo "  - roles/iam.workloadIdentityUser"
-echo "  - プリンシパル: principalSet://iam.googleapis.com/projects/${EO_GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d01/attribute.repository/Masamasamasashito/multi-cloud-request-engine-test"
+echo "  - プリンシパル: principalSet://iam.googleapis.com/projects/${EO_GCP_PROJECT_NUMBER}/locations/global/workloadIdentityPools/eo-gcp-pool-wif-d1/attribute.repository/Masamasamasashito/multi-cloud-request-engine-test"
 echo ""
 
 echo "4. Compute Engine デフォルト SA のリソースレベルロール確認"

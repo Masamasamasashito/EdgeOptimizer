@@ -10,7 +10,7 @@ Description: >
 # 1. Lambda Layer:
 #    Create the Lambda Layer manually before deploying this stack.
 #    Layer ARN format: arn:aws:lambda:{AWSRegion}:{AWSAccountId}:layer:{ProjectPrefix}-{Component}-{Environment}-lambda-py314-slim-layer:{Version}
-#    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:eo-re-d01-lambda-python-slim-layer:1
+#    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:eo-re-d1-lambda-python-slim-layer:1
 #    See: EO_Documents/Manuals/py/LAMBDA_README.md (Section 8-9) for layer creation steps.
 #
 # 2. GitHub OIDC Provider (IMPORTANT):
@@ -69,7 +69,7 @@ Metadata:
       Component:
         default: "Component Identifier (e.g., re)"
       Environment:
-        default: "Environment Identifier (e.g., d01, p01)"
+        default: "Environment Identifier (e.g., d1, p01)"
       RegionShort:
         default: "Region Short Name (e.g., apne1)"
       LambdaLayerName:
@@ -95,8 +95,8 @@ Parameters:
 
   Environment:
     Type: String
-    Description: "Environment identifier (d01 = dev01, p01 = prod01)"
-    Default: "d01"
+    Description: "Environment identifier (d1 = dev01, p01 = prod01)"
+    Default: "d1"
     AllowedPattern: "^[a-z0-9]+$"
 
   RegionShort:
@@ -146,8 +146,8 @@ Parameters:
 
   LambdaLayerName:
     Type: String
-    Description: "Lambda Layer name (MUST exist before deployment). Example: eo-re-d01-lambda-python-slim-layer"
-    Default: "eo-re-d01-lambda-python-slim-layer"
+    Description: "Lambda Layer name (MUST exist before deployment). Example: eo-re-d1-lambda-python-slim-layer"
+    Default: "eo-re-d1-lambda-python-slim-layer"
 
   LambdaLayerVersion:
     Type: Number

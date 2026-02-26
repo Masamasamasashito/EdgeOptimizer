@@ -27,9 +27,9 @@ variable "component" {
 }
 
 variable "environment" {
-  description = "Environment identifier (d01 = dev01, p01 = prod01)"
+  description = "Environment identifier (d1 = dev01)"
   type        = string
-  default     = "d01"
+  default     = "d1"
 
   validation {
     condition     = can(regex("^[a-z0-9]+$", var.environment))
@@ -51,7 +51,7 @@ variable "region_short" {
 # --- GCP Settings ---
 
 variable "gcp_project_id" {
-  description = "GCP Project ID (e.g., eo-re-d01-pr-asne1)"
+  description = "GCP Project ID (e.g., eo-re-d1-pr-asne1)"
   type        = string
 
   validation {
@@ -154,7 +154,7 @@ variable "cloud_run_port" {
 variable "secret_name" {
   description = "Secret Manager secret name (must match code constant CLOUDRUN_REQUEST_SECRET_NAME)"
   type        = string
-  default     = "eo-re-d01-secretmng"
+  default     = "eo-re-d1-secretmng"
 }
 
 variable "secret_key_name" {

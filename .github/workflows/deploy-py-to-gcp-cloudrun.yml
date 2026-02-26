@@ -25,13 +25,13 @@ permissions:
   contents: read  # リポジトリの読み取りに必須
 
 # Request Engine Instance config: ../../RequestEngine/gcp/cloudrun/py/instances_conf/cloudrun001.env
-# Resource name pattern: eo-re-d01-cloudrun-{re_region_short}
+# Resource name pattern: eo-re-d1-cloudrun-{re_region_short}
 env:
   EO_GCP_PROJECT_ID: ${{ secrets.EO_GCP_PROJECT_ID }}
   EO_GCP_REGION: asia-northeast1
-  EO_GCP_CLOUD_RUN_SERVICE_NAME: eo-re-d01-cloudrun-asne1
+  EO_GCP_CLOUD_RUN_SERVICE_NAME: eo-re-d1-cloudrun-asne1
   EO_GCP_CLOUD_RUN_SERVICE_ACCOUNT_EMAIL: ${{ secrets.EO_GCP_RUN_ASNE1_RUNTIME_SA_EMAIL }}
-  EO_CLOUDRUN_REQUEST_SECRET_NAME: eo-re-d01-secretmng
+  EO_CLOUDRUN_REQUEST_SECRET_NAME: eo-re-d1-secretmng
   # Cloud Run スペック（RequestEngine/gcp/cloudrun/py/terraform/variables.tf デフォルト値にあわせた）
   EO_GCP_CLOUD_RUN_MEMORY: '512Mi'
   EO_GCP_CLOUD_RUN_CPU: '1'

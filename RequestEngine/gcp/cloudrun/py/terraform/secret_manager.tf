@@ -4,7 +4,7 @@
 # Creates a secret with placeholder value.
 # POST-DEPLOYMENT: Update the secret value with N8N_EO_REQUEST_SECRET from EO_Infra_Docker/.env
 #
-# Secret name must match code constant: CLOUDRUN_REQUEST_SECRET_NAME = "eo-re-d01-secretmng"
+# Secret name must match code constant: CLOUDRUN_REQUEST_SECRET_NAME = "eo-re-d1-secretmng"
 # Reference: EO_Documents/Manuals/py/CloudRun_README.md "Secret Manager による照合用リクエストシークレットの管理"
 
 resource "google_secret_manager_secret" "request_secret" {

@@ -7,8 +7,8 @@
 # ※ ここでの "Provider" は WIF ID プロバイダ (IdP) であり、
 #   main.tf の Terraform プロバイダ (hashicorp/google) とは別概念です。
 #
-# Pool naming: eo-gcp-pool-wif-d01 (4-32 chars, lowercase + digits + hyphens)
-# IdP naming:  eo-gcp-idp-gh-oidc-wif-d01
+# Pool naming: eo-gcp-pool-wif-d1 (4-32 chars, lowercase + digits + hyphens)
+# IdP naming:  eo-gcp-idp-gh-oidc-wif-d1
 
 # ==============================================================================
 # Workload Identity Pool

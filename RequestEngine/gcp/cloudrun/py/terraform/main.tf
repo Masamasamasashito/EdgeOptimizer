@@ -44,7 +44,7 @@ provider "google" {
 # Local Variables - Naming Convention
 # ==============================================================================
 # Pattern: {project_prefix}-{component}-{environment}-{resource}-{region_short}
-# Example: eo-re-d01-cloudrun-asne1
+# Example: eo-re-d1-cloudrun-asne1
 
 locals {
   name_prefix  = "${var.project_prefix}-${var.component}-${var.environment}"

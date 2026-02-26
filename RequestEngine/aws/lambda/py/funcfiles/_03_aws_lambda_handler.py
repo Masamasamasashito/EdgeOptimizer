@@ -22,7 +22,7 @@
 #
 # * Dependencies:
 # - AWS Secrets Manager (env.AWS_REGION) - Region for Secrets Manager
-# - AWS Secrets Manager Secret Name: eo-re-d01-secretsmng-apne1 (LAMBDA_REQUEST_SECRET_NAME)
+# - AWS Secrets Manager Secret Name: eo-re-d1-secretsmng-apne1 (LAMBDA_REQUEST_SECRET_NAME)
 # - AWS Secrets Manager Secret Key: LAMBDA_REQUEST_SECRET (LAMBDA_REQUEST_SECRET_KEY_NAME)
 
 # ======================================================================
@@ -34,7 +34,7 @@ from botocore.exceptions import BotoCoreError, ClientError
 # ======================================================================
 # AWS Secrets Manager Configuration
 # ======================================================================
-LAMBDA_REQUEST_SECRET_NAME = "eo-re-d01-secretsmng-apne1"  # AWS Secrets Manager secret name (secret ID)
+LAMBDA_REQUEST_SECRET_NAME = "eo-re-d1-secretsmng-apne1"  # AWS Secrets Manager secret name (secret ID)
 LAMBDA_REQUEST_SECRET_KEY_NAME = "LAMBDA_REQUEST_SECRET"  # Key name within the secret
 
 # ======================================================================

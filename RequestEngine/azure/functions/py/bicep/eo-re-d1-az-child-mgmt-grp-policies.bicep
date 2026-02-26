@@ -4,19 +4,19 @@
 // Creates Policy Assignments for subscription governance
 //
 // PREREQUISITES:
-// 1. Management Group 'eo-re-d01-azure-mgmt-group' must exist
-//    (Deploy eo-re-d01-azure-mgmt-group.bicep first)
+// 1. Management Group 'eo-re-d1-azure-mgmt-group' must exist
+//    (Deploy eo-re-d1-azure-mgmt-group.bicep first)
 //
 // DEPLOYMENT:
 // This template requires MANAGEMENT GROUP scope deployment:
 //   az deployment mg create \
 //     --location japaneast \
-//     --management-group-id eo-re-d01-azure-mgmt-group \
-//     --template-file eo-re-d01-azure-mgmt-group-policies.bicep
+//     --management-group-id eo-re-d1-azure-mgmt-group \
+//     --template-file eo-re-d1-azure-mgmt-group-policies.bicep
 //
 // POST-DEPLOYMENT:
 // 1. Verify policy assignments in Azure Portal
-// 2. Deploy eo-re-d01-azure-funcapp.bicep to resource group under this subscription
+// 2. Deploy eo-re-d1-azure-funcapp.bicep to resource group under this subscription
 //
 // ==============================================================================
 
@@ -55,9 +55,9 @@ param EO_AZ_POLICY_RESOURCE_TYPES_DEFINITION_ID string = '<デプロイ可能リ
 // Management Group: デプロイスコープの名前は managementGroup().name で参照（README: EO_AZ_CHILD_MANAGEMENT_GROUP_ID と一致）
 
 // デプロイ先リージョン制限用ポリシー割り当ての名前（README の EO_AZ_* 命名に合わせる）
-var EO_AZ_POLICY_REGIONS_NAME = 'eo-re-d01-allowed-locations'
+var EO_AZ_POLICY_REGIONS_NAME = 'eo-re-d1-allowed-locations'
 // デプロイ可能リソースタイプ制限用ポリシー割り当ての名前
-var EO_AZ_POLICY_RESOURCE_TYPES_NAME = 'eo-re-d01-allowed-resource-types'
+var EO_AZ_POLICY_RESOURCE_TYPES_NAME = 'eo-re-d1-allowed-resource-types'
 
 // 上記パラメータで受け取ったポリシー定義 ID（フルパスで参照）
 var EO_AZ_POLICY_REGIONS_ID = concat('/providers/Microsoft.Authorization/policyDefinitions/', EO_AZ_POLICY_REGIONS_DEFINITION_ID)

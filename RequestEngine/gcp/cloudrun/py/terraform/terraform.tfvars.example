@@ -10,7 +10,7 @@
 # ==============================================================================
 
 # --- Required: GCP Project ---
-gcp_project_id     = "<GCPプロジェクトID>"         # e.g., "eo-re-d01-pr-asne1"
+gcp_project_id     = "<GCPプロジェクトID>"         # e.g., "eo-re-d1-pr-asne1"
 gcp_project_number = "<GCPプロジェクト番号>"        # e.g., "123456789012"
 
 # --- Required: GitHub Actions OIDC ---
@@ -20,7 +20,7 @@ github_repo = "<Githubリポジトリ名>"                # e.g., "EdgeOptimizer
 # --- Optional: Naming Convention (defaults shown) ---
 # project_prefix = "eo"
 # component      = "re"
-# environment    = "d01"
+# environment    = "d1"
 # region_short   = "asne1"
 
 # --- Optional: GCP Region (default shown) ---
@@ -35,5 +35,5 @@ github_repo = "<Githubリポジトリ名>"                # e.g., "EdgeOptimizer
 # cloud_run_port          = 8080
 
 # --- Optional: Secret Manager (defaults shown) ---
-# secret_name     = "eo-re-d01-secretmng"
+# secret_name     = "eo-re-d1-secretmng"
 # secret_key_name = "CLOUDRUN_REQUEST_SECRET"
