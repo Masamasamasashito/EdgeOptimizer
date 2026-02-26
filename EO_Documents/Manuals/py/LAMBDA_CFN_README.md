@@ -314,22 +314,17 @@ STEP 4 で Credential と #280AWS ノードの設定が完了しました。次�
 #### **設定⑨ 235 Get IDtoken [今回はスキップ]**
 - Google Cloud Run を使用しない場合は設定不要です。
 
-#### **設定⑩ 280系 RequestEngine設定**
-- 各クラウド（AWS Lambda, Azure Functions, Cloudflare Workers, GCP Cloud Run）へリクエストを送るノードの設定です。
-- **今回構築した Lambdaの設定**:
+#### **設定⑩ 280系 RequestEngine(Lambda)設定**
+- AWS Lambdaへリクエスト(Warmupリクエストの指示)を送るn8nノード設定です。
+- **LambdaにWarmupリクエストを送るn8nノード設定**:
     - ノード `280AWS-ap-northeast1 RequestEngine` を開く
-    - **Authentication**: `Header Auth` を選択
-    - **Header Auth**: STEP 3-4 で設定した `Header Auth` (IAM Access Key) を選択
-    - **URL**: STEP 3-1 でメモした API Gateway のURL、または Lambda 関数URLを入力
-        - ※ 本構成では `lambda:InvokeFunction` を直接叩く場合、n8n の AWS Lambda ノードを使用しますが、このワークフローは HTTP Request ノードで統一されているため、通常は **Function URL (関数URL)** を発行して設定するか、API Gateway経由で設定します。
-        - **補足**: `eo-aws-cfnstack.yml` では IAM User を作成しましたが、Function URL は作成していません。
-            - **方法A (推奨)**: Lambda コンソール > 設定 > 関数URL > 「関数URLを作成」 > 認証タイプ `AWS_IAM` を選択。このURLを n8n の URL 欄に設定。
-            - **方法B**: n8n の `AWS Lambda` ノードに置き換えて、Function Name を指定して実行（要ワークフロー修正）。
-    - **Headers**:
-        - `x-aws-lambda-token`: `{{ $json.tokenCalculatedByN8n }}` (変更不要)
-
-設定が完了したら、n8n 画面右上の「Save」を押して保存してください。
-
+    - Parameters
+    - **Credential to connect with**: `EO_RE_Lambda_apne1_AccessKey` を選択
+    - Operation: `Invoke` を選択
+    - Function Name or ID: `eo-re-d1-lambda-apne1`を入力
+    - Qualifier: `LATEST` を選択
+    - Invocation Type: `Wait for Results` を選択
+    -JSON Input: `{{ $json.data }}` を入力
 
 ## STEP 7: github actions workflow実行
 

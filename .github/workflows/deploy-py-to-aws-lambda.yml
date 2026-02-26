@@ -1,4 +1,4 @@
-name: Deploy AWS Lambda apne1
+name: Deploy AWS Lambda
 
 on:
 #   push:
