@@ -9,7 +9,7 @@ Cloudflare Github 連携(独自ドメインのサブドメインでWorker作る�
 1. Cloudflareダッシュボードの左メニューから 「Workers & Pages」 をクリック
 2. 「アプリケーションを作成する (Create application)」 → 「Hello Worldを開始する」 をクリック
 3. Worker name
-  - 例: `eo-re-d01-cfworker-global`を入力、「デプロイ (Deploy)」 をクリック
+  - 例: `eo-re-d1-cfworker-global`を入力、「デプロイ (Deploy)」 をクリック
 	- この時点では xxx.<Cloudflareアカウント名>.workers.dev という仮のドメインが割り当てられる
 
 `.github/workflows/deploy-ts-to-cf-worker.yml`とgithub上のシークレットが設定して有れば、WorkerがCloudflare上に無くても、新規Workerが**カスタムドメイン無し**で作成される。
@@ -23,7 +23,7 @@ Cloudflare Github 連携(独自ドメインのサブドメインでWorker作る�
 3. ページ内メニューの 「ドメインとルート (Domains & Routes)」で「+ 追加 (+ Add)」 ボタンをクリック
 4. 「カスタムドメイン (Custom Domains)」 を選択 
 5. 「ドメイン (Domain)」 の入力欄に、割り当てたいサブドメインを入力
-	- 例: `eo-re-d01-cfworker-global.sample.com`
+	- 例: `eo-re-d1-cfworker-global.sample.com`
 6. 「ドメインを追加 (Add Custom Domain)」 をクリック
 7. xxx.<Cloudflareアカウント名>.workers.dev ドメインの3点リーダーをクリック
 8. 「ドメインを無効にする」をクリック
@@ -36,10 +36,10 @@ Cloudflare Github 連携(独自ドメインのサブドメインでWorker作る�
 DNSレコードの画面で確認。
 
 1. Cloudflareが自動的に以下の処理を裏側で行う（数分かかる場合あり）
-	- DNSレコードの作成: eo-re-d01-cfworker-global.sample.com のDNSレコード（A/AAAA）を自動生成。
+	- DNSレコードの作成: eo-re-d1-cfworker-global.sample.com のDNSレコード（A/AAAA）を自動生成。
 	- SSL証明書の発行: そのサブドメイン用の証明書を発行
 2. プロキシステータスが 「プロキシ済み」 になれば完了。
-3. ブラウザで https://eo-re-d01-cfworker-global.sample.com にアクセスしてHello World!確認
+3. ブラウザで https://eo-re-d1-cfworker-global.sample.com にアクセスしてHello World!確認
 
 ## 手順 4: Cloudflare ユーザーAPIトークンとアカウントIDの取得
 
@@ -50,7 +50,7 @@ Github ActionsによるWorker自動デプロイを行うため、GitHubにCloudf
     - 「トークンを作成」**をクリック
     - 「Cloudflare Workers を編集する (Edit Cloudflare Workers)」テンプレートの「使用する」を選択
        - トークン名 の右側にある鉛筆マークをクリック
-       - トークン名を変更する　EX) deploy to eo-re-d01-cfworker-global from githubリポジトリ名 yyyymmdd hh:mm
+       - トークン名を変更する　EX) deploy to eo-re-d1-cfworker-global from githubリポジトリ名 yyyymmdd hh:mm
        - 不要権限の削減検証中
     - 特定のアカウントやゾーンに制限したい場合は設定を変更、「概要に進む」→「トークンを作成」をクリック
     - 表示された APIトークン をコピーして控える。この画面を閉じると二度と表示されない
@@ -155,7 +155,7 @@ n8nに持たせる「通行手形（IDとパスワード）」を作成し、Clo
 1. Cloudflare Zero Trust ダッシュボード にアクセス
 2. 左メニューの Accessコントロール > サービス資格情報 をクリック
 3. サービストークンを追加する をクリック
-	- サービストークン名（`eo-re-d01-cfworker-global-service-token-for-n8n`）を入力
+	- サービストークン名（`eo-re-d1-cfworker-global-service-token-for-n8n`）を入力
     - 有効期限：無期限
     - Create Service Token をクリック
     - 重要: ここで表示される Client ID と Client Secret を必ずコピーして控えて。Secretはこの画面を閉じると二度と表示されない
@@ -170,24 +170,24 @@ Workerのカスタムドメインに対して「Accessアプリケーション�
 3. 基本情報（そのままスルー）
 4. Access ポリシー (重要。先にポリシー作る):
 	- 新しいポリシーを作成する
-	    - ポリシー名: `eo-re-d01-cfworker-global Allow n8n HTTPSrequests ServiceToken`
+	    - ポリシー名: `eo-re-d1-cfworker-global Allow n8n HTTPSrequests ServiceToken`
 	    - アクション: Service Auth （※ここ重要です。Allowではありません）
 
 	    - ルールを追加する:
 	    	- 包含 
 	    	- セレクター: Service Token を選択
-	        - 値: サービストークン名（`eo-re-d01-cfworker-global-service-token-for-n8n`）を選択
+	        - 値: サービストークン名（`eo-re-d1-cfworker-global-service-token-for-n8n`）を選択
 		- ポリシーテスター
 	 		- 1 ユーザー (100%) は ブロック済みです　と出ればOK
 	    - 保存をクリック
 5. 基本情報に戻って入力を再開
-	- Application name: 任意（例: `eo-re-d01-cfworker-global-n8n-auth-app`）
+	- Application name: 任意（例: `eo-re-d1-cfworker-global-n8n-auth-app`）
     - セッション時間:15分（Warmupリクエストでは、あまり関係ない）
     - パブリック ホスト名を追加（Workerのカスタムドメインと完全に一致させる）:
-		- Subdomain: `eo-re-d01-cfworker-global`
+		- Subdomain: `eo-re-d1-cfworker-global`
     	- Domain: <sample.com>
     - 既存のポリシーを選択
-    - `eo-re-d01-cfworker-global Allow n8n HTTPSrequests ServiceToken`を選ぶ
+    - `eo-re-d1-cfworker-global Allow n8n HTTPSrequests ServiceToken`を選ぶ
     - 確認 をクリック
 	- ポリシーテスター
 		- 1 ユーザー (100%) は ブロック済みです　と出ればOK
@@ -197,7 +197,7 @@ Workerのカスタムドメインに対して「Accessアプリケーション�
     - 次へ
     - 保存
 
-https://eo-re-d01-cfworker-global.<sample.com> にアクセス
+https://eo-re-d1-cfworker-global.<sample.com> にアクセス
 ```
 Forbidden
 
@@ -233,7 +233,7 @@ n8n Credentials登録
   
 1. n8n のワークフロー画面で280CF-global RequestEngine ZeroTrustノードのCloudflareリクエストエンジンのHTTP Requestノードを開く
 2. Parameters > URL にCFワーカーで設定したカスタムドメインを「https://」から始まるURLで末尾に「/」を付けて登録
-  - EX) `https://eo-re-d01-cfworker-global.<sample.com>/`
+  - EX) `https://eo-re-d1-cfworker-global.<sample.com>/`
 3. Authentication > Generic Credential Typeを選ぶ
 4. Generic Auth Type > Custom Authを選ぶ
 5. Custom Auth > `EO_RE_CF_HeaderAuth_ServiceToken`を選ぶ
@@ -248,9 +248,9 @@ n8n Credentials登録
 
 # httpsリクエストを受けたWorkerの実行ログ
 
-`https://dash.cloudflare.com/<CF_ACCOUNT_ID>/workers/services/view/eo-re-d01-cfworker-global/production/observability/logs?workers-observability-view=invocations`
+`https://dash.cloudflare.com/<CF_ACCOUNT_ID>/workers/services/view/eo-re-d1-cfworker-global/production/observability/logs?workers-observability-view=invocations`
 
-Cloudflareダッシュボード > Workers & Pages > eo-re-d01-cfworker-global > Observability > Logs からもアクセス可能。
+Cloudflareダッシュボード > Workers & Pages > eo-re-d1-cfworker-global > Observability > Logs からもアクセス可能。
 
 # ファイル構成（Python版と同一構造）
 

@@ -136,7 +136,7 @@ Request Engine は生データの取得と計測に専念する。導出・分�
 
 - **Secret management**: All Request Engines share the same `N8N_EO_REQUEST_SECRET` value stored in their respective cloud secret services
 - **Token verification**: Each Request Engine validates incoming tokens against `SHA-256(url + secret)` before processing
-- **Naming convention**: Resources follow `eo-re-d01-{service}-{region}` pattern
+- **Naming convention**: Resources follow `eo-re-d1-{service}-{region}` pattern
 
 ## Git Operation Policy
 

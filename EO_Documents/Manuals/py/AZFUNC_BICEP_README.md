@@ -1,6 +1,6 @@
 # Azure Functions Request Engine - Bicep 構築手順
 
-`eo-re-d01-azure-funcapp.bicep`と`eo-re-d01-az-child-mgmt-grp.bicep` を使用した Azure Functions Request Engine インフラストラクチャの構築手順です。
+`eo-re-d1-azure-funcapp.bicep`と`eo-re-d1-az-child-mgmt-grp.bicep` を使用した Azure Functions Request Engine インフラストラクチャの構築手順です。
 
 ※bicepやjsonのテンプレートでうまくできない場合、お手数ですが[AZFUNC_README.md](AZFUNC_README.md) の手動手順を参照してください。特にSTEP 0は、個人契約だと権限不足でazure cliがエラーになります。
 
@@ -23,18 +23,18 @@
 
 `RequestEngine\azure\functions\py\bicep`ディレクトリには3つのBicepテンプレートがあります：
 
-### 1. `eo-re-d01-az-child-mgmt-grp.bicep`（管理グループ作成とサブスクリプション紐付け）
+### 1. `eo-re-d1-az-child-mgmt-grp.bicep`（管理グループ作成とサブスクリプション紐付け）
 
-- Management Group（`eo-re-d01-az-child-mgmt-grp`）
+- Management Group（`eo-re-d1-az-child-mgmt-grp`）
 
-### 2. `eo-re-d01-az-child-mgmt-grp-policies.bicep`（管理グループへのポリシー割り当て）
+### 2. `eo-re-d1-az-child-mgmt-grp-policies.bicep`（管理グループへのポリシー割り当て）
 
 **目的**: GitHub Secrets にサブスクリプションIDを登録する際のリスク軽減/権限の絞り込み
 
 - Allowed locations ポリシー（Japan East のみ許可）
 - Allowed resource types ポリシー（Function App, Storage, Key Vault 等のみ許可）
 
-### 3. `eo-re-d01-azure-funcapp.bicep`（Function App 等のリソース作成）
+### 3. `eo-re-d1-azure-funcapp.bicep`（Function App 等のリソース作成）
 
 Edge Optimizer の Azure Functions Request Engine に必要な以下のリソースを一括作成します：
 
@@ -64,7 +64,7 @@ export EO_AZ_ENTRA_TENANT_ID="<AZURE_ENTRA_TENANT_ID>"
 export EO_AZ_SUBSC_ID="<AZURE_SUBSC_ID>"
 export EO_PROJECT="eo"
 export EO_COMPONENT="re"
-export EO_ENV="d01"
+export EO_ENV="d1"
 export EO_REGION="japaneast"
 export EO_REGION_SHORT="jpe"
 export EO_RE_INSTANCE_ID="001"
@@ -76,26 +76,26 @@ export EO_AZFUNC_REQUEST_SECRET_NAME="AZFUNC-REQUEST-SECRET"
 export EO_AZ_PARENT_MANAGEMENT_GROUP_ID="<PARENT_MANAGEMENT_GROUP_ID>"
 export EO_AZ_CHILD_MANAGEMENT_GROUP_ID="${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-az-child-mgmt-grp"
 export EO_AZ_CHILD_MANAGEMENT_GROUP_DISPLAY_NAME="${EO_AZ_CHILD_MANAGEMENT_GROUP_ID}"
-# 以下は eo-re-d01-azure-funcapp.bicep 用（Azure Function App の Python・メモリ・スケール。省略時は 各Bicepファイルに記載されたデフォルト値を使用）
+# 以下は eo-re-d1-azure-funcapp.bicep 用（Azure Function App の Python・メモリ・スケール。省略時は 各Bicepファイルに記載されたデフォルト値を使用）
 export EO_AZ_RE_FUNCAPP_PYTHON_VERSION="3.13"
 export EO_AZ_RE_FUNCAPP_INSTANCE_MEMORY_MB="512"
 export EO_AZ_RE_FUNCAPP_MAXIMUM_INSTANCE_COUNT="1"
 export EO_SOFT_DELETE_RETENTION_DAYS="7"
-# 以下は eo-re-d01-az-child-mgmt-grp-policies.bicep 用（ポリシーで指定するリージョン等。省略時は 各Bicepファイルに記載されたデフォルト値を使用）
+# 以下は eo-re-d1-az-child-mgmt-grp-policies.bicep 用（ポリシーで指定するリージョン等。省略時は 各Bicepファイルに記載されたデフォルト値を使用）
 export EO_AZ_LOCATIONS='["japaneast"]'
 export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 ```
 
 **`EO_RE_INSTANCE_ID` をリソース名に含める基準**は [naming_convention.md](../../Naming/naming_convention.md) の **§2.4** を参照。Azure の Function App / Key Vault / Storage は一意スコープがグローバルのため、いずれも `EO_RE_INSTANCE_ID` を含める。
 
-デフォルトパラメータ（`eo-re-d01-funcapp-jpe-001`）の文字制約：
+デフォルトパラメータ（`eo-re-d1-funcapp-jpe-001`）の文字制約：
 
 | リソース種別 | リソース名パターン | グローバル一意命名 | 文字制約 |
 |-------------|-------------------|---------------|----------|
-| Function App | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}`<br>デフォルト: `eo-re-d01-funcapp-jpe-001` | ✅ 必須 | 2-60文字、英数字とハイフン |
-| App Service Plan | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}`<br>デフォルト: `ASP-eored01resourcegrpjpe`(25文字) | - | 1-40文字、英数字とハイフン |
-| Storage Account | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}`<br>デフォルト:`eorestd01jpea1b2001`（19文字） | ✅ 必須 | 3-24文字、**英小文字と数字のみ**（ハイフン不可） |
-| Key Vault | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}`<br>デフォルト:`eo-kv-d01-jpe-a1b2-001`（22文字。24文字制限に対し2文字バッファ） | ✅ 必須 | 3-24文字、英数字とハイフン、英字で開始 |
+| Function App | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}`<br>デフォルト: `eo-re-d1-funcapp-jpe-001` | ✅ 必須 | 2-60文字、英数字とハイフン |
+| App Service Plan | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}`<br>デフォルト: `ASP-eored1resourcegrpjpe`(25文字) | - | 1-40文字、英数字とハイフン |
+| Storage Account | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}`<br>デフォルト:`eorestd1jpea1b2001`（19文字） | ✅ 必須 | 3-24文字、**英小文字と数字のみ**（ハイフン不可） |
+| Key Vault | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}`<br>デフォルト:`eo-kv-d1-jpe-a1b2-001`（22文字。24文字制限に対し2文字バッファ） | ✅ 必須 | 3-24文字、英数字とハイフン、英字で開始 |
 | Key Vault Secret | `{EO_AZFUNC_REQUEST_SECRET_NAME}`<br>デフォルト:`AZFUNC-REQUEST-SECRET` | - | 1-127文字、英数字とハイフン |
 | RBAC 割り当て | Function App → Key Vault シークレットユーザー | - | - |
 
@@ -104,18 +104,18 @@ export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 以下のリソースは文字制約に注意しながら **Azure 全体でグローバルに一意** である必要があります：
 
 - **Key Vault**: `https://{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}.vault.azure.net/` の `{name}` 部分
-    - EX) `https://eo-kv-d01-jpe-a1b2-001.vault.azure.net/`
+    - EX) `https://eo-kv-d1-jpe-a1b2-001.vault.azure.net/`
 - **Storage Account**: `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}.blob.core.windows.net` の `{name}` 部分
-    - EX) `eorestd01jpea1b2001.blob.core.windows.net`
+    - EX) `eorestd1jpea1b2001.blob.core.windows.net`
     - ハイフン不可
 - **Function App**: `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}.azurewebsites.net`
-    - EX) `eo-re-d01-funcapp-jpe-001.azurewebsites.net`
+    - EX) `eo-re-d1-funcapp-jpe-001.azurewebsites.net`
 
 **Key Vault / Storage の文字数**: いずれも Azure 制限は 24 文字。2 文字バッファを残すため、実質 22 文字以内を推奨。デフォルトでは Key Vault 22 文字・Storage 19 文字。`EO_GLOBAL_PRJ_ENV_ID` は 4 文字以内にすると 22 文字を超えにくい。
 
 **対策**: いずれかのパラメータを変更して一意の名前を生成してください：
 - `EO_PROJECT` を変更（例: `eo` → `myeo`）
-- `EO_ENV` を変更（例: `d01` → `dev01`）
+- `EO_ENV` を変更（例: `d1` → `dev01`）
 - `EO_GLOBAL_PRJ_ENV_ID` を変更（例: `a1b2` → `x9k3`）。4 文字推奨（Key Vault/Storage の 22 文字バッファのため）
 - または組織固有のプレフィックスを追加
 
@@ -160,8 +160,8 @@ export EO_AZ_ENABLE_APPLICATION_INSIGHTS="false"
 
 | ステップ | ファイル | スコープ |
 |---------|---------|---------|
-| Step 1 | `eo-re-d01-az-child-mgmt-grp.bicep` | 管理グループ作成(テナントスコープ) |
-| Step 2 | `eo-re-d01-az-child-mgmt-grp-policies.bicep` | 管理グループのポリシー割り当て |
+| Step 1 | `eo-re-d1-az-child-mgmt-grp.bicep` | 管理グループ作成(テナントスコープ) |
+| Step 2 | `eo-re-d1-az-child-mgmt-grp-policies.bicep` | 管理グループのポリシー割り当て |
 
 **⚠️ 注意**: 個人Microsoftアカウント（ゲストユーザー）ではテナントスコープのデプロイに権限エラーが発生する場合があります。その場合は Azure Portal（GUI）で手動設定した方が速いこともある。
 
@@ -246,13 +246,13 @@ Azure Portal のテンプレートデプロイはテナントスコープに対�
 
 ### 0-3. パラメータ
 
-**eo-re-d01-az-child-mgmt-grp.bicep（管理グループ）**
+**eo-re-d1-az-child-mgmt-grp.bicep（管理グループ）**
 
 | パラメータ | デフォルト | 説明 |
 |-----------|-----------|------|
 | `subscriptionId` | (必須) | 管理グループに紐付けるサブスクリプションID |
 
-**eo-re-d01-az-child-mgmt-grp-policies.bicep（ポリシー）**
+**eo-re-d1-az-child-mgmt-grp-policies.bicep（ポリシー）**
 
 | パラメータ | デフォルト | 説明 |
 |-----------|-----------|------|
@@ -334,7 +334,7 @@ Bicep デプロイ先のリソースグループを作成します。
 
 **Azure Portal:**
 1. Azure Portal > リソースグループ > 「+ 作成」
-2. リソースグループ名: `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（デフォルト: eo-re-d01-resource-grp-jpe）
+2. リソースグループ名: `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（デフォルト: eo-re-d1-resource-grp-jpe）
 3. リージョン: `(Asia Pacific) Japan East`
 4. 「レビューと作成」> 「作成」
 
@@ -382,7 +382,7 @@ az account show --query tenantId -o tsv
   "parameters": {
     "EO_PROJECT": { "value": "eo" },
     "EO_COMPONENT": { "value": "re" },
-    "EO_ENV": { "value": "d01" },
+    "EO_ENV": { "value": "d1" },
     "EO_REGION_SHORT": { "value": "jpe" },
     "EO_REGION": { "value": "japaneast" },
     "EO_RE_INSTANCE_ID": { "value": "001" },
@@ -459,11 +459,11 @@ az bicep build --file "${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-azure-funcapp.bic
 4. 「保存」をクリック
 5. **カスタム デプロイ** 画面で設定:
    - **サブスクリプション**: デプロイ先のサブスクリプションを選択
-   - **リソースグループ**: `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（STEP 1-1 で作成済み、デフォルトでは eo-re-d01-resource-grp-jpe）
+   - **リソースグループ**: `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（STEP 1-1 で作成済み、デフォルトでは eo-re-d1-resource-grp-jpe）
    - **リージョン**: `Japan East`
    - **EO_PROJECT**: `${EO_PROJECT}`（デフォルト: eo）
    - **EO_COMPONENT**: `${EO_COMPONENT}`（デフォルト: re）
-   - **EO_ENV**: `${EO_ENV}`（デフォルト: d01）
+   - **EO_ENV**: `${EO_ENV}`（デフォルト: d1）
    - **EO_REGION_SHORT**: `${EO_REGION_SHORT}`（デフォルト: jpe）
    - **EO_REGION**: `${EO_REGION}`（デフォルト: japaneast）
    - **EO_RE_INSTANCE_ID**: `${EO_RE_INSTANCE_ID}`（デフォルト: 001）
@@ -483,7 +483,7 @@ az bicep build --file "${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-azure-funcapp.bic
 #### 方法C: リソースグループ画面からデプロイ
 
 1. 上記 **方法B 手順1** で JSON に変換済みであること
-2. Azure Portal > リソースグループ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（デフォルト: eo-re-d01-resource-grp-jpe）
+2. Azure Portal > リソースグループ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（デフォルト: eo-re-d1-resource-grp-jpe）
 3. 「+ 作成」> 検索バーで「テンプレート」と入力 > 「テンプレートのデプロイ（カスタムテンプレートを使用したデプロイ）」
 4. 以降は **方法B** の手順2以降と同様
 
@@ -538,7 +538,7 @@ az keyvault secret set \
 
 ### 4-2. サービスプリンシパルへのデプロイ権限付与
 
-1. Azure Portal > リソースグループ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（デフォルト: eo-re-d01-resource-grp-jpe）> アクセス制御 (IAM)
+1. Azure Portal > リソースグループ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-resource-grp-${EO_REGION_SHORT}`（デフォルト: eo-re-d1-resource-grp-jpe）> アクセス制御 (IAM)
 2. 「+ 追加」> 「ロールの割り当ての追加」
 3. ロール: `Web サイト共同作成者`
 4. アクセスの割り当て先: **ユーザー、グループ、またはサービス プリンシパル**
@@ -583,7 +583,7 @@ Bicep で作成した Function App にはまだ関数コードがありません
 
 ### 5-2. デプロイ結果の確認
 
-1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d01-funcapp-jpe-001）
+1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-001）
 2. 左サイドバー > **関数** をクリック
 3. `requestengine_func` が表示されていれば成功
 
@@ -594,7 +594,7 @@ Bicep で作成した Function App にはまだ関数コードがありません
 
 ### 6-1. Function App Key の取得
 
-1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d01-funcapp-jpe-001）
+1. Azure Portal > Function App > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-001）
 2. 関数 > `requestengine_func`
 3. 「関数の URL の取得」> `default` (ファンクション キー) を選択
 4. URL をコピー（`?code=...` まで含む）
@@ -620,12 +620,12 @@ Bicep で作成した Function App にはまだ関数コードがありません
 1. n8n > `280AZ-japaneast RequestEngine KeyVault` ノードを開く
 2. **Parameters** > **URL** に Function App の URL を設定:
    ```
-   https://eo-re-d01-funcapp-jpe-001.azurewebsites.net/api/requestengine_func
+   https://eo-re-d1-funcapp-jpe-001.azurewebsites.net/api/requestengine_func
    ```
 3. 「Save」
 
 **URL の確認方法**:
-- Azure Portal > 関数アプリ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d01-funcapp-jpe-001）> 関数 > `requestengine_func`
+- Azure Portal > 関数アプリ > `${EO_PROJECT}-${EO_COMPONENT}-${EO_ENV}-${EO_SERVERLESS_SERVICE}-${EO_REGION_SHORT}-${EO_RE_INSTANCE_ID}`（デフォルト: eo-re-d1-funcapp-jpe-001）> 関数 > `requestengine_func`
 - 「関数の URL の取得」> `default` (ファンクション キー) の URL から `?code=...` を除いた部分
 
 **認証の補足**:
@@ -652,7 +652,7 @@ az provider register --namespace Microsoft.KeyVault
 **原因**: Key Vault 名はグローバルで一意である必要がある
 
 **解決**:
-1. `environment` パラメータを変更（例: `d01` → `d02`）
+1. `environment` パラメータを変更（例: `d1` → `d2`）
 2. または論理削除された Key Vault を完全削除:
    ```bash
    # Bash / PowerShell 共通

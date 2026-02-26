@@ -318,8 +318,8 @@ const requestEngineList = [
 
 | ノード名 | 設定内容 |
 |---------|---------|
-| #280AWS-Singapore | Lambda関数: `eo-re-d01-lambda-apse1` |
-| #280AZ-HongKong | Azure Functions URL: `https://eo-re-d01-funcapp-eastasia.azurewebsites.net/...` |
+| #280AWS-Singapore | Lambda関数: `eo-re-d1-lambda-apse1` |
+| #280AZ-HongKong | Azure Functions URL: `https://eo-re-d1-funcapp-eastasia.azurewebsites.net/...` |
 
 ### #225 Switcher ノードの編集手順
 
@@ -371,15 +371,15 @@ const requestEngineList = [
 | 項目 | 設定値 |
 |-----|--------|
 | Credential | AWS (IAM) を選択（事前に作成が必要） |
-| Function | Lambda関数名（例: `eo-re-d01-lambda-apse1`） |
+| Function | Lambda関数名（例: `eo-re-d1-lambda-apse1`） |
 | Payload | `={{ $json.data }}` |
 
 4. **接続**: 出力を `295 JSON result REMOVER` または `340 Random Sleep (ms)` に接続
 
 ```
 AWS Lambda関数名の命名規則: eo-re-{env}-lambda-{region}
-例: eo-re-d01-lambda-apne1 (東京)
-    eo-re-d01-lambda-apse1 (シンガポール)
+例: eo-re-d1-lambda-apne1 (東京)
+    eo-re-d1-lambda-apse1 (シンガポール)
 ```
 
 ### Azure Functions ノードの作成

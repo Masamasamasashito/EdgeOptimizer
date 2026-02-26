@@ -113,7 +113,7 @@ EO_REGION_SHORT=apne1
 ```env
 # Referenced by (この定義値を使用するファイル):
 #   .github/workflows/deploy-py-to-az-function.yml (FUNCTION_APP_NAME, RESOURCE_GROUP)
-#   RequestEngine/azure/functions/py/bicep/eo-re-d01-azure-funcapp.bicep (パラメータ化済み)
+#   RequestEngine/azure/functions/py/bicep/eo-re-d1-azure-funcapp.bicep (パラメータ化済み)
 EO_RE_INSTANCE_TYPE=funcapp
 EO_RE_INSTANCE_ID=001
 EO_REGION=japaneast
@@ -149,7 +149,7 @@ EO_REGION_SHORT=global
 
 変数表現例）AzureのFunction App`{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-{EO_SERVERLESS_SERVICE}-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` となり、`EO_RE_INSTANCE_ID`
 
-実名例）AzureのFunction App`eo-re-d01-funcapp-jpe-001`
+実名例）AzureのFunction App`eo-re-d1-funcapp-jpe-001`
 
 - **付与する**: コンピュート／関数リソース（Lambda 関数名、Function App、Cloud Run サービス、Worker 名など）— クラウドを問わずリクエストエンジンすべて
 - **付与しない**: シークレットサービス（Key Vault、Secrets Manager 等）とストレージ（Storage Account、S3 等）— クラウドを問わず
@@ -169,8 +169,8 @@ EO_REGION_SHORT=global
 | パターン | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` |
 |---|---|
 | Bicep変数名 | `KEY_VAULT_NAME` |
-| 具体例 | `eo-kv-d01-jpe-a1b2-001` (22文字) |
-| 内訳 | `eo`(2) + `-kv`(3) + `-d01`(4) + `-jpe`(4) + `-a1b2`(5) + `-001`(4) = 22文字 |
+| 具体例 | `eo-kv-d1-jpe-a1b2-001` (21文字) |
+| 内訳 | `eo`(2) + `-kv`(3) + `-d1`(3) + `-jpe`(4) + `-a1b2`(5) + `-001`(4) = 21文字 |
 | 文字種 | 小文字英数字 + ハイフン |
 
 > **`EO_SECRET_SERVICE` = `kv`（Bicep パラメータ、デフォルト値）**
@@ -180,8 +180,8 @@ EO_REGION_SHORT=global
 | パターン | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}` |
 |---|---|
 | Bicep変数名 | `STORAGE_ACCOUNT_NAME` |
-| 具体例 | `eorestd01jpea1b2001` (19文字) |
-| 内訳 | `eo`(2) + `re`(2) + `st`(2) + `d01`(3) + `jpe`(3) + `a1b2`(4) + `001`(3) = 19文字 |
+| 具体例 | `eorestd1jpea1b2001` (18文字) |
+| 内訳 | `eo`(2) + `re`(2) + `st`(2) + `d1`(2) + `jpe`(3) + `a1b2`(4) + `001`(3) = 18文字 |
 | 文字種 | 小文字英数字のみ（ハイフン不可） |
 
 > **`EO_STORAGE_SERVICE` = `st`（Bicep パラメータ、デフォルト値）**
@@ -205,7 +205,7 @@ Storage Account のハイフン不可制約に合わせ、かつ Key Vault の6�
 >
 > Azure Key Vault・Storage Account はリソース自体は指定リージョンに物理配置されるが、
 > **DNS 名前空間は Azure 全リージョン・全テナントを跨いだグローバル空間**になっている。
-> つまり `eo-kv-d01-jpe-001` というシンプルな名前は自分以外の誰かが既に使用していると作成できない。
+> つまり `eo-kv-d1-jpe-001` というシンプルな名前は自分以外の誰かが既に使用していると作成できない。
 >
 > `EO_GLOBAL_PRJ_ENV_ID` を **`EO_RE_INSTANCE_ID` の直前に**付加することで、他テナントとの衝突を回避し、リクエストエンジン全体で順序を統一する。
 
@@ -286,7 +286,7 @@ AWS, GCP, Cloudflare のリソースはプロジェクト/リージョン内で�
 # main.tf
 locals {
   name_prefix  = "${var.project_prefix}-${var.component}-${var.environment}"
-  # 例: eo-re-d01
+  # 例: eo-re-d1
   region_short = var.region_short
 }
 ```
@@ -301,17 +301,17 @@ IaC: `RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml`
 
 | リソース | パターン | 例 | 文字制限 |
 |---|---|---|---|
-| **Lambda 関数** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}` | `eo-re-d01-lambda-apne1` | 64文字 |
-| **Lambda Log Group** | `/aws/lambda/{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}` | `/aws/lambda/eo-re-d01-lambda-apne1` | — |
-| **Lambda Layer** | `{ProjectPrefix}-{Component}-{Environment}-lambda-python-slim-layer` | `eo-re-d01-lambda-python-slim-layer` | 自動採番あり |
-| **Secrets Manager** | `{ProjectPrefix}-{Component}-{Environment}-secretsmng-{RegionShort}` | `eo-re-d01-secretsmng-apne1` | 512文字 |
-| **IAM Role (Lambda実行)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-role` | `eo-re-d01-lambda-apne1-role` | 64文字 |
-| **IAM Policy (基本実行)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-basic-exec-iamp` | `eo-re-d01-lambda-apne1-basic-exec-iamp` | 128文字 |
-| **IAM Policy (SM アクセス)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-role-iamp` | `eo-re-d01-lambda-apne1-role-iamp` | 128文字 |
-| **IAM User (n8n呼び出し)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-iamu` | `eo-re-d01-lambda-apne1-iamu` | 64文字 |
-| **IAM Policy (n8n invoke)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-access-key-iamp` | `eo-re-d01-lambda-apne1-access-key-iamp` | 128文字 |
-| **IAM Role (GH Actions)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-ghactions-deploy-iamr` | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr` | 64文字 |
-| **IAM Policy (GH Actions)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-ghactions-deploy-iamr-iamp` | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr-iamp` | 128文字 |
+| **Lambda 関数** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}` | `eo-re-d1-lambda-apne1` | 64文字 |
+| **Lambda Log Group** | `/aws/lambda/{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}` | `/aws/lambda/eo-re-d1-lambda-apne1` | — |
+| **Lambda Layer** | `{ProjectPrefix}-{Component}-{Environment}-lambda-python-slim-layer` | `eo-re-d1-lambda-python-slim-layer` | 自動採番あり |
+| **Secrets Manager** | `{ProjectPrefix}-{Component}-{Environment}-secretsmng-{RegionShort}` | `eo-re-d1-secretsmng-apne1` | 512文字 |
+| **IAM Role (Lambda実行)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-role` | `eo-re-d1-lambda-apne1-role` | 64文字 |
+| **IAM Policy (基本実行)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-basic-exec-iamp` | `eo-re-d1-lambda-apne1-basic-exec-iamp` | 128文字 |
+| **IAM Policy (SM アクセス)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-role-iamp` | `eo-re-d1-lambda-apne1-role-iamp` | 128文字 |
+| **IAM User (n8n呼び出し)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-iamu` | `eo-re-d1-lambda-apne1-iamu` | 64文字 |
+| **IAM Policy (n8n invoke)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-access-key-iamp` | `eo-re-d1-lambda-apne1-access-key-iamp` | 128文字 |
+| **IAM Role (GH Actions)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-ghactions-deploy-iamr` | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr` | 64文字 |
+| **IAM Policy (GH Actions)** | `{ProjectPrefix}-{Component}-{Environment}-lambda-{RegionShort}-ghactions-deploy-iamr-iamp` | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr-iamp` | 128文字 |
 | **OIDC Provider Tag** | `{ProjectPrefix}-ghactions-idp-request-engine-lambda-aws-{RegionShort}` | `eo-ghactions-idp-request-engine-lambda-aws-apne1` | — |
 | **CFn スタック** | `eo-aws-cfnstack` | `eo-aws-cfnstack` | — |
 
@@ -323,19 +323,19 @@ IaC: `RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml`
 
 ### 5.3 Azure リソース（Bicep）
 
-IaC: `RequestEngine/azure/functions/py/bicep/eo-re-d01-azure-funcapp.bicep`
+IaC: `RequestEngine/azure/functions/py/bicep/eo-re-d1-azure-funcapp.bicep`
 
 **§2.4 に従い** Function App / Key Vault / Storage Account の名前は一意スコープがグローバルのため、いずれも `EO_GLOBAL_PRJ_ENV_ID-EO_RE_INSTANCE_ID` を含める。
 
 | リソース | パターン（Bicep変数） | 例 | 文字制限 |
 |---|---|---|---|
-| **Function App** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-funcapp-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-funcapp-jpe-001` | 60文字 |
-| **App Service Plan** | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}` | `ASP-eored01reourcegrpjpe` | — |
-| **Key Vault** | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` | `eo-kv-d01-jpe-a1b2-001` | **24文字** |
-| **Storage Account** | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}` | `eorestd01jpea1b2001` | **24文字** |
+| **Function App** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-funcapp-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d1-funcapp-jpe-001` | 60文字 |
+| **App Service Plan** | `ASP-{EO_PROJECT}{EO_COMPONENT}{EO_ENV}resourcegrp{EO_REGION_SHORT}` | `ASP-eored1reourcegrpjpe` | — |
+| **Key Vault** | `{EO_PROJECT}-{EO_SECRET_SERVICE}-{EO_ENV}-{EO_REGION_SHORT}-{EO_GLOBAL_PRJ_ENV_ID}-{EO_RE_INSTANCE_ID}` | `eo-kv-d1-jpe-a1b2-001` | **24文字** |
+| **Storage Account** | `{EO_PROJECT}{EO_COMPONENT}{EO_STORAGE_SERVICE}{EO_ENV}{EO_REGION_SHORT}{EO_GLOBAL_PRJ_ENV_ID}{EO_RE_INSTANCE_ID}` | `eorestd1jpea1b2001` | **24文字** |
 | **Key Vault Secret** | `AZFUNC-REQUEST-SECRET` | `AZFUNC-REQUEST-SECRET` | 127文字 |
 | **Entra ID App (GH Actions)** | `eo-ghactions-deploy-entra-app-azfunc-{EO_REGION_SHORT}` | `eo-ghactions-deploy-entra-app-azfunc-jpe` | — |
-| **Resource Group** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-resourcegroup-{EO_REGION_SHORT}` | `eo-re-d01-resourcegroup-jpe` | 90文字 |
+| **Resource Group** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-resourcegrp-{EO_REGION_SHORT}` | `eo-re-d1-resourcegrp-jpe` | 90文字 |
 
 > [!NOTE]
 > Key Vault と Storage Account はグローバル一意が必須のため `EO_GLOBAL_PRJ_ENV_ID` を **`EO_RE_INSTANCE_ID` の直前に**付与（§3 の順序の原則）。
@@ -350,19 +350,19 @@ IaC: `RequestEngine/gcp/cloudrun/py/terraform/`
 
 | リソース | パターン（Terraform） | 例 | 文字制限 |
 |---|---|---|---|
-| **Cloud Run Service** | `{name_prefix}-cloudrun-{region_short}` | `eo-re-d01-cloudrun-asne1` | 63文字 |
-| **Artifact Registry** | `{name_prefix}-ar-{region_short}` ※ | `eo-re-d01-ar-asne1` | 63文字 |
-| **Secret Manager** | `{name_prefix}-secretmng` | `eo-re-d01-secretmng` | 255文字 |
+| **Cloud Run Service** | `{name_prefix}-cloudrun-{region_short}` | `eo-re-d1-cloudrun-asne1` | 63文字 |
+| **Artifact Registry** | `{name_prefix}-ar-{region_short}` ※ | `eo-re-d1-ar-asne1` | 63文字 |
+| **Secret Manager** | `{name_prefix}-secretmng` | `eo-re-d1-secretmng` | 255文字 |
 | **Secret キー名** | `CLOUDRUN_REQUEST_SECRET` | `CLOUDRUN_REQUEST_SECRET` | — |
-| **SA (Deployer)** | `{project_prefix}-gsa-{environment}-deploy-{region_short}` | `eo-gsa-d01-deploy-asne1` | **30文字** |
-| **SA (Runtime)** | `{project_prefix}-gsa-{environment}-runtime-{region_short}` | `eo-gsa-d01-runtime-asne1` | **30文字** |
-| **SA (OAuth2 Invoker)** | `{project_prefix}-gsa-{environment}-oa2inv-{region_short}` | `eo-gsa-d01-oa2inv-asne1` | **30文字** |
-| **WIF Pool** | `{project_prefix}-gcp-pool-wif-{environment}` | `eo-gcp-pool-wif-d01` | 32文字 |
-| **WIF IdP** | `{project_prefix}-gcp-idp-gh-oidc-wif-{environment}` | `eo-gcp-idp-gh-oidc-wif-d01` | 32文字 |
+| **SA (Deployer)** | `{project_prefix}-gsa-{environment}-deploy-{region_short}` | `eo-gsa-d1-deploy-asne1` | **30文字** |
+| **SA (Runtime)** | `{project_prefix}-gsa-{environment}-runtime-{region_short}` | `eo-gsa-d1-runtime-asne1` | **30文字** |
+| **SA (OAuth2 Invoker)** | `{project_prefix}-gsa-{environment}-oa2inv-{region_short}` | `eo-gsa-d1-oa2inv-asne1` | **30文字** |
+| **WIF Pool** | `{project_prefix}-gcp-pool-wif-{environment}` | `eo-gcp-pool-wif-d1` | 32文字 |
+| **WIF IdP** | `{project_prefix}-gcp-idp-gh-oidc-wif-{environment}` | `eo-gcp-idp-gh-oidc-wif-d1` | 32文字 |
 
 > [!IMPORTANT]
 > **GCP Service Account の命名（§2.4 に準拠）**
-> - パターン: `eo-gsa-{env}-{role}-{region_short}`（例: `eo-gsa-d01-runtime-asne1`）
+> - パターン: `eo-gsa-{env}-{role}-{region_short}`（例: `eo-gsa-d1-runtime-asne1`）
 > - 一意スコープがプロジェクト内のため、リソース名に `EO_RE_INSTANCE_ID` は含めない。
 >
 > [!NOTE]
@@ -373,16 +373,16 @@ IaC: `RequestEngine/gcp/cloudrun/py/terraform/`
 
 | SA | 例 | 文字数 | 余裕 |
 |---|---|---|---|
-| Deployer | `eo-gsa-d01-deploy-asne1` | 23文字 | 7文字 ✅ |
-| Runtime | `eo-gsa-d01-runtime-asne1` | 24文字 | 6文字 ✅ |
-| OAuth2 Invoker | `eo-gsa-d01-oa2inv-asne1` | 23文字 | 7文字 ✅ |
+| Deployer | `eo-gsa-d1-deploy-asne1` | 22文字 | 8文字 ✅ |
+| Runtime | `eo-gsa-d1-runtime-asne1` | 23文字 | 7文字 ✅ |
+| OAuth2 Invoker | `eo-gsa-d1-oa2inv-asne1` | 22文字 | 8文字 ✅ |
 
 > [!NOTE]
 > GCP SA は `labels` 非対応。命名メタデータは `display_name`（100文字）+ `description`（256文字）で保持。
 >
 > ```hcl
 > resource "google_service_account" "runtime" {
->   account_id   = "eo-gsa-d01-runtime-asne1"
+>   account_id   = "eo-gsa-d1-runtime-asne1"
 >   display_name = "EO GCP Cloud Run Runtime SA (asne1)"
 >   description  = "Cloud Run runtime identity with Secret Manager access"
 > }
@@ -398,7 +398,7 @@ IaC: `RequestEngine/cf/workers/ts/funcfiles/wrangler.toml`（または `wrangler
 
 | リソース | パターン | 例 |
 |---|---|---|
-| **Worker 名** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-cfworker-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d01-cfworker-global-001` |
+| **Worker 名** | `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-cfworker-{EO_REGION_SHORT}-{EO_RE_INSTANCE_ID}` | `eo-re-d1-cfworker-global-001` |
 
 > Cloudflare にはタグ機能がないため、命名メタデータは `wrangler.toml` 内コメントで管理。
 
@@ -419,7 +419,7 @@ Tags:
   - Key: Project
     Value: !Ref ProjectPrefix     # eo
   - Key: Environment
-    Value: !Ref Environment       # d01
+    Value: !Ref Environment       # d1
 ```
 
 **Azure Tags（Bicep）:**
@@ -428,7 +428,7 @@ Tags:
 var COMMON_TAGS = {
   Project:     EO_PROJECT      // eo
   Component:   EO_COMPONENT    // re
-  Environment: EO_ENV          // d01
+  Environment: EO_ENV          // d1
   ManagedBy:   'Bicep'
 }
 ```
@@ -440,7 +440,7 @@ locals {
   eo_gcp_resource_labels = {
     project     = var.project_prefix   # eo
     component   = var.component        # re
-    environment = var.environment      # d01
+    environment = var.environment      # d1
     managed-by  = "terraform"
   }
 }
@@ -462,16 +462,16 @@ locals {
 
 | リソース | 制限 | 現在の例 | 文字数 | 余裕 |
 |---|---|---|---|---|
-| **Azure Key Vault** | **24文字** | `eo-kv-d01-jpe-001-a1b2` | 22文字 | 2文字 |
-| **Azure Storage Account** | **24文字** | `eorestd01jpe001a1b2` | 19文字 | 5文字 |
-| **GCP SA (Deployer)** | **30文字** | `eo-gsa-d01-deploy-asne1` | 23文字 | 7文字 |
-| **GCP SA (Runtime)** | **30文字** | `eo-gsa-d01-runtime-asne1` | 24文字 | 6文字 |
-| **GCP SA (OAuth2 Invoker)** | **30文字** | `eo-gsa-d01-oa2inv-asne1` | 23文字 | 7文字 |
-| **GCP WIF Pool/IdP** | 32文字 | `eo-gcp-idp-gh-oidc-wif-d01` | 27文字 | 5文字 |
-| **AWS IAM Role** | 64文字 | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr` | 44文字 | 20文字 |
-| **AWS IAM Policy** | 128文字 | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr-iamp` | 49文字 | 79文字 |
-| **Azure Function App** | 60文字 | `eo-re-d01-funcapp-jpe-001` | 25文字 | 35文字 |
-| **Cloud Run Service** | 63文字 | `eo-re-d01-cloudrun-asne1` | 24文字 | 39文字 |
+| **Azure Key Vault** | **24文字** | `eo-kv-d1-jpe-a1b2-001` | 21文字 | 3文字 |
+| **Azure Storage Account** | **24文字** | `eorestd1jpea1b2001` | 18文字 | 6文字 |
+| **GCP SA (Deployer)** | **30文字** | `eo-gsa-d1-deploy-asne1` | 22文字 | 8文字 |
+| **GCP SA (Runtime)** | **30文字** | `eo-gsa-d1-runtime-asne1` | 23文字 | 7文字 |
+| **GCP SA (OAuth2 Invoker)** | **30文字** | `eo-gsa-d1-oa2inv-asne1` | 22文字 | 8文字 |
+| **GCP WIF Pool/IdP** | 32文字 | `eo-gcp-idp-gh-oidc-wif-d1` | 27文字 | 5文字 |
+| **AWS IAM Role** | 64文字 | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr` | 43文字 | 21文字 |
+| **AWS IAM Policy** | 128文字 | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr-iamp` | 48文字 | 80文字 |
+| **Azure Function App** | 60文字 | `eo-re-d1-funcapp-jpe-001` | 24文字 | 36文字 |
+| **Cloud Run Service** | 63文字 | `eo-re-d1-cloudrun-asne1` | 23文字 | 40文字 |
 
 > [!NOTE]
 > **GCP SA** は `gcp-sa`→`gsa`、`oa2be-inv`→`oa2inv` の短縮により、いずれも 30文字以内に収まっている。`EO_ENV` を 4文字以上にする場合は文字数再確認すること。
@@ -493,6 +493,6 @@ validation {
 
 | パターン | 例 | 文字数 |
 |---|---|---|
-| `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-pr-{EO_REGION_SHORT}` | `eo-re-d01-pr-asne1` | 18文字 ✅ |
+| `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-pr-{EO_REGION_SHORT}` | `eo-re-d1-pr-asne1` | 18文字 ✅ |
 
 `-pr-` は "project" の略。

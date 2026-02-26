@@ -20,14 +20,14 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 ## 管理グループ作成
 
 1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > 「+ 作成」 > 管理グループの作成
-2. 命名(ID) `eo-re-d01-azure-mgmt-group`
+2. 命名(ID) `eo-re-d1-azure-mgmt-grp`
 3. 作成後、反映するまで少し待つ（遅い）。
 
 ## サブスクリプション を管理グループに紐付け
 
 既存もしくは、新規作成したサブスクリプションを管理グループに紐付ける。
 今後、この管理グループでサブスクリプションの権限を制限する。
-1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d01-azure-mgmt-group`
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d1-azure-mgmt-grp`
 2. 「+ サブスクリプションの追加」
 3. 紐付けたいサブスクリプションを選択 > 保存
 
@@ -36,19 +36,19 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 まだ、作成中であるため、直下の「管理グループで(サブスクリプションIDを)ポリシー制限」を行ってください。
 
 1. Azure > ポリシー > (左サイドバー)作成 > 定義 > 「+ ポリシー定義」
-2. スコープ > `eo-re-d01-azure-mgmt-group` を選択
+2. スコープ > `eo-re-d1-azure-mgmt-grp` を選択
 3. 定義の種類 > ポリシー
 4. ポリシーの種類
 
-   - 名前: `eo-re-d01-allowed-locations`
-   - 説明: `Allow only specific locations for resources in eo-re-d01-azure-mgmt-group`
+   - 名前: `eo-re-d1-allowed-locations`
+   - 説明: `Allow only specific locations for resources in eo-re-d1-azure-mgmt-grp`
    - カテゴリ: `EdgeOptimizer`
 
 ## 管理グループで(サブスクリプションIDを)ポリシー制限
 
-1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d01-azure-mgmt-group`
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d1-azure-mgmt-grp`
 2. (左サイドバー)ガバナンス > ポリシー > 「ポリシーの割り当て」をクリック
-3. (タブ)基本情報 > スコープ > `eo-re-d01-azure-mgmt-group` を選択
+3. (タブ)基本情報 > スコープ > `eo-re-d1-azure-mgmt-grp` を選択
 4. 基本情報 > ポリシー定義 > `Allowed resource types` を選択 > 追加
 5. 次へ(パラメーター)
 6. リソースの種類 > 以下を選択（検索機能が非常に非力。sitesなどの最後尾の名称で検索する）
@@ -76,7 +76,7 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 11. レビューと作成 > 作成
 
 【参考】割り当て名：使用できるリソースの種類
-- スコープ `eo-re-d01-azure-mgmt-group`
+- スコープ `eo-re-d1-azure-mgmt-grp`
 - 定義の種類 `ポリシー`
 - パラメーターID `listOfResourceTypesAllowed`
 - パラメーター名 `Allowed resource types`
@@ -86,9 +86,9 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 
 リソースの作成先リージョンを Japan East のみに制限し、意図しないリージョンへのデプロイを防止する。
 
-1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d01-azure-mgmt-group`
+1. Azure Portal > Resource Manager(管理グループ) > (左サイドバー)組織 > 管理グループ > `eo-re-d1-azure-mgmt-grp`
 2. (左サイドバー)ガバナンス > ポリシー > 「ポリシーの割り当て」をクリック
-3. (タブ)基本情報 > スコープ > `eo-re-d01-azure-mgmt-group` を選択
+3. (タブ)基本情報 > スコープ > `eo-re-d1-azure-mgmt-grp` を選択
 4. 基本情報 > ポリシー定義 > `Allowed locations` を選択 > 追加
 5. 次へ(パラメーター)
 6. 許可されている場所 > 以下を選択
@@ -102,7 +102,7 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 11. 次へ > 作成
 
 【参考】割り当て名：許可されている場所
-- スコープ `eo-re-d01-azure-mgmt-group`
+- スコープ `eo-re-d1-azure-mgmt-grp`
 - 定義の種類 `ポリシー`
 - パラメーターID `listOfAllowedLocations`
 - パラメーター名 `Allowed locations`
@@ -110,20 +110,20 @@ Entra ID「グローバル管理者」ロールのユーザーで行う必要が
 
 # Step.1 Azureリソースグループ作成
 
-`eo-re-d01-resource-group-jpe`
+`eo-re-d1-resource-grp-jpe`
 
 - eoはEdge Optimizerの略称
 - reはrequest engineの略称
-- d01はdev01の略称。
+- d1はdev01の略称。
 - jpeはjapan eastの略称
 
 GCPのサービスアカウント名30文字制限が根底にあり、短縮化している。
 
 # Azure Functions 製 Request Engine 関数アプリ作成
 
-`eo-re-d01-funcapp-jpe`
+`eo-re-d1-funcapp-jpe`
 
-1. リソースグループ: `eo-re-d01-resource-group-jpe`
+1. リソースグループ: `eo-re-d1-resource-grp-jpe`
 2. 概要 > リソース > 作成 > Marketplace > 「Azureサービスのみ』にチェックを入れる > 関数アプリ > 作成 > 関数アプリ
 3. ホスティング オプションの選択 > フレックス従量課金 > 選択
 
@@ -146,11 +146,11 @@ GCPのサービスアカウント名30文字制限が根底にあり、短縮化
    - VNet 統合が使えるため、将来的にプライベート通信や他サービスの制限付きアクセスにも対応しやすい。
    - 実行時間上限が実質ないため、n8n からの長時間リクエストにも対応しやすい（②Premium も同様で、常時低レイテンシが必須なら検討可）。
 
-4. 関数アプリ名: `eo-re-d01-funcapp-jpe`
+4. 関数アプリ名: `eo-re-d1-funcapp-jpe`
     - 文字数制限有：43文字まで
 5. リージョン > Japan East > 選択
 6. 基本情報
-- リソース名: `eo-re-d01-funcapp-jpe`  
+- リソース名: `eo-re-d1-funcapp-jpe`  
 - 提供元: Microsoft / Azure Functions  
 - 安全な一意の既定のホスト名: 有効  
 - リージョン: Japan East  
@@ -160,7 +160,7 @@ GCPのサービスアカウント名30文字制限が根底にあり、短縮化
 「次: Storage」をクリック
 7. Storage
 - ストレージアカウント: 新規作成
-- ストレージアカウント名: `eored01storage`
+- ストレージアカウント名: `eored1storage`
     - 24文字以下
     - 数字と英小文字のみ
 - 診断設定
@@ -185,9 +185,9 @@ GCPのサービスアカウント名30文字制限が根底にあり、短縮化
 - 「次: 認証」をクリック
 12. 認証
 - リソース認証
-    - ホストストレージ（AzureWebJobsStorage）:`eored01storage`
+    - ホストストレージ（AzureWebJobsStorage）:`eored1storage`
         - 認証の種類: シークレット
-    - デプロイストレージ:`app-package-eo-re-d01-funcapp-jpe-xxxxxx`
+    - デプロイストレージ:`app-package-eo-re-d1-funcapp-jpe-xxxxxx`
         - 認証の種類: シークレット
 - 「次: タグ」をクリック
 13. タグ
@@ -209,9 +209,9 @@ GCPのサービスアカウント名30文字制限が根底にあり、短縮化
 
 ## App Service プラン確認
 
-1. リソースグループ > `eo-re-d01-resource-group-jpe` > 概要 > リソース
+1. リソースグループ > `eo-re-d1-resource-grp-jpe` > 概要 > リソース
 2. App Service プランを確認
-    - `ASP-eored01resourcegroupjpe-xxxx`
+    - `ASP-eored1resourcegrpjpe-xxxx`
 
 # 関数アプリの関数作成
 
@@ -359,9 +359,9 @@ RequestEngine/azure/functions/py/
 2. サブスクリプション
     - 従量課金
 3. リソースグループ
-    - `eo-re-d01-resource-group-jpe`
+    - `eo-re-d1-resource-grp-jpe`
 4. Key Vault 名
-    - `eo-re-d01-kv-jpe`
+    - `eo-re-d1-kv-jpe`
 5. 地域
     - `Japan East`
 6. 価格レベル
@@ -381,8 +381,8 @@ RequestEngine/azure/functions/py/
 |------------------------------|----------------------------------------------------|
 | 基本                         |                                                    |
 | サブスクリプション           | 従量課金                                           |
-| リソース グループ            | eo-re-d01-resource-group-jpe   |
-| Key Vault 名                 | eo-re-d01-kv-jpe |
+| リソース グループ            | eo-re-d1-resource-grp-jpe   |
+| Key Vault 名                 | eo-re-d1-kv-jpe |
 | 地域                         | Japan East                                         |
 | 価格レベル                   | Standard                                           |
 | 論理的な削除                 | 有効                                              |
@@ -427,13 +427,13 @@ RequestEngine/azure/functions/py/
 5. 次へ
 6. 選択されたロール > キー コンテナー シークレット ユーザー であること。
 7. (タブ)メンバー > アクセスの割り当て先 > マネージド ID
-8. メンバー > +メンバーを選択する > マネージドID で 関数アプリ を選択 > 該当する関数アプリ`eo-re-d01-funcapp-jpe`を選択する
-9. メンバー > 名前 に 選択した関数アプリ`eo-re-d01-funcapp-jpe`が表示されていること。
+8. メンバー > +メンバーを選択する > マネージドID で 関数アプリ を選択 > 該当する関数アプリ`eo-re-d1-funcapp-jpe`を選択する
+9. メンバー > 名前 に 選択した関数アプリ`eo-re-d1-funcapp-jpe`が表示されていること。
 10. Description にメンテナンス向けに、目的、背景、対象リソース、理由、設定日、設定者　などを入力
     ```
     目的: Azure Functions Request Engine が Key Vault から照合用リクエストシークレットを取得するため
     背景: セキュアな照合用リクエストシークレット管理のため Key Vault を使用
-    対象リソース: eo-re-d01-kv-jpe
+    対象リソース: eo-re-d1-kv-jpe
     理由: N8N_EO_REQUEST_SECRET と同じ値を Key Vault から取得し、n8nとリクエストエンジンで生成した各トークンを照合する必要があるため
     設定日: yyyy-mm-dd hh:mm
     設定者: [Your Name/Team]
@@ -448,7 +448,7 @@ RequestEngine/azure/functions/py/
 2. (左サイドバー)アクセス制御 (IAM)
 3. ロールの割り当て
 4. (タブ)すべて
-5. 一覧で、キーコンテナーシークレットユーザーに該当の関数アプリ名`eo-re-d01-funcapp-jpe`、役割に`キー コンテナー シークレット ユーザー`が有ればOK
+5. 一覧で、キーコンテナーシークレットユーザーに該当の関数アプリ名`eo-re-d1-funcapp-jpe`、役割に`キー コンテナー シークレット ユーザー`が有ればOK
 
 ## Azure内でシークレット作成する作業者にキーコンテナ “データプレーン権限” を付与
 
@@ -477,7 +477,7 @@ Key Vault には 2 種類の権限層がある
     ```
     目的: Azure Functions Request Engine が Key Vault からシークレットを取得する。そのシークレットを登録するため。
     背景: セキュアなシークレット管理のため Key Vault を使用
-    対象リソース: eo-re-d01-kv-jpe
+    対象リソース: eo-re-d1-kv-jpe
     理由: N8N_EO_REQUEST_SECRET を Key Vault から取得する必要があるため
     設定日: yyyy-mm-dd hh:mm
     設定者: [Your Name/Team]
@@ -492,7 +492,7 @@ Key Vault には 2 種類の権限層がある
 この操作は RBAC で許可されていません。ロールの割り当てが最近変更された場合は、ロールの割り当てが有効になるまで数分お待ちください。
 と表示されている。
 
-1. 該当するキーコンテナー`eo-re-d01-kv-jpe`にいく
+1. 該当するキーコンテナー`eo-re-d1-kv-jpe`にいく
 2. オブジェクト > シークレット
 3. 上部の「+ 生成/インポート」をクリック
 4. アップロードオプション > 手動
@@ -505,14 +505,14 @@ Key Vault には 2 種類の権限層がある
     ```
     目的: Azure Functions Request Engine が コード内でn8n生成トークン検証を行う、検証でKeyVaultから取得した照合用リクエストシークレットを使い照合するため。
     背景: リクエストエンジンでトークン検証を行うため
-    対象リソース: eo-re-d01-kv-jpe　の　AZFUNC-REQUEST-SECRET
+    対象リソース: eo-re-d1-kv-jpe　の　AZFUNC-REQUEST-SECRET
     設定日: yyyy-mm-dd hh:mm
     設定者: [Your Name/Team]
     ```
 8. 有効
     - はい
 9. 作成
-10. 該当するキーコンテナー`eo-re-d01-kv-jpe`の「概要」で、コンテナーのURL`https://eo-re-d01-kv-jpe.vault.azure.net/`を取得。
+10. 該当するキーコンテナー`eo-re-d1-kv-jpe`の「概要」で、コンテナーのURL`https://eo-re-d1-kv-jpe.vault.azure.net/`を取得。
     - シークレット識別子(URL) ではないので注意
 
 **更新方法**:「+ 新しいバージョン」をクリック、新しい値を入力、「作成」をクリックするとシークレット値を変更できる。古いバージョンの保管は無料。
@@ -529,7 +529,7 @@ GitHub Actionsのワークフローが、デプロイ前に`local.settings.json`
 1. GitHubリポジトリ → Settings → Secrets and variables → Actions
 2. 「New repository secret」をクリック
 3. シークレット名: `EO_AZ_RE_KEYVAULT_URL`
-4. 値: Key Vault(コンテナー)のURL（語尾のスラッシュ不要。例: `https://eo-re-d01-kv-jpe.vault.azure.net`）
+4. 値: Key Vault(コンテナー)のURL（語尾のスラッシュ不要。例: `https://eo-re-d1-kv-jpe.vault.azure.net`）
 5. 「Add secret」をクリック
 
 **セキュリティについて**:
@@ -541,12 +541,12 @@ GitHub Actionsのワークフローが、デプロイ前に`local.settings.json`
 
 GitHub Actionsを使用しない場合、または初回設定時：
 
-1. Azure Portal → Function App (`eo-re-d01-funcapp-jpe`)
+1. Azure Portal → Function App (`eo-re-d1-funcapp-jpe`)
 2. 左サイドバー → **設定** → **環境変数** → **アプリ設定** タブ
 3. **+ 追加** をクリック
 4. 以下の値を設定：
    - **名前**: `EO_AZ_RE_KEYVAULT_URL`
-   - **値**: Key VaultのURI（語尾のスラッシュ不要。例: `https://eo-re-d01-kv-jpe.vault.azure.net`）
+   - **値**: Key VaultのURI（語尾のスラッシュ不要。例: `https://eo-re-d1-kv-jpe.vault.azure.net`）
 5. **適用** をクリック
 
 **注意**: GitHub Actionsでデプロイする場合、`local.settings.json`に`EO_AZ_RE_KEYVAULT_URL`が含まれていないと、デプロイ時に既存の設定が削除される可能性があります。必ずGitHub Secretsに`EO_AZ_RE_KEYVAULT_URL`を設定してください。
@@ -668,7 +668,7 @@ GitHub ActionsからOIDC認証でログインするため、サービスプリ�
 
 **推奨**: リソースグループレベルで権限を付与します。最小権限の原則に従い、必要なリソースグループのみに権限を付与できます。
 
-1. Azure Portal → リソースグループ (`eo-re-d01-resource-group-jpe`) → アクセス制御 (IAM)
+1. Azure Portal → リソースグループ (`eo-re-d1-resource-grp-jpe`) → アクセス制御 (IAM)
 2. 「+ 追加」→「ロールの割り当ての追加」
 3. ロール: `Web サイト共同作成者` を選択
 4. 次へ
@@ -697,7 +697,7 @@ GitHub ActionsからOIDC認証でログインするため、サービスプリ�
 | `EO_AZ_FUNC_JPE_DEPLOY_ENTRA_APP_ID_FOR_GITHUB` | 上記で取得したアプリケーション（クライアント）ID | Azure ADアプリケーションのClient ID |
 | `EO_AZ_TENANT_ID` | 上記で取得したディレクトリ（テナント）ID | Azure ADテナントID |
 | `EO_AZURE_SUBSCRIPTION_ID` | AzureサブスクリプションID | デプロイ先のサブスクリプションID |
-| `EO_AZ_RE_KEYVAULT_URL` | Key VaultのURI（語尾のスラッシュ不要。例: `https://eo-re-d01-kv-jpe.vault.azure.net`） | Key VaultのURI（デプロイ時に`local.settings.json`に含まれ、アプリケーション設定として自動設定されます） |
+| `EO_AZ_RE_KEYVAULT_URL` | Key VaultのURI（語尾のスラッシュ不要。例: `https://eo-re-d1-kv-jpe.vault.azure.net`） | Key VaultのURI（デプロイ時に`local.settings.json`に含まれ、アプリケーション設定として自動設定されます） |
 
 ## 手順 5: ワークフローファイルの確認
 
@@ -718,7 +718,7 @@ GitHub ActionsからOIDC認証でログインするため、サービスプリ�
 4. 「Deploy Azure Functions」ワークフローが実行されていることを確認
 5. ワークフローが成功（緑色のチェックマーク）することを確認
 6. Azure Portalで確認:
-   - Function App (`eo-re-d01-funcapp-jpe`) → **Functions**
+   - Function App (`eo-re-d1-funcapp-jpe`) → **Functions**
    - `requestengine_func` 関数が表示されていることを確認
 
 ### 通常のデプロイ（コード変更時）
@@ -742,7 +742,7 @@ GitHub ActionsからOIDC認証でログインするため、サービスプリ�
 
 Azure Portalでログを確認：
 
-1. Azure Portal → Function App (`eo-re-d01-funcapp-jpe`)
+1. Azure Portal → Function App (`eo-re-d1-funcapp-jpe`)
 2. 左サイドバー → **監視** → **ログストリーム** をクリック
 3. リアルタイムログを確認してエラーメッセージを特定
 
@@ -752,11 +752,11 @@ Azure Portalでログを確認：
 
 `EO_AZ_RE_KEYVAULT_URL` が正しく設定されているか確認：
 
-1. Azure Portal → Function App (`eo-re-d01-funcapp-jpe`)
+1. Azure Portal → Function App (`eo-re-d1-funcapp-jpe`)
 2. 左サイドバー → **設定** → **環境変数** → **アプリ設定**
 3. `EO_AZ_RE_KEYVAULT_URL` が存在し、正しいKey Vault URLが設定されているか確認
    - 形式: `https://<KeyVault名>.vault.azure.net`（語尾のスラッシュ不要）
-   - 例: `https://eo-re-d01-kv-jpe.vault.azure.net`
+   - 例: `https://eo-re-d1-kv-jpe.vault.azure.net`
 
 #### 3. Key Vaultへのアクセス権限の確認
 
@@ -804,7 +804,7 @@ GitHub Actionsでのデプロイが失敗する場合のトラブルシューテ
 
 ```bash
 cd RequestEngine/azure/functions/py/funcfiles
-func azure functionapp publish eo-re-d01-funcapp-jpe
+func azure functionapp publish eo-re-d1-funcapp-jpe
 ```
 
 **注意**: 通常はGitHub Actionsからデプロイするため、この方法はトラブルシューティング時のみ使用してください。
@@ -831,7 +831,7 @@ n8n の `280AZ-japan-east RequestEngine KeyVault` ノードで Azure Functions �
 
 **対処手順**:
 
-1. Azure Portal で該当の **関数アプリ** (`eo-re-d01-funcapp-jpe`) → **関数** → **requestengine_func** を開く。
+1. Azure Portal で該当の **関数アプリ** (`eo-re-d1-funcapp-jpe`) → **関数** → **requestengine_func** を開く。
 2. 関数の詳細画面で **「Get Function URL」**（関数の URL の取得）をクリックする。
 3. キー選択のドロップダウンが表示されます。次のいずれかが出ます：
    - **`_master` (ホスト キー)** … 管理用。n8n からの通常呼び出しには使わない。
@@ -858,7 +858,7 @@ n8n の `280AZ-japan-east RequestEngine KeyVault` ノードで Azure Functions �
 
 ```bash
 cd RequestEngine\azure\functions\py\funcfiles
-func azure functionapp publish eo-re-d01-funcapp-jpe --python
+func azure functionapp publish eo-re-d1-funcapp-jpe --python
 ```
 
 **重要なポイント**:
@@ -968,9 +968,9 @@ curl.exe -X POST http://localhost:7071/api/requestengine_func -H "Content-Type: 
     
     2. 左側のメニューから「リソースグループ」を選択するか、検索バーで「リソースグループ」を検索します
     
-    3. リソースグループ一覧から `eo-re-d01-resource-group-jpe` をクリックします
+    3. リソースグループ一覧から `eo-re-d1-resource-grp-jpe` をクリックします
     
-    4. リソース一覧から、関数アプリ `eo-re-d01-funcapp-jpe` をクリックします
+    4. リソース一覧から、関数アプリ `eo-re-d1-funcapp-jpe` をクリックします
     
     5. 関数アプリの詳細画面で、左側のメニューから「関数」を選択します
     
@@ -995,7 +995,7 @@ curl.exe -X POST http://localhost:7071/api/requestengine_func -H "Content-Type: 
     
     以下の情報を基に、PowerShellで実行可能なcurlテストコマンドの完成形を作成してください：
     
-    - Function URL: https://eo-re-d01-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func
+    - Function URL: https://eo-re-d1-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func
     - Function Key: <YOUR_FUNCTION_KEY>（ステップ3で取得したFunction Keyに置き換える）
     - 計算したトークン: <CALCULATED_TOKEN>（ステップ1で計算したトークンに置き換える）
     - テストURL: https://sample.com
@@ -1004,7 +1004,7 @@ curl.exe -X POST http://localhost:7071/api/requestengine_func -H "Content-Type: 
     
     ```powershell
     # 変数の設定
-    $functionUrl = "https://eo-re-d01-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func"
+    $functionUrl = "https://eo-re-d1-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func"
     $functionKey = "<YOUR_FUNCTION_KEY>"  # 人間がAzure Portalから取得したFunction Keyに置き換える
     $token = "<CALCULATED_TOKEN>"  # ステップ1で計算したトークンに置き換える
     
@@ -1155,7 +1155,7 @@ Azureへのデプロイ（コンテナの外でローカルpwsh7で行う）
 
 ```bash
 cd RequestEngine\azure\functions\py\funcfiles
-func azure functionapp publish eo-re-d01-funcapp-jpe --python
+func azure functionapp publish eo-re-d1-funcapp-jpe --python
 ```
 
 **重要なポイント**:
@@ -1186,12 +1186,12 @@ curl.exe -X POST <INVOKE_URL> `
 **PowerShellでの実行方法（推奨）**:
 ```powershell
 $jsonData = '{"data": {"url": "https://sample.com", "token": "<YOUR_TOKEN>", "httpRequestNumber": 1, "httpRequestUUID": "550e8400-e29b-41d4-a716-446655440000", "httpRequestRoundID": 1737123456}}'
-curl.exe -X POST https://eo-re-d01-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func -H "Content-Type: application/json" -H "x-functions-key:<YOUR_FUNCTION_KEY>" -d $jsonData
+curl.exe -X POST https://eo-re-d1-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func -H "Content-Type: application/json" -H "x-functions-key:<YOUR_FUNCTION_KEY>" -d $jsonData
 ```
 
 **cmd.exeでの実行方法**:
 ```cmd
-curl.exe -X POST https://eo-re-d01-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func -H "Content-Type: application/json" -H "x-functions-key:<YOUR_FUNCTION_KEY>" -d "{\"data\": {\"url\": \"https://sample.com\", \"token\": \"<YOUR_TOKEN>\", \"httpRequestNumber\": 1, \"httpRequestUUID\": \"550e8400-e29b-41d4-a716-446655440000\", \"httpRequestRoundID\": 1737123456}}"
+curl.exe -X POST https://eo-re-d1-funcapp-jpe-<ランダム文字列>.japaneast-01.azurewebsites.net/api/requestengine_func -H "Content-Type: application/json" -H "x-functions-key:<YOUR_FUNCTION_KEY>" -d "{\"data\": {\"url\": \"https://sample.com\", \"token\": \"<YOUR_TOKEN>\", \"httpRequestNumber\": 1, \"httpRequestUUID\": \"550e8400-e29b-41d4-a716-446655440000\", \"httpRequestRoundID\": 1737123456}}"
 ```
 
 **注意**: 
@@ -1200,10 +1200,10 @@ curl.exe -X POST https://eo-re-d01-funcapp-jpe-<ランダム文字列>.japaneast
   - 詳細な計算方法・実装例・生成AIへのプロンプト例については、上記「ローカルDockerでAzure Functions 初期化/開発環境構築」セクションの「生成AIへのプロンプト例」を参照してください
 
 # キーコンテナ(Key Vault)URLの変更コマンド
-az functionapp config appsettings set --name eo-re-d01-funcapp-jpe --resource-group eo-re-d01-resource-group-jpe --settings EO_AZ_RE_KEYVAULT_URL="https://eo-re-d01-kv-jpe.vault.azure.net"
+az functionapp config appsettings set --name eo-re-d1-funcapp-jpe --resource-group eo-re-d1-resource-grp-jpe --settings EO_AZ_RE_KEYVAULT_URL="https://eo-re-d1-kv-jpe.vault.azure.net"
 
 # 再デプロイ
-func azure functionapp publish eo-re-d01-funcapp-jpe --python
+func azure functionapp publish eo-re-d1-funcapp-jpe --python
 # Azure Functions アプリキー/関数キー（Azure Functions へのアクセス認証）
 
 🔐Request Engine へのアクセス権そのものであり、漏洩してはいけない機密情報
@@ -1215,7 +1215,7 @@ func azure functionapp publish eo-re-d01-funcapp-jpe --python
 - キー値
     - 以下の手順で取得 
 
-1. Azure Portal で該当の 関数アプリ (eo-re-d01-funcapp-jpe) へ移動します。
+1. Azure Portal で該当の 関数アプリ (eo-re-d1-funcapp-jpe) へ移動します。
 2. 左側のメニューから 関数 を選択します。
 3. 目的の関数名 (requestengine_func) をクリックします。
 4. 関数の詳細画面で、「関数のURLの取得」 を選択します。
@@ -1356,12 +1356,12 @@ logging.warning("Content size exceeds {MAX_CONTENT_SIZE_FOR_ANALYSIS} bytes")
 ## 課金抑制アクション
 
 - Application Insights
-  - `eo-re-d01-funcapp-jpe`
+  - `eo-re-d1-funcapp-jpe`
     - 保持期間を 30 日に設定（無料枠）
     - Adaptive Sampling を有効化
     - 不要なログ（成功リクエストなど）を除外
 - 関数アプリ
-  - `eo-re-d01-funcapp-jpe`
+  - `eo-re-d1-funcapp-jpe`
     - `host.json`でログレベルを調整（`Warning`以上に）
     - `ILogger`の使い方を見直す（`Information` や `Trace` を減らす）
     - `Application Insights`SDK のフィルタリングを活用

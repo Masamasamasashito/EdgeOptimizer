@@ -67,15 +67,15 @@
 - 付随して作られるCWLogsロググループの保持期間とIAMポリシーに注意が必要
 
 - 関数名
-  - eo-re-d01-lambda-apne1
+  - eo-re-d1-lambda-apne1
       - eoはEdge Optimizerの略称
       - reはRequest Engineの略称
-      - d01はdev01の略称
+      - d1はdev01の略称
       - apne1はap-northeast-1の略称
 - ランタイム
   - Python3.14
 - タグ
-  - Name: eo-re-d01-lambda-apne1
+  - Name: eo-re-d1-lambda-apne1
 
 ※GCPサービスアカウント名30文字制限が根底にあり、短縮化している。
 
@@ -89,7 +89,7 @@
 
 n8nの280系のリクエストエンジンLambdaノードがIAMユーザーのアクセスキーでLambdaを呼び出すためのポリシーを作成
 
-eo-re-d01-lambda-apne1-access-key-iamp
+eo-re-d1-lambda-apne1-access-key-iamp
 
 ```json
 {
@@ -101,8 +101,8 @@ eo-re-d01-lambda-apne1-access-key-iamp
                 "lambda:InvokeFunction"
             ],
             "Resource": [
-                "arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:function:eo-re-d01-lambda-apne1",
-                "arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:function:eo-re-d01-lambda-apne1:*"
+                "arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:function:eo-re-d1-lambda-apne1",
+                "arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:function:eo-re-d1-lambda-apne1:*"
             ]
         }
     ]
@@ -114,19 +114,19 @@ eo-re-d01-lambda-apne1-access-key-iamp
 > 💡 **CFn版の場合**: IAM ユーザーは CloudFormation が自動作成します。アクセスキーのみ手動発行が必要です（[CFn版 STEP 3-2](LAMBDA_CFN_README.md)）。
 
 1. IAMユーザー
-    - eo-re-d01-lambda-apne1-iamu
+    - eo-re-d1-lambda-apne1-iamu
 2. AWS マネジメントコンソールへのユーザーアクセスを提供する
     - チェックしない
 3. ユーザーグループ無し
 4. ポリシーを直接アタッチする
-    - eo-re-d01-lambda-apne1-access-key-iamp
+    - eo-re-d1-lambda-apne1-access-key-iamp
 5. IAMU作ったら、セキュリティ認証情報でアクセスキー/シークレットアクセスキーを作成
     1. AWS の外部で実行されるアプリケーション
         - n8nからLambdaを呼び出すため
     2. 説明タグ値
-        - eo-re-d01-lambda-apne1-iamu-access-key
+        - eo-re-d1-lambda-apne1-iamu-access-key
     3. csvでアクセスキー/シークレットアクセスキーをダウンロードする
-        - eo-re-d01-lambda-apne1-iamu_accessKeys.csv
+        - eo-re-d1-lambda-apne1-iamu_accessKeys.csv
 6. 完了を押下
 
 ## 5. n8n 280系リクエストエンジンLambdaノード用Credential設定
@@ -139,7 +139,7 @@ n8nの280系のリクエストエンジンLambdaノードで使うCredentialを�
 2. Credential Type: AWS(IAM) を選択 > Continue
 3. Name: EO_RE_AWS_AccessKey など
 4. Region > apne1（ap-northeast-1、your own region）
-5. eo-re-d01-lambda-apne1-iamu_accessKeys.csvよりAccess Key ID と Secret Access Key を入力
+5. eo-re-d1-lambda-apne1-iamu_accessKeys.csvよりAccess Key ID と Secret Access Key を入力
 6. 右上の「Save」ボタンをクリック
 7. Green で Connection tested successfully が表示されたら成功
 
@@ -150,7 +150,7 @@ n8nの280系のリクエストエンジンLambdaノードにCredentialを設定
 3.  EO_RE_AWS_AccessKeyを選択
    「EO_RE_AWS_AccessKey」を選択
 4. Function Name or ID > Expression > Lambda関数名を入力
-   EX) eo-re-d01-lambda-apne1
+   EX) eo-re-d1-lambda-apne1
 5. Workflow画面で「Save」ボタンをクリック
 
 ## 6. AWS Secrets Manager 設定
@@ -159,7 +159,7 @@ n8nの280系のリクエストエンジンLambdaノードにCredentialを設定
 
 AWS Secrets ManagerでSecretを作成
 
-**重要**: シークレット名は、Lambda関数コード内で使用されている`eo-re-d01-secretsmng-apne1`と一致させる必要があります。
+**重要**: シークレット名は、Lambda関数コード内で使用されている`eo-re-d1-secretsmng-apne1`と一致させる必要があります。
 
 東京リージョン（apne1 / ap-northeast-1）
 
@@ -170,7 +170,7 @@ AWS Secrets ManagerでSecretを作成
 5. 暗号化キー
    - aws/secretsmanager（デフォルトのKMSキー）
 6. シークレットの名前
-   - `eo-re-d01-secretsmng-apne1`（コード内のLAMBDA_REQUEST_SECRET_NAMEに格納定義しているシークレット名）
+   - `eo-re-d1-secretsmng-apne1`（コード内のLAMBDA_REQUEST_SECRET_NAMEに格納定義しているシークレット名）
 7. オプションの説明
    - N8N_EO_REQUEST_SECRET と同じ値を、Lambda Request Engine が SecretsMng から照合用リクエストシークレットとして取得する。n8nとリクエストエンジンで生成した各トークンを照合するため。
 8. 「次へ」をクリック
@@ -184,15 +184,15 @@ AWS Secrets ManagerでSecretを作成
 
 > 💡 **CFn版の場合**: IAM ロール・ポリシーは CloudFormation が自動作成します。
 
-IAMポリシー作成:`eo-re-d01-lambda-apne1-role-iamp`
+IAMポリシー作成:`eo-re-d1-lambda-apne1-role-iamp`
 
-eo-re-d01-lambda-apne1のLambdaのIAMロールに対して、eo-re-d01-lambda-apne1-role-iamp のIAMポリシーを作り、LambdaのIAMロールに対して追加する
+eo-re-d1-lambda-apne1のLambdaのIAMロールに対して、eo-re-d1-lambda-apne1-role-iamp のIAMポリシーを作り、LambdaのIAMロールに対して追加する
 
 説明 > AWS Secrets Manager の照合用リクエストシークレットをLambdaで取得するためのIAMポリシー
 
-eo-re-d01-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作られる
+eo-re-d1-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作られる
 
-**重要**: シークレット名は、コード内で使用されている`eo-re-d01-secretsmng-apne1`と一致させる必要があります。
+**重要**: シークレット名は、コード内で使用されている`eo-re-d1-secretsmng-apne1`と一致させる必要があります。
 
 ```json
 {
@@ -204,7 +204,7 @@ eo-re-d01-lambda-apne1-role-xxxxxxxx ←CWLogs用のポリシーは勝手に作�
             "Action": [
                 "secretsmanager:GetSecretValue"
             ],
-            "Resource": "arn:aws:secretsmanager:ap-northeast-1:<AWSアカウントID>:secret:eo-re-d01-secretsmng-apne1-*"
+            "Resource": "arn:aws:secretsmanager:ap-northeast-1:<AWSアカウントID>:secret:eo-re-d1-secretsmng-apne1-*"
         }
     ]
 }
@@ -261,7 +261,7 @@ exit
 
 1. Lambda の レイヤー
 2. レイヤーを作成
-   - `eo-re-d01-lambda-python-slim-layer`
+   - `eo-re-d1-lambda-python-slim-layer`
 3. 「カスタムレイヤー」→ さきほど作った `RequestEngine/aws/lambda/py/funcfiles/requests-python-slim-layer.zip` を選択
 4. 作成
 5. ARNをメモる
@@ -278,7 +278,7 @@ exit
 
 **重要**: Lambda関数のタイムアウトは、HTTPリクエストのタイムアウト（10秒）とリトライ（最大2回）を考慮して、最低30秒以上に設定する必要があります。
 
-1. AWSコンソールで該当Lambda関数（`eo-re-d01-lambda-apne1`）を開く
+1. AWSコンソールで該当Lambda関数（`eo-re-d1-lambda-apne1`）を開く
 2. 「設定」タブ > 「一般設定」 > 「編集」
 3. 「タイムアウト」を 30秒以上（推奨: 60秒）に設定
 4. 「保存」
@@ -294,7 +294,7 @@ AWS CLIでタイムアウトを設定する場合:
 
 ```bash
 aws lambda update-function-configuration \
-  --function-name eo-re-d01-lambda-apne1 \
+  --function-name eo-re-d1-lambda-apne1 \
   --timeout 60 \
   --region ap-northeast-1
 ```
@@ -354,7 +354,7 @@ AWSコンソールの IAM > IDプロバイダ へ移動。
 
 ### 参考ステップ2：IAMポリシー作成
 
-命名：`eo-re-d01-lambda-apne1-ghactions-deploy-iamr-iamp`
+命名：`eo-re-d1-lambda-apne1-ghactions-deploy-iamr-iamp`
 
 ```json
 {
@@ -369,7 +369,7 @@ AWSコンソールの IAM > IDプロバイダ へ移動。
                 "lambda:UpdateFunctionConfiguration",
                 "lambda:GetFunction"
             ],
-            "Resource": "arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:function:eo-re-d01-lambda-apne1"
+            "Resource": "arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:function:eo-re-d1-lambda-apne1"
         }
     ]
 }
@@ -379,14 +379,14 @@ AWSコンソールの IAM > IDプロバイダ へ移動。
 
 GitHub Actionsが使用する専用ロールを作成します。
 
-命名：`eo-re-d01-lambda-apne1-ghactions-deploy-iamr`
+命名：`eo-re-d1-lambda-apne1-ghactions-deploy-iamr`
 
 1. IAM > ロール > [ロールを作成] をクリック
 2. 信頼されたエンティティタイプ > ウェブアイデンティティ を選択
 3. プロバイダ: `token.actions.githubusercontent.com`
 4. Audience: `sts.amazonaws.com`
 5. 許可の境界: 設定しない
-6. アクセス許可に `eo-re-d01-lambda-apne1-ghactions-deploy-iamr-iamp` を追加
+6. アクセス許可に `eo-re-d1-lambda-apne1-ghactions-deploy-iamr-iamp` を追加
 
 > **重要**: 信頼関係のポリシーで、ConditionのStringLikeの`token.actions.githubusercontent.com:sub`でリポジトリのブランチを `*` 指定可能。
 
@@ -419,7 +419,7 @@ GitHub Actionsが使用する専用ロールを作成します。
 
 | Secret名 | 値 |
 |----------|------|
-| `EO_LAMBDA_DEPLOY_AWS_APNE1_ROLE_FOR_GITHUB` | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr` のARN |
+| `EO_LAMBDA_DEPLOY_AWS_APNE1_ROLE_FOR_GITHUB` | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr` のARN |
 
 ### 参考ステップ5：GitHubワークフロー
 

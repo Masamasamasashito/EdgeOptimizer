@@ -67,7 +67,7 @@ n8nから各クラウド基盤のサーバレス関数（Request Engine）への
 
 - `280AWS-apne1 RequestEngine AccessKey`ノード
     - Parameters > Function Name or ID > Expression
-    - Lambda関数名を入力 > `eo-re-d01-lambda-apne1`
+    - Lambda関数名を入力 > `eo-re-d1-lambda-apne1`
 
 ## RequestEngine Azure Functions App Key
 
@@ -82,7 +82,7 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 - `280AZ-japan-east RequestEngine KeyVault`ノード
     - Parameters > URL
     - Azure > 関数アプリ > 関数 > リソースJSON > invoke_url_template
-     `https://eo-re-d01-funcapp-jpe-xxxxxxxxxxxxxxxx.japaneast-01.azurewebsites.net/api/requestengine_func`
+     `https://eo-re-d1-funcapp-jpe-xxxxxxxxxxxxxxxx.japaneast-01.azurewebsites.net/api/requestengine_func`
 
 ## RequestEngine Worker Cloudflare Access Secret
 
@@ -107,7 +107,7 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 - **権限の参照**: GCP Cloud Run のサービスアカウント（Deployer / Compute Engine Default / Runtime / OAuth2 Invoker）のロール・権限一覧と設定手順は [EO_Documents/Manuals/py/CloudRun_README.md](py/CloudRun_README.md) を参照。
 
-個人GCPメール > IAMと管理 > サービスアカウント > `eo-gsa-d01-oa2inv-asne1`を選択 > 鍵
+個人GCPメール > IAMと管理 > サービスアカウント > `eo-gsa-d1-oa2inv-asne1`を選択 > 鍵
 
 `********************-xxxxxxxxxxxx.json`
 
@@ -131,19 +131,19 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 | クラウド名 | リージョン | クラウドのシークレットサービス | リクエストエンジンコード内環境変数 | ランタイム |
 |---|---|---|---|---|
-| **Azure** | Japan East (jpe) | Key Vault: `eo-re-d01-kv-jpe`<br>シークレット: `AZFUNC-REQUEST-SECRET` | `AZFUNC_REQUEST_SECRET_NAME` | Python 3.13 |
-| **AWS** | apne1 (ap-northeast-1) | Secrets Managerのシークレット名: `eo-re-d01-secretsmng-apne1`<br>シークレットキー: `LAMBDA_REQUEST_SECRET` | `LAMBDA_REQUEST_SECRET_NAME`<br>`LAMBDA_REQUEST_SECRET_KEY_NAME` | Python 3.14 |
-| **GCP** | asne1 (asia-northeast1) | Secret Managerのシークレット名: `eo-re-d01-secretmng`<br>シークレットキー: `CLOUDRUN_REQUEST_SECRET` | `CLOUDRUN_REQUEST_SECRET_NAME`<br>`CLOUDRUN_REQUEST_SECRET_KEY_NAME` | Python (Flask) |
+| **Azure** | Japan East (jpe) | Key Vault: `eo-re-d1-kv-jpe`<br>シークレット: `AZFUNC-REQUEST-SECRET` | `AZFUNC_REQUEST_SECRET_NAME` | Python 3.13 |
+| **AWS** | apne1 (ap-northeast-1) | Secrets Managerのシークレット名: `eo-re-d1-secretsmng-apne1`<br>シークレットキー: `LAMBDA_REQUEST_SECRET` | `LAMBDA_REQUEST_SECRET_NAME`<br>`LAMBDA_REQUEST_SECRET_KEY_NAME` | Python 3.14 |
+| **GCP** | asne1 (asia-northeast1) | Secret Managerのシークレット名: `eo-re-d1-secretmng`<br>シークレットキー: `CLOUDRUN_REQUEST_SECRET` | `CLOUDRUN_REQUEST_SECRET_NAME`<br>`CLOUDRUN_REQUEST_SECRET_KEY_NAME` | Python (Flask) |
 | **Cloudflare** | global (Edge) | `CFWORKER_REQUEST_SECRET` | `env.CFWORKER_REQUEST_SECRET` | TypeScript (V8) |
 
 ### 詳細情報
 
 #### Azure Functions
 
-- **リクエストエンジン名**: リソースグループ: `eo-re-d01-resource-group-jpe`、関数アプリ: `eo-re-d01-funcapp-jpe`、関数名: `requestengine_func`
-- **Key Vault URI**: `https://eo-re-d01-kv-jpe.vault.azure.net/` (GitHubシークレット: `EO_AZ_RE_KEYVAULT_URL`)
-- **シークレット識別子**: `https://eo-re-d01-kv-jpe.vault.azure.net/secrets/AZFUNC-REQUEST-SECRET/{VERSION}`
-- **Key Vault**: `eo-re-d01-kv-jpe`
+- **リクエストエンジン名**: リソースグループ: `eo-re-d1-resource-grp-jpe`、関数アプリ: `eo-re-d1-funcapp-jpe`、関数名: `requestengine_func`
+- **Key Vault URI**: `https://eo-re-d1-kv-jpe.vault.azure.net/` (GitHubシークレット: `EO_AZ_RE_KEYVAULT_URL`)
+- **シークレット識別子**: `https://eo-re-d1-kv-jpe.vault.azure.net/secrets/AZFUNC-REQUEST-SECRET/{VERSION}`
+- **Key Vault**: `eo-re-d1-kv-jpe`
 - **シークレット**: `AZFUNC-REQUEST-SECRET`
 - **シークレット取得方法**: Azure Key Vault Secrets API (`SecretClient`)
 - **保存方式**: テキスト
@@ -152,9 +152,9 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 #### AWS Lambda
 
-- **リクエストエンジン名**: Lambda関数: `eo-re-d01-lambda-apne1`
-- **ARN**: `arn:aws:secretsmanager:ap-northeast-1:{AWSアカウントID}:secret:eo-re-d01-secretsmng-apne1-{RANDOM}`
-- **シークレット**: `eo-re-d01-secretsmng-apne1`
+- **リクエストエンジン名**: Lambda関数: `eo-re-d1-lambda-apne1`
+- **ARN**: `arn:aws:secretsmanager:ap-northeast-1:{AWSアカウントID}:secret:eo-re-d1-secretsmng-apne1-{RANDOM}`
+- **シークレット**: `eo-re-d1-secretsmng-apne1`
 - **シークレットキー**: `LAMBDA_REQUEST_SECRET`
 - **シークレット取得方法**: AWS Secrets Manager API (`boto3.client('secretsmanager')`)
 - **保存方式**: シークレットキーの値はテキストだが、シークレットはJSON形式
@@ -164,9 +164,9 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 #### GCP Cloud Run
 
-- **リクエストエンジン名**: 組織: `<組織ドメイン>`、プロジェクト名: `eo-re-d01-pr-asne1`、Cloud Runサービス: `eo-re-d01-cloudrun-asne1`
-- **リソース名**: `projects/eo-re-d01-pr-asne1/secrets/eo-re-d01-secretmng/versions/{VERSION}`
-- **シークレット**: `eo-re-d01-secretmng`
+- **リクエストエンジン名**: 組織: `<組織ドメイン>`、プロジェクト名: `eo-re-d1-pr-asne1`、Cloud Runサービス: `eo-re-d1-cloudrun-asne1`
+- **リソース名**: `projects/eo-re-d1-pr-asne1/secrets/eo-re-d1-secretmng/versions/{VERSION}`
+- **シークレット**: `eo-re-d1-secretmng`
 - **シークレットキー**: `CLOUDRUN_REQUEST_SECRET`
 - **保存方式**: シークレットキーの値はテキストだが、シークレットはJSON形式
 - **シークレット取得方法**: GCP Secret Manager API (`google.cloud.secretmanager`)
@@ -176,7 +176,7 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 #### Cloudflare Workers
 
-- **リクエストエンジン名**: Workersアプリケーション: `eo-re-d01-cfworker-global`、カスタムドメイン: `eo-re-d01-cfworker-global.sample.com`
+- **リクエストエンジン名**: Workersアプリケーション: `eo-re-d1-cfworker-global`、カスタムドメイン: `eo-re-d1-cfworker-global.sample.com`
 - **保存方式**: テキスト（環境変数として自動管理）
 - **シークレット設定方法**: `npx wrangler secret put CFWORKER_REQUEST_SECRET` または Cloudflare Dashboard
 - **シークレット取得方法**: 環境変数として `env.CFWORKER_REQUEST_SECRET` で直接参照（Worker起動時にメモリに読み込まれる）

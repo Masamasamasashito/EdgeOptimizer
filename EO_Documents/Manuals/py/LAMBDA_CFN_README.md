@@ -31,21 +31,21 @@
 
 ## 作成されるリソース一覧
 
-デフォルトパラメータ（`eo-re-d01-*-apne1`）の場合：
+デフォルトパラメータ（`eo-re-d1-*-apne1`）の場合：
 
 | リソース種別 | リソース名 |
 |-------------|-----------|
-| Lambda 関数 | `eo-re-d01-lambda-apne1` |
-| Lambda 実行ロール | `eo-re-d01-lambda-apne1-role` |
-| Lambda 基本実行ポリシー | `eo-re-d01-lambda-apne1-basic-exec-iamp` |
-| Lambda シークレットアクセスポリシー | `eo-re-d01-lambda-apne1-role-iamp` |
-| Secrets Manager | `eo-re-d01-secretsmng-apne1` |
-| CloudWatch Logs | `/aws/lambda/eo-re-d01-lambda-apne1` |
-| n8n用 IAM ユーザー | `eo-re-d01-lambda-apne1-iamu` |
-| n8n用 IAM ポリシー | `eo-re-d01-lambda-apne1-access-key-iamp` |
+| Lambda 関数 | `eo-re-d1-lambda-apne1` |
+| Lambda 実行ロール | `eo-re-d1-lambda-apne1-role` |
+| Lambda 基本実行ポリシー | `eo-re-d1-lambda-apne1-basic-exec-iamp` |
+| Lambda シークレットアクセスポリシー | `eo-re-d1-lambda-apne1-role-iamp` |
+| Secrets Manager | `eo-re-d1-secretsmng-apne1` |
+| CloudWatch Logs | `/aws/lambda/eo-re-d1-lambda-apne1` |
+| n8n用 IAM ユーザー | `eo-re-d1-lambda-apne1-iamu` |
+| n8n用 IAM ポリシー | `eo-re-d1-lambda-apne1-access-key-iamp` |
 | GitHub OIDC プロバイダー | `token.actions.githubusercontent.com` |
-| GitHub Actions デプロイロール | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr` |
-| GitHub Actions デプロイポリシー | `eo-re-d01-lambda-apne1-ghactions-deploy-iamr-iamp` |
+| GitHub Actions デプロイロール | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr` |
+| GitHub Actions デプロイポリシー | `eo-re-d1-lambda-apne1-ghactions-deploy-iamr-iamp` |
 
 ---
 
@@ -86,14 +86,14 @@ exit
 **AWS コンソールで Layer を作成:**
 
 1. Lambda > レイヤー > 「レイヤーを作成」
-2. 名前: `eo-re-d01-lambda-python-slim-layer`
+2. 名前: `eo-re-d1-lambda-python-slim-layer`
 3. 説明:  `Python 3.14 yyyymmdd v1`
     - Lambda Layer 作成時に確認したpythonバージョンと、バージョン番号を記載しておく。 バージョン毎に説明文を変えることで、バージョン管理が容易になる。
 4. zip ファイルをアップロード
 5. 互換性のあるアーキテクチャ: `x86_64`
 6. 互換性のあるランタイム: `Python 3.14`
 7. 「作成」をクリック
-8. **バージョンARN をメモ**（例: `arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:layer:eo-re-d01-lambda-python-slim-layer:1`）
+8. **バージョンARN をメモ**（例: `arn:aws:lambda:ap-northeast-1:<AWSアカウントID>:layer:eo-re-d1-lambda-python-slim-layer:1`）
 
 詳細手順: [LAMBDA_README.md](LAMBDA_README.md) の Section 8-9 参照
 
@@ -126,7 +126,7 @@ AWS IAMのIDプロバイダは、グローバルリソースなので、リー�
 3. 「テンプレートソース」で「テンプレートファイルのアップロード」を選択
 4. 「テンプレートファイルのアップロード」で `RequestEngine/aws/lambda/py/CFn/eo-aws-cfnstack.yml` を選択
 5. 次へ
-6. スタック名: `eo-re-d01-lambda-apne1-stack-yyyymmdd-001`（任意）
+6. スタック名: `eo-re-d1-lambda-apne1-stack-yyyymmdd-001`（任意）
 7. パラメータを入力:
 
 | パラメータ | 値 | 備考 |
@@ -137,7 +137,7 @@ AWS IAMのIDプロバイダは、グローバルリソースなので、リー�
 | PythonRuntime | `python3.14` | Lambdaランタイム |
 | GitHubOrg | `your-org` | GitHub組織名またはユーザー名 |
 | GitHubRepo | `your-repo` | リポジトリ名 |
-| LambdaLayerName | `eo-re-d01-lambda-python-slim-layer` | STEP 1-1 で作成した Layer 名 |
+| LambdaLayerName | `eo-re-d1-lambda-python-slim-layer` | STEP 1-1 で作成した Layer 名 |
 
 8. 「次へ」> 「次へ」
 9. 「AWS CloudFormation によって IAM リソースが作成される場合があることを承認します」にチェック
@@ -147,14 +147,14 @@ AWS IAMのIDプロバイダは、グローバルリソースなので、リー�
 
 ```bash
 aws cloudformation create-stack \
-  --stack-name eo-re-d01-lambda-apne1-stack-yyyymmdd-001 \
+  --stack-name eo-re-d1-lambda-apne1-stack-yyyymmdd-001 \
   --template-body file://eo-aws-cfnstack.yml \
   --parameters \
     ParameterKey=AWSAccountId,ParameterValue=<AWSアカウントID> \
     ParameterKey=AWSRegion,ParameterValue=ap-northeast-1 \
     ParameterKey=GitHubOrg,ParameterValue=your-org \
     ParameterKey=GitHubRepo,ParameterValue=your-repo \
-    ParameterKey=LambdaLayerName,ParameterValue=eo-re-d01-lambda-python-slim-layer \
+    ParameterKey=LambdaLayerName,ParameterValue=eo-re-d1-lambda-python-slim-layer \
   --capabilities CAPABILITY_NAMED_IAM \
   --region ap-northeast-1
 ```
@@ -167,7 +167,7 @@ aws cloudformation create-stack \
 
 CFn で作成されたシークレットにはプレースホルダー値が入っています。実際の値に更新してください。
 
-1. AWS コンソール > Secrets Manager > `eo-re-d01-secretsmng-apne1`
+1. AWS コンソール > Secrets Manager > `eo-re-d1-secretsmng-apne1`
 2. 「シークレットの値を取得する」をクリック
 3. 「編集」をクリック
 4. `LAMBDA_REQUEST_SECRET` の値を `EO_Infra_Docker/.env` の `N8N_EO_REQUEST_SECRET` の値に変更
@@ -177,7 +177,7 @@ CFn で作成されたシークレットにはプレースホルダー値が入�
 
 ```bash
 aws secretsmanager put-secret-value \
-  --secret-id eo-re-d01-secretsmng-apne1 \
+  --secret-id eo-re-d1-secretsmng-apne1 \
   --secret-string '{"LAMBDA_REQUEST_SECRET": "実際のシークレット値"}' \
   --region ap-northeast-1
 ```
@@ -186,13 +186,13 @@ aws secretsmanager put-secret-value \
 
 n8n から Lambda を呼び出すためのアクセスキーを作成します。
 
-1. AWS コンソール > IAM > ユーザー > `eo-re-d01-lambda-apne1-iamu`
+1. AWS コンソール > IAM > ユーザー > `eo-re-d1-lambda-apne1-iamu`
 2. 「セキュリティ認証情報」タブ
 3. 「アクセスキーを作成」
 4. 「AWS の外部で実行されるアプリケーション」を選択
-5. 説明タグ: `eo-re-d01-lambda-apne1-iamu-access-key`
+5. 説明タグ: `eo-re-d1-lambda-apne1-iamu-access-key`
 6. 「アクセスキーを作成」
-7. **CSV をダウンロード**（`eo-re-d01-lambda-apne1-iamu_accessKeys.csv`）
+7. **CSV をダウンロード**（`eo-re-d1-lambda-apne1-iamu_accessKeys.csv`）
 
 ---
 
@@ -214,7 +214,7 @@ n8n から Lambda を呼び出すためのアクセスキーを作成します�
 
 1. `280AWS-apne1 RequestEngine AccessKey` ノードを開く
 2. Credential to connect with: `EO_RE_Lambda_apne1_AccessKey`
-3. Function Name or ID: `eo-re-d01-lambda-apne1`
+3. Function Name or ID: `eo-re-d1-lambda-apne1`
 4. 「Save」
 
 ---
@@ -227,7 +227,7 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 
 **ARN の確認:**
 - AWS コンソール > CloudFormation > スタック > 出力タブ > `GitHubActionsDeployRoleArn`
-- 例: `arn:aws:iam::<AWSアカウントID>:role/eo-re-d01-lambda-apne1-ghactions-deploy-iamr`
+- 例: `arn:aws:iam::<AWSアカウントID>:role/eo-re-d1-lambda-apne1-ghactions-deploy-iamr`
 
 **GitHub への設定:**
 1. GitHub リポジトリ > Settings > Secrets and variables > Actions
@@ -345,14 +345,14 @@ Lambdaだけ実行可能な状態です。Lambda以外を使わない場合、18
 | **命名規則** |||
 | ProjectPrefix | `eo` | プロジェクトプレフィックス |
 | Component | `re` | コンポーネント識別子（Request Engine） |
-| Environment | `d01` | 環境識別子（dev01, prod01等） |
+| Environment | `d1` | 環境識別子（dev01 等） |
 | RegionShort | `apne1` | リージョン短縮名 |
 | **AWSアカウント** |||
 | AWSAccountId | (入力必須) | 12桁のAWSアカウントID |
 | AWSRegion | `ap-northeast-1` | デプロイ先リージョン |
 | **Lambda設定** |||
 | PythonRuntime | `python3.14` | Pythonランタイムバージョン |
-| LambdaLayerName | `eo-re-d01-lambda-python-slim-layer` | Lambda Layer 名 |
+| LambdaLayerName | `eo-re-d1-lambda-python-slim-layer` | Lambda Layer 名 |
 | LambdaLayerVersion | `1` | Lambda Layer バージョン |
 | LambdaTimeout | `30` | タイムアウト（秒） |
 | LambdaMemorySize | `128` | メモリサイズ（MB） |
@@ -393,7 +393,7 @@ Resource handler returned message: "Role/Policy with name ... already exists"
 **原因**: 同じ名前のリソースが既に存在
 **解決**:
 1. 既存リソースを削除してから再デプロイ
-2. または `Environment` パラメータを変更（例: `d01` → `d02`）
+2. または `Environment` パラメータを変更（例: `d1` → `d02`）
 
 ### Secrets Manager の値が反映されない
 

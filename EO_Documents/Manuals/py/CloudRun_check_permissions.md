@@ -6,7 +6,7 @@
 
 1. **Google Cloud Console にアクセス**
    - https://console.cloud.google.com/ を開く
-   - プロジェクト `eo-re-d01-pr-asne1` を選択
+   - プロジェクト `eo-re-d1-pr-asne1` を選択
 
 2. **Cloud Shell を開く**
    - 画面上部の Cloud Shell アイコン（`>_`）をクリック
@@ -52,7 +52,7 @@ gcloud --version
 
 # 認証（初回のみ）
 gcloud auth login
-gcloud config set project eo-re-d01-pr-asne1
+gcloud config set project eo-re-d1-pr-asne1
 
 # 実行
 chmod +x check_service_account_permissions.sh
@@ -69,7 +69,7 @@ cd /<プロジェクトルートディレクトリ>/RequestEngine/gcp/cloudrun/p
 
 # 認証（初回のみ）
 gcloud auth login
-gcloud config set project eo-re-d01-pr-asne1
+gcloud config set project eo-re-d1-pr-asne1
 
 # 実行
 bash check_service_account_permissions.sh
@@ -81,11 +81,11 @@ bash check_service_account_permissions.sh
 
 ```powershell
 # 環境変数設定
-$env:EO_GCP_PROJECT_ID = "eo-re-d01-pr-asne1"
+$env:EO_GCP_PROJECT_ID = "eo-re-d1-pr-asne1"
 $env:EO_GCP_PROJECT_NUMBER = "<GCPプロジェクト番号>"
-$DEPLOY_SA = "eo-gsa-d01-deploy-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-$RUNTIME_SA = "eo-gsa-d01-runtime-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
-$OAUTH2_INVOKER_SA = "eo-gsa-d01-oa2inv-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$DEPLOY_SA = "eo-gsa-d1-deploy-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$RUNTIME_SA = "eo-gsa-d1-runtime-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
+$OAUTH2_INVOKER_SA = "eo-gsa-d1-oa2inv-asne1@${env:EO_GCP_PROJECT_ID}.iam.gserviceaccount.com"
 $COMPUTE_DEFAULT_SA = "${env:EO_GCP_PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 # 1. Deployer SAのプロジェクトレベルロール確認
@@ -121,7 +121,7 @@ gcloud iam service-accounts get-iam-policy $OAUTH2_INVOKER_SA --project=$env:EO_
 
 # 7. Cloud Run への Invoker 権限確認
 Write-Host "`n=== OAuth2_Invoker SA の Cloud Run Invokerロール ===" -ForegroundColor Cyan
-gcloud run services get-iam-policy eo-re-d01-cloudrun-asne1 `
+gcloud run services get-iam-policy eo-re-d1-cloudrun-asne1 `
     --region=asia-northeast1 `
     --project=$env:EO_GCP_PROJECT_ID
 ```
@@ -134,7 +134,7 @@ gcloud run services get-iam-policy eo-re-d01-cloudrun-asne1 `
 ==========================================
 GCP Service Account 権限チェック
 ==========================================
-プロジェクトID: eo-re-d01-pr-asne1
+プロジェクトID: eo-re-d1-pr-asne1
 プロジェクト番号: <GCPプロジェクト番号>
 
 ----------------------------------------
@@ -216,10 +216,10 @@ chmod +x check_service_account_permissions.sh
 
 ```bash
 gcloud auth login
-gcloud config set project eo-re-d01-pr-asne1
+gcloud config set project eo-re-d1-pr-asne1
 ```
 
-### 警告: "Project 'eo-re-d01-pr-asne1' lacks an 'environment' tag"
+### 警告: "Project 'eo-re-d1-pr-asne1' lacks an 'environment' tag"
 
 この警告は**無視して問題ありません**。プロジェクトの設定は正常に更新されています。
 

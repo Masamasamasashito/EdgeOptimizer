@@ -4,15 +4,15 @@
 // Creates Policy Assignments for subscription governance
 //
 // PREREQUISITES:
-// 1. Management Group 'eo-re-d1-azure-mgmt-group' must exist
-//    (Deploy eo-re-d1-azure-mgmt-group.bicep first)
+// 1. Management Group 'eo-re-d1-azure-mgmt-grp' must exist
+//    (Deploy eo-re-d1-azure-mgmt-grp.bicep first)
 //
 // DEPLOYMENT:
 // This template requires MANAGEMENT GROUP scope deployment:
 //   az deployment mg create \
 //     --location japaneast \
-//     --management-group-id eo-re-d1-azure-mgmt-group \
-//     --template-file eo-re-d1-azure-mgmt-group-policies.bicep
+//     --management-group-id eo-re-d1-azure-mgmt-grp \
+//     --template-file eo-re-d1-azure-mgmt-grp-policies.bicep
 //
 // POST-DEPLOYMENT:
 // 1. Verify policy assignments in Azure Portal
