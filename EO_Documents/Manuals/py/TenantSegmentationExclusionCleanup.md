@@ -88,6 +88,8 @@
 17. EoService と EoAreaShort の順序について、EoAreaShort → EoService の順序を採用する。改善作業の影響範囲が広いため、影響範囲の計画をしてから変更する。
 18. リソース名の主要なセグメントは以下の通り。
 
+## 3. リソース命名セグメント改善の前後比較
+
 | 改善前CFn | 改善前Bicep | 改善前GCP Terraform | 改善後共通リソース命名セグメントPascalCase(CFn,Bicep,Terraform) | 備考 |
 |------------------|-----------------|----------------------|------------------|------------------|
 | EoTenant | 無し | 無し | 廃止 | テナントはEoProject側で吸収する。 |
@@ -101,9 +103,9 @@
 | EoSecretService（CFn）等 | service_type_slug | service_type | EoServiceSecret（値例: secretsmng, kv） |
 | EoServiceStorage（CFn）等 | service_type_slug | service_type | EoServiceStorage（値例: st） |
 | EoLambdaRequestSecretName | request_secret_name | request_secret_name | EoRequestSecretName（値例: LAMBDA_REQUEST_SECRET） |
-|EoRePythonRuntimeVer | python_runtime_version | python_runtime_version | EoReRuntimeVer（値例: python3.14） |
-|EoReLambdaTimeout | lambda_timeout | lambda_timeout | EoReTimeout（値例: 30） |
-|EoReLambdaMemorySize | lambda_memory_size | lambda_memory_size | EoReMemorySize（値例: 128） |
+| EoRePythonRuntimeVer | python_runtime_version | python_runtime_version | EoReRuntimeVer（値例: python3.14） |
+| EoReLambdaTimeout | lambda_timeout | lambda_timeout | EoReTimeout（値例: 30） |
+| EoReLambdaMemorySize | lambda_memory_size | lambda_memory_size | EoReMemorySize（値例: 128） |
 | EoReInstanceId | issued_resource_name_nanoid_slug | issued_resource_name_nanoid | 廃止。採番管理しない世界グローバルユニークIDのNanoIdに依存する |
 
 - .envファイルが有るため、envという単語を避けてEoEnvではなくEoEnvironmentにした。
@@ -111,7 +113,7 @@
 
 **サービスの 1 パラメータ（EoService）統合する/しない検討** 同一 CFn スタックで Lambda 名（lambda）と Secrets Manager 名（secretsmng）の両方が必要になるため、1 パラメータでは両方の値を表現できず矛盾する。このため **EoServiceServerless / EoServiceSecret / EoServiceStorage** の分割などを検討する。
 
-## 2. 改善前と改善後でロジックが異なるセグメント
+## 4. 改善前と改善後でロジックが異なるセグメント
 
 おそらく無いが、出てきた場合のためにフォーマットだけ置いておく。
 
@@ -119,7 +121,7 @@
 |------|-----------------------------|-------------------|
 
 
-## 3. hyphen_allowed 2 グループ (Azure Storageの場合)
+## 5. hyphen_allowed 2 グループ (Azure Storageの場合)
 
 | グループ | リソース | パターン | 例 |
 |----------|----------|----------|-----|
@@ -129,12 +131,12 @@
 
 Key Vault は Azure 上ハイフン可だが、MCNE の安全サブセットに合わせて hyphen_allowed : false で統一する。
 
-## 4. 移行・実装の要点
+## 6. 移行・実装の要点
 
 - **注意:** (1) EoTenant / EoProject の 2 本をセットで変更 (2) ワークフロー・`./AZFUNC_BICEP_README.md`・`../SchemaDesign_DbNormalization.md`・他 IaC の参照を一括更新 (3) 既存環境がある場合は移行手順を用意。
 - **チェックリスト:** Bicep のパラメータ・変数式を新セグメント対応に変更 → リソース名を §5 のパターンに変更 → ワークフロー・`./AZFUNC_BICEP_README.md`・`../SchemaDesign_DbNormalization.md` を更新。
 
-## 5. README に追記するだけの場合（設計は変えない）
+## 7. README に追記するだけの場合（設計は変えない）
 
 設計を変えず拡張性だけ確保する場合、AZFUNC_BICEP_README の「リソース名パターン」付近に次の 1 ブロックを追記する。
 

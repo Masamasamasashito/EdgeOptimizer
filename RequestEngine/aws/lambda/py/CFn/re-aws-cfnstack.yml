@@ -9,7 +9,7 @@ Description: >
 # ==============================================================================
 # 1. Lambda Layer:
 #    Create the Lambda Layer manually before deploying this stack.
-#    Layer ARN format: arn:aws:{EoServiceServerless}:{EoArea}:{AWSAccountId}:layer:{EoTenant}-{EoProject}-{EoEnvironment}-{EoServiceServerless}-python-slim-layer:{Version}
+#    Layer ARN format: arn:aws:{EoServiceServerless}:{EoArea}:{AWSAccountId}:layer:{EoProject}-{EoEnvironment}-{EoServiceServerless}-python-slim-layer:{Version}
 #    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:tnp-re-d1-lambda-python-slim-layer:1
 #    See: EO_Documents/Manuals/py/LAMBDA_README.md (Section 8-9) for layer creation steps.
 #
@@ -25,7 +25,7 @@ Description: >
 #    Replace "REPLACE_WITH_N8N_EO_REQUEST_SECRET" with actual N8N_EO_REQUEST_SECRET from EO_Infra_Docker/.env
 #
 # 2. Create IAM Access Key for n8n (manual creation recommended for security):
-#    IAM Console > Users > {EoTenant}-{EoProject}-{EoEnvironment}-{EoServiceServerless}-{EoAreaShort}-iamu > Security credentials > Create access key
+#    IAM Console > Users > {EoProject}-{EoEnvironment}-{EoServiceServerless}-{EoAreaShort}-iamu > Security credentials > Create access key
 #
 # 3. Set GitHub Secrets:
 #    Add GitHubActionsDeployRoleArn output value to GitHub repository secrets
@@ -272,11 +272,11 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      LogGroupName: !Sub "/aws/${EoServiceServerless}/${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
+      LogGroupName: !Sub "/aws/${EoServiceServerless}/${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
       RetentionInDays: 1
       Tags:
         - Key: Name
-          Value: !Sub "/aws/${EoServiceServerless}/${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
+          Value: !Sub "/aws/${EoServiceServerless}/${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
         - Key: Project
           Value: !Ref EoTenant
         - Key: EoEnvironment
@@ -290,13 +290,13 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      Name: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceSecret}-${EoAreaShort}"
+      Name: !Sub "${EoProject}-${EoEnvironment}-${EoServiceSecret}-${EoAreaShort}"
       Description: "N8N Request Secret for token verification (LAMBDA_REQUEST_SECRET)"
       # POST-DEPLOYMENT: Update this value with N8N_EO_REQUEST_SECRET from EO_Infra_Docker/.env
       SecretString: !Sub '{"${EoRequestSecretName}": "REPLACE_WITH_N8N_EO_REQUEST_SECRET"}'
       Tags:
         - Key: Name
-          Value: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceSecret}-${EoAreaShort}"
+          Value: !Sub "${EoProject}-${EoEnvironment}-${EoServiceSecret}-${EoAreaShort}"
         - Key: Project
           Value: !Ref EoTenant
         - Key: EoEnvironment
@@ -310,7 +310,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      RoleName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-role"
+      RoleName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-role"
       Path: "/service-role/"
       MaxSessionDuration: 3600
       AssumeRolePolicyDocument:
@@ -325,7 +325,7 @@ Resources:
         - !Ref LambdaSecretsAccessPolicy
       Tags:
         - Key: Name
-          Value: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-role"
+          Value: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-role"
 
   # --- Lambda Basic Execution Policy (CloudWatch Logs) ---
   LambdaBasicExecutionPolicy:
@@ -333,7 +333,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-basic-exec-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-basic-exec-iamp"
       Path: "/service-role/"
       Description: "Basic execution policy for Lambda (CloudWatch Logs)"
       PolicyDocument:
@@ -347,7 +347,7 @@ Resources:
               - logs:CreateLogStream
               - logs:PutLogEvents
             Resource:
-              - !Sub "arn:aws:logs:${EoArea}:${AWSAccountId}:log-group:/aws/${EoServiceServerless}/${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}:*"
+              - !Sub "arn:aws:logs:${EoArea}:${AWSAccountId}:log-group:/aws/${EoServiceServerless}/${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}:*"
 
   # --- Lambda Secrets Manager Access Policy ---
   LambdaSecretsAccessPolicy:
@@ -355,7 +355,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-role-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-role-iamp"
       Path: "/"
       Description: "Policy to allow Lambda to read request secret from Secrets Manager"
       PolicyDocument:
@@ -365,7 +365,7 @@ Resources:
             Effect: Allow
             Action:
               - secretsmanager:GetSecretValue
-            Resource: !Sub "arn:aws:secretsmanager:${EoArea}:${AWSAccountId}:secret:${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceSecret}-${EoAreaShort}-*"
+            Resource: !Sub "arn:aws:secretsmanager:${EoArea}:${AWSAccountId}:secret:${EoProject}-${EoEnvironment}-${EoServiceSecret}-${EoAreaShort}-*"
 
   # ============================================================================
   # IAM - n8n Access Key User (for Lambda Invocation)
@@ -376,13 +376,13 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      UserName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-iamu"
+      UserName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-iamu"
       Path: "/"
       ManagedPolicyArns:
         - !Ref N8nLambdaInvokePolicy
       Tags:
         - Key: Name
-          Value: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-iamu"
+          Value: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-iamu"
 
   # --- n8n Lambda Invoke Policy ---
   N8nLambdaInvokePolicy:
@@ -390,7 +390,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-access-key-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-access-key-iamp"
       Path: "/"
       Description: "Policy for n8n to invoke Lambda function via Access Key"
       PolicyDocument:
@@ -400,8 +400,8 @@ Resources:
             Action:
               - !Sub "${EoServiceServerless}:InvokeFunction"
             Resource:
-              - !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:function:${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
-              - !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:function:${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}:*"
+              - !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:function:${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
+              - !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:function:${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}:*"
 
   # ============================================================================
   # IAM - GitHub Actions OIDC Provider (created only when CreateOIDCResource is true)
@@ -421,7 +421,7 @@ Resources:
         - "2b18947a6a9fc7764fd8b5fb18a863b0c6dac24f"
       Tags:
         - Key: Name
-          Value: !Sub "${EoTenant}-ghactions-idp-request-engine-${EoServiceServerless}-aws-${EoAreaShort}"
+          Value: !Sub "${EoProject}-${EoEnvironment}-ghactions-idp-request-engine-${EoServiceServerless}-aws-${EoAreaShort}"
 
   # --- GitHub Actions Deploy Role ---
   GitHubActionsDeployRole:
@@ -429,7 +429,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      RoleName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-ghactions-deploy-iamr"
+      RoleName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-ghactions-deploy-iamr"
       Path: "/"
       MaxSessionDuration: 3600
       Description: "Role for GitHub Actions to deploy Lambda function"
@@ -453,7 +453,7 @@ Resources:
         - !Ref GitHubActionsDeployPolicy
       Tags:
         - Key: Name
-          Value: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-ghactions-deploy-iamr"
+          Value: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-ghactions-deploy-iamr"
 
   # --- GitHub Actions Deploy Policy ---
   GitHubActionsDeployPolicy:
@@ -461,7 +461,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      ManagedPolicyName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-ghactions-deploy-iamr-iamp"
+      ManagedPolicyName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}-ghactions-deploy-iamr-iamp"
       Path: "/"
       Description: "Policy for GitHub Actions to deploy Lambda function"
       PolicyDocument:
@@ -474,7 +474,7 @@ Resources:
               - lambda:UpdateFunctionCode
               - lambda:UpdateFunctionConfiguration
               - lambda:GetFunction
-            Resource: !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:function:${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
+            Resource: !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:function:${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
 
   # ============================================================================
   # Lambda Function
@@ -486,7 +486,7 @@ Resources:
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      FunctionName: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
+      FunctionName: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
       Description: "Edge Optimizer Request Engine - Lambda"
       Runtime: !Ref EoReRuntimeVer
       Handler: lambda_function.lambda_handler
@@ -509,7 +509,7 @@ Resources:
       # PREREQUISITE: Create this layer before deploying the stack
       # See: EO_Documents/Manuals/py/LAMBDA_README.md
       Layers:
-        - !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:layer:${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoReLambdaLayerSuffix}:${EoReLambdaLayerVer}"
+        - !Sub "arn:aws:${EoServiceServerless}:${EoArea}:${AWSAccountId}:layer:${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoReLambdaLayerSuffix}:${EoReLambdaLayerVer}"
       LoggingConfig:
         LogFormat: Text
         LogGroup: !Ref LambdaLogGroup
@@ -522,7 +522,7 @@ Resources:
       RecursiveLoop: Terminate
       Tags:
         - Key: Name
-          Value: !Sub "${EoTenant}-${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
+          Value: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
         - Key: Project
           Value: !Ref EoTenant
         - Key: EoEnvironment
