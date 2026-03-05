@@ -279,7 +279,7 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 
 ### 5-2. GitHub Actions ワークフローの確認
 
-`.github/workflows/deploy-to-aws-lambda-apne1.yml` が設定済みであることを確認してください。
+Github上のリポジトリの`.github/workflows/deploy-to-aws-lambda-apne1.yml` が設定済みであることを確認してください。
 同yml内の`LAMBDA_RUNTIME_PYTHON_VERSION`と`LAMBDA_FUNCTION_NAME`に正しい値が入っているか確認してください。これらの値は、`re-aws-cfnstack.yml` で設定した値と一致している必要があり、`LAMBDA_RUNTIME_PYTHON_VERSION`は小数第2位までを記載してください。
 
 詳細: [LAMBDA_README.md](LAMBDA_README.md) の「github workflow AWS Lambda自動デプロイ」セクション参照
