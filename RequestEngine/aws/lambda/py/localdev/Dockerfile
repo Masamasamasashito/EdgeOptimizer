@@ -9,7 +9,7 @@ FROM ${LAMBDA_LAYER_DOCKER_IMAGE}:${LAMBDA_LAYER_DOCKER_IMAGE_TAG}
 RUN apt-get update && \
     apt-get install -y zip && \
     rm -rf /var/lib/apt/lists/* && \
-    pip install --upgrade pip
+    pip install --root-user-action=ignore --upgrade pip
 
 # 作業ディレクトリの設定
 WORKDIR /lambda-layer

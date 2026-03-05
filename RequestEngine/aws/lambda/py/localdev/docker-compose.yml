@@ -1,4 +1,4 @@
-﻿#---------------------------------------------------------------------------
+#---------------------------------------------------------------------------
 # Global Logging Configuration (Log Rotation)
 #---------------------------------------------------------------------------
 x-logging: &default-logging
@@ -34,7 +34,7 @@ services:
         python --version &&
         echo '==============================================' &&
         mkdir -p /opt/python &&
-        pip install --no-cache-dir -t /opt/python requests &&
+        pip install --root-user-action=ignore --no-cache-dir -t /opt/python requests &&
         mkdir -p /lambda-layer/funcfiles &&
         cd /opt &&
         zip -r /lambda-layer/funcfiles/requests-python-slim-layer.zip .
