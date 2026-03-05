@@ -277,10 +277,32 @@ CloudFormation Outputs から `GitHubActionsDeployRoleArn` の値を取得し、
 4. Secret: 上記で取得した ARN
 5. 「Add secret」
 
-### 5-2. GitHub Actions ワークフローの確認
+### 5-2. GitHub Actions 変数（Variables）の設定
 
-Github上のリポジトリの`.github/workflows/deploy-to-aws-lambda-apne1.yml` が設定済みであることを確認してください。
-同yml内の`LAMBDA_RUNTIME_PYTHON_VERSION`と`LAMBDA_FUNCTION_NAME`に正しい値が入っているか確認してください。これらの値は、`re-aws-cfnstack.yml` で設定した値と一致している必要があり、`LAMBDA_RUNTIME_PYTHON_VERSION`は小数第2位までを記載してください。
+ワークフロー `.github/workflows/deploy-py-to-aws-lambda.yml` は、Lambda 関数名・リージョン・ランタイムなどを **GitHub リポジトリの Variables** から読みます。`re-aws-cfnstack.yml` でデプロイしたスタックのパラメータと一致する値を設定してください。
+
+**手順:**
+1. GitHub リポジトリ > **Settings** > **Secrets and variables** > **Actions**
+2. 上部タブで **Variables** を選択 > **New repository variable**
+3. 以下の変数を必要に応じて追加（未設定の場合はワークフロー内のデフォルト値が使われます）
+
+| Variable name | 推奨値（CFn デフォルトと同一） | 説明 |
+|---------------|-------------------------------|------|
+| `EoProject` | `re` | プロジェクト識別子（Request Engine） |
+| `EoEnvironment` | `d1` | 環境識別子（dev01 等） |
+| `EoServiceServerless` | `lambda` | サーバレス識別子（AWS Lambda） |
+| `EoAreaShort` | `apne1` | エリア短縮名（ap-northeast-1 の場合） |
+| `EoArea` | `ap-northeast-1` | AWS リージョン（フルネーム） |
+| `EoReRuntimeVer` | `python3.14` | Lambda ランタイム（小数第2位まで記載） |
+
+4. 各変数の **Value** を入力 > **Add variable** で保存
+
+**注意:** 変数を 1 つも設定しなくても、上記の推奨値がデフォルトとして使われるため、CFn をデフォルトパラメータでデプロイした場合は Variables の追加は任意です。別環境（例: d02, apne2）や別ランタイムを使う場合は、ここで値を設定してください。
+
+### 5-3. GitHub Actions ワークフローの確認
+
+- リポジトリに `.github/workflows/deploy-py-to-aws-lambda.yml` が存在することを確認してください。
+- デプロイ先の Lambda 関数名は `{EoProject}-{EoEnvironment}-{EoServiceServerless}-{EoAreaShort}`（例: `re-d1-lambda-apne1`）になります。CFn で作成した関数名と一致している必要があります。
 
 詳細: [LAMBDA_README.md](LAMBDA_README.md) の「github workflow AWS Lambda自動デプロイ」セクション参照
 

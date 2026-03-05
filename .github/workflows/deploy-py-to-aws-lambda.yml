@@ -22,13 +22,15 @@ permissions:
 # Request Engine Instance config: RequestEngine/aws/lambda/py/instances_conf/lambda001.env
 # Resource name pattern: {EoProject}-{EoEnvironment}-{EoServiceServerless}-{EoAreaShort}
 # EX) Lambda function name: re-d1-lambda-apne1
+# Values are read from GitHub Actions Variables (Settings > Secrets and variables > Actions > Variables).
+# If not set, defaults below are used. Must match re-aws-cfnstack.yml parameters.
 env:
-  EoProject: "re"
-  EoEnvironment: "d1"
-  EoServiceServerless: "lambda"
-  EoAreaShort: "apne1"
-  EoArea: "ap-northeast-1"
-  EoReRuntimeVer: "python3.14"
+  EoProject: ${{ vars.EoProject || 're' }}
+  EoEnvironment: ${{ vars.EoEnvironment || 'd1' }}
+  EoServiceServerless: ${{ vars.EoServiceServerless || 'lambda' }}
+  EoAreaShort: ${{ vars.EoAreaShort || 'apne1' }}
+  EoArea: ${{ vars.EoArea || 'ap-northeast-1' }}
+  EoReRuntimeVer: ${{ vars.EoReRuntimeVer || 'python3.14' }}
 
 jobs:
   deploy:
