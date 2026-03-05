@@ -67,7 +67,7 @@ n8nから各クラウド基盤のサーバレス関数（Request Engine）への
 
 - `280AWS-apne1 RequestEngine AccessKey`ノード
     - Parameters > Function Name or ID > Expression
-    - Lambda関数名を入力 > `tnp-re-d1-lambda-apne1`
+    - Lambda関数名を入力 > `re-d1-lambda-apne1`
 
 ## RequestEngine Azure Functions App Key
 
@@ -132,7 +132,7 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 | クラウド名 | リージョン | クラウドのシークレットサービス | リクエストエンジンコード内環境変数 | ランタイム |
 |---|---|---|---|---|
 | **Azure** | Japan East (jpe) | Key Vault: `tnp-re-d1-kv-jpe`<br>シークレット: `AZFUNC-REQUEST-SECRET` | `AZFUNC_REQUEST_SECRET_NAME` | Python 3.13 |
-| **AWS** | apne1 (ap-northeast-1) | Secrets Managerのシークレット名: `tnp-re-d1-secretsmng-apne1`<br>シークレットキー: `LAMBDA_REQUEST_SECRET` | `LAMBDA_REQUEST_SECRET_NAME`<br>`LAMBDA_REQUEST_SECRET_KEY_NAME` | Python 3.14 |
+| **AWS** | apne1 (ap-northeast-1) | Secrets Managerのシークレット名: `re-d1-secretsmng-apne1`<br>シークレットキー: `LAMBDA_REQUEST_SECRET` | `LAMBDA_REQUEST_SECRET_NAME`<br>`LAMBDA_REQUEST_SECRET_KEY_NAME` | Python 3.14 |
 | **GCP** | asne1 (asia-northeast1) | Secret Managerのシークレット名: `tnp-re-d1-secretmng`<br>シークレットキー: `CLOUDRUN_REQUEST_SECRET` | `CLOUDRUN_REQUEST_SECRET_NAME`<br>`CLOUDRUN_REQUEST_SECRET_KEY_NAME` | Python (Flask) |
 | **Cloudflare** | global (Edge) | `CFWORKER_REQUEST_SECRET` | `env.CFWORKER_REQUEST_SECRET` | TypeScript (V8) |
 
@@ -152,9 +152,9 @@ Azure > Function App > (FunctionName) > Function > App Key(must) > Host Key > `d
 
 #### AWS Lambda
 
-- **リクエストエンジン名**: Lambda関数: `tnp-re-d1-lambda-apne1`
-- **ARN**: `arn:aws:secretsmanager:ap-northeast-1:{AWSアカウントID}:secret:tnp-re-d1-secretsmng-apne1-{RANDOM}`
-- **シークレット**: `tnp-re-d1-secretsmng-apne1`
+- **リクエストエンジン名**: Lambda関数: `re-d1-lambda-apne1`
+- **ARN**: `arn:aws:secretsmanager:ap-northeast-1:{AWSアカウントID}:secret:re-d1-secretsmng-apne1-{RANDOM}`
+- **シークレット**: `re-d1-secretsmng-apne1`
 - **シークレットキー**: `LAMBDA_REQUEST_SECRET`
 - **シークレット取得方法**: AWS Secrets Manager API (`boto3.client('secretsmanager')`)
 - **保存方式**: シークレットキーの値はテキストだが、シークレットはJSON形式
