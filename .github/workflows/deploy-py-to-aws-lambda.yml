@@ -20,10 +20,16 @@ permissions:
   contents: read  # Required for repository read
 
 # Request Engine Instance config: ../../RequestEngine/aws/lambda/py/instances_conf/lambda001.env
-# Resource name pattern: eo-re-d1-lambda-{re_region_short}
+# Request Engine Resource Name pattern: {EoTenant}-{EoProject}-{EoEnvironment}-{EoAreaShort}-{EoServiceServerless}`
+# EX) Request Engine Resource Name: tnp-re-d1-lambda-apne1
 env:
-  LAMBDA_RUNTIME_PYTHON_VERSION: "3.14"
-  LAMBDA_FUNCTION_NAME: eo-re-d1-lambda-apne1
+  EoTenant: "tnp"
+  EoProject: "re"
+  EoEnvironment: "d1"
+  EoServiceServerless: "lambda"
+  EoAreaShort: "apne1"
+  EoArea: "ap-northeast-1"
+  EoReRuntimeVer: "python3.14"
 
 jobs:
   deploy:
@@ -112,17 +118,18 @@ jobs:
           head -60 deploy_package/lambda_function.py
 
       # 2. AWS auth (OIDC)
+      #    - Github Actions Secrets から IAM ロール ARNを取得、そのロールを Assume する
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.EO_LAMBDA_DEPLOY_AWS_APNE1_ROLE_FOR_GITHUB }}
-          aws-region: ap-northeast-1
+          aws-region: ${{ env.EoArea }}
 
       # 3. Lambda Deploy
       - name: Deploy to Lambda
         uses: aws-actions/aws-lambda-deploy@v1.1.0
         with:
-          function-name: ${{ env.LAMBDA_FUNCTION_NAME }}
+          function-name: ${{ env.EoTenant }}-${{ env.EoProject }}-${{ env.EoEnvironment }}-${{ env.EoServiceServerless }}-${{ env.EoAreaShort }}
           code-artifacts-dir: ./deploy_package
           handler: lambda_function.lambda_handler
-          runtime: python${{ env.LAMBDA_RUNTIME_PYTHON_VERSION }}
+          runtime: ${{ env.EoReRuntimeVer }}
