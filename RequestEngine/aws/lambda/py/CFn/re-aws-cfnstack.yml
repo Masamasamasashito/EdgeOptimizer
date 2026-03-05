@@ -10,7 +10,7 @@ Description: >
 # 1. Lambda Layer:
 #    Create the Lambda Layer manually before deploying this stack.
 #    Layer ARN format: arn:aws:{EoServiceServerless}:{EoArea}:{AWSAccountId}:layer:{EoProject}-{EoEnvironment}-{EoServiceServerless}-python-slim-layer:{Version}
-#    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:tnp-re-d1-lambda-python-slim-layer:1
+#    Example: arn:aws:lambda:ap-northeast-1:123456789012:layer:re-d1-lambda-python-slim-layer:1
 #    See: EO_Documents/Manuals/py/LAMBDA_README.md (Section 8-9) for layer creation steps.
 #
 # 2. GitHub OIDC Provider (IMPORTANT):
@@ -41,7 +41,6 @@ Metadata:
       - Label:
           default: "Naming Convention Parameters"
         Parameters:
-          - EoTenant
           - EoProject
           - EoEnvironment
           - EoAreaShort
@@ -69,8 +68,6 @@ Metadata:
           - GitHubOrg
           - EoGitHubRepo
     ParameterLabels:
-      EoTenant:
-        default: "Tenant Prefix (e.g., tnp)"
       EoProject:
         default: "Project Identifier (e.g., re)"
       EoEnvironment:
@@ -111,12 +108,6 @@ Metadata:
 # ==============================================================================
 Parameters:
   # --- Naming Convention ---
-  EoTenant:
-    Type: String
-    Description: "Tenant Identifier for resource naming (e.g., tnp)"
-    Default: "tnp"
-    AllowedPattern: "^[a-z0-9]+$"
-    ConstraintDescription: "Lowercase alphanumeric only"
 
   EoProject:
     Type: String
@@ -126,7 +117,7 @@ Parameters:
 
   EoEnvironment:
     Type: String
-    Description: "EoEnvironment identifier (d1 = dev01, p1 = prod01)"
+    Description: "EoEnvironment identifier (d1 = dev01, p1 = prd01)"
     Default: "d1"
     AllowedPattern: "^[a-z0-9]+$"
 
@@ -278,7 +269,7 @@ Resources:
         - Key: Name
           Value: !Sub "/aws/${EoServiceServerless}/${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
         - Key: Project
-          Value: !Ref EoTenant
+          Value: !Ref EoProject
         - Key: EoEnvironment
           Value: !Ref EoEnvironment
 
@@ -298,7 +289,7 @@ Resources:
         - Key: Name
           Value: !Sub "${EoProject}-${EoEnvironment}-${EoServiceSecret}-${EoAreaShort}"
         - Key: Project
-          Value: !Ref EoTenant
+          Value: !Ref EoProject
         - Key: EoEnvironment
           Value: !Ref EoEnvironment
 
@@ -421,7 +412,7 @@ Resources:
         - "2b18947a6a9fc7764fd8b5fb18a863b0c6dac24f"
       Tags:
         - Key: Name
-          Value: !Sub "${EoProject}-${EoEnvironment}-ghactions-idp-request-engine-${EoServiceServerless}-aws-${EoAreaShort}"
+          Value: !Sub "${EoProject}-ghactions-idp-request-engine-${EoServiceServerless}"
 
   # --- GitHub Actions Deploy Role ---
   GitHubActionsDeployRole:
@@ -524,7 +515,7 @@ Resources:
         - Key: Name
           Value: !Sub "${EoProject}-${EoEnvironment}-${EoServiceServerless}-${EoAreaShort}"
         - Key: Project
-          Value: !Ref EoTenant
+          Value: !Ref EoProject
         - Key: EoEnvironment
           Value: !Ref EoEnvironment
 
