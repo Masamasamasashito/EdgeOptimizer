@@ -85,9 +85,9 @@ Metadata:
       EoArea:
         default: "AREA (AWS Region) Identifier (e.g., ap-northeast-1)"
       EoReRuntimeVer:
-        default: "RequestEngine PYTHON RUNTIME VERSION (Lambda) (e.g., python3.14)"
+        default: "RequestEngine RUNTIME VERSION (Lambda) (e.g., python3.14)"
       EoReLambdaLayerSuffix:
-        default: "RequestEngine Lambda Layer NAME SUFFIX (must exist before deployment. Example: python-slim-layer)"
+        default: "RequestEngine Lambda Layer SUFFIX (must exist before deployment. Example: python-slim-layer)"
       EoReLambdaLayerVer:
         default: "RequestEngine Lambda Layer VERSION (e.g., 1)"
       EoReTimeout:
@@ -415,8 +415,11 @@ Resources:
           Value: !Sub "${EoProject}-ghactions-idp-request-engine-${EoServiceServerless}"
 
   # --- GitHub Actions Deploy Role ---
+  # DependsOn: When CreateOIDCResource is true, OIDC provider must exist before the role so that
+  # !Ref GitHubOIDCProvider resolves to a valid ARN. When false, the dependency is skipped.
   GitHubActionsDeployRole:
     Type: AWS::IAM::Role
+    DependsOn: GitHubOIDCProvider
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
