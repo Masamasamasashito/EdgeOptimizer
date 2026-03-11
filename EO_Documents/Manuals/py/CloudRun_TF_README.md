@@ -104,13 +104,28 @@ eo_gcp_resource_labels
 
 ## STEP 0: 事前準備
 
-### 0-1. GCP プロジェクト
+### 0-1. GCP プロジェクト作成
 
-以下が完了していること:
-- GCP プロジェクトが作成済み
-- 課金が有効化済み
+- `プロジェクト名 (Project Name)` と `プロジェクトID (Project ID)` は 同じにする
+    - `プロジェクトID (Project ID)`は、最初にプロジェクトを作る時、GCPのGUIで「たたまれている」ので、わかりにくい。見にくいため、展開したほうがいい。
+    - `プロジェクト名 (Project Name)`は後から変更可能だが、`プロジェクトID (Project ID)`は変更不可
+    - `プロジェクトID (Project ID)`
+      - グローバル一意
+      - 6〜30文字の小文字、数字、ハイフンのみ使用可。小文字で始まり、ハイフンで終わるのは不可。
+      - 一般的な命名パターン: `{企業/組織識別子}-{サービス/アプリケーション識別子}-{環境識別子}`
+      - EO推奨命名パターン: `{EO_PROJECT}-{EO_COMPONENT}-{EO_ENV}-pr-{EO_REGION_SHORT}`
+      - 例: `eo-re-d1-pr-asne1` (eo-re-d1-pr-asne1)
+        - eo : Edge Optimizer
+        - re : Request Engine
+        - d1 : dev01
+        - pr : Project
+        - asne1 : Asia Northeast1
+    - `プロジェクト番号 (Project Number)`
+      - Google Cloudによって自動生成される一意の数字のID
+- 請求先アカウントを設定し、課金を有効にする
+- 組織を設定し、スコープを組織内に制限する
 
-### 0-2. 環境変数設定
+### 0-2. gcloudコマンド環境変数設定
 
 以降のコマンドで使用する変数を事前に設定します（[CloudRun_README.md](CloudRun_README.md) と同じ変数名）。
 

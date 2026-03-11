@@ -1,21 +1,21 @@
 # Edge Analyzer (EA) データ分析・可視化基盤設計（ローカルn8n拡張・超低コスト版）
 
-Edge Optimizerのマルチリージョン展開で収集された稼働結果を元に、Looker Studioを用いてEdgeの「痛み」を可視化し、キャッシュ最適化によるビジネスインパクトを分析するための基盤設計案です。
-
-現在のEdge Optimizerのアーキテクチャと強み（n8nによるオーケストレーションとデータ集約）を最大限に活かし、**既存のAWS Lambda（Request Engine）には一切手を加えず、S3も使用せず、ランニングコストを実質ゼロに抑える「n8n ＋ Google Drive ＋ Looker Studio」** の構成を提案します。
+- Edge Optimizerのマルチリージョン展開で収集された稼働結果を元に、Looker Studioを用いてEdgeの「痛み」を可視化し、キャッシュ最適化によるビジネスインパクトを分析するための基盤設計
+- Edge Optimizerのアーキテクチャ（n8nによるオーケストレーションとデータ集約）を活かし、ランニングコストを実質ゼロに抑える「n8n ＋ Google Drive ＋ Looker Studio」** の構成
 
 ## 1. 全体アーキテクチャ案（S3完全撤廃・n8nワークフロー拡張モデル）
 
-現状、n8nワークフローの末尾（ノード `#420 JSON to RequestResultsCSV`）で手動ダウンロードしているCSVの蓄積プロセスを、n8nの標準ノードを用いてGoogleエコシステムへ「自動・直結」させるアプローチです。
+n8nワークフローの末尾（ノード `#420 JSON to RequestResultsCSV`）で手動ダウンロードしているCSVの蓄積プロセスを、n8n標準ノードを用いてGoogle Drive のスプレッドシートに自動保存する
 
 ### データフロー
 1. **データ収集 (Edge Optimizerの既存フロー)**
    - ローカル（またはオンプレミス）で稼働するn8nがオーケストレーターとして機能。
    - n8nからAWS Lambda等のRequest Engineへ指示出し。
-   - Request Engine はTarget CDN Edgeから応答ヘッダーやTTFB等のパフォーマンス指標を取得し、JSON形式でn8nに返却。（※Lambda側の改修は不要。S3も不要）
+   - Request Engine はTarget CDN Edgeから応答ヘッダーやTTFB等のパフォーマンス指標を取得し、JSON形式でn8nに返却。
 
 2. **データ変換・蓄積 (ローカル n8n のワークフロー拡張)**
    - n8nが全リージョンからのJSONを結合・フラット化（ノード `#350 JSON Flattener`付近）。
+   - 事前準備: n8nのGoogle Driveノードを使うために、Google Cloud Consoleでサービスアカウントを作成し、Google Drive APIとGoogle Sheets APIを有効化。サービスアカウントキー（JSON）を発行またはOAuth2認証の準備。
    - **【新規追加】** ここで生成されたデータを直接、n8nの `Google Drive` ノードまたは `Google Sheets` ノードへ渡します。
      - **パターンA（Sheet直結）:** 解析に必要なメトリクス（TTFB、cache-status等）に絞り込み、マスターとなるGoogleスプレッドシートの最下行へ`Append`（追記）し続ける。
      - **パターンB（CSV保存）:** 生成したCSVファイルをそのままGoogle Driveの特定フォルダへ定期的に自動アップロードする。

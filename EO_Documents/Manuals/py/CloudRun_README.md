@@ -110,6 +110,7 @@ GCPは、組織を前提とした設計が必要です。
   - Secret Manager API が有効
 - Service Accountの作成と権限設定
 
+
 ## サービスアカウントID文字制約等の制限事項と略語
 
 GCPはサービスアカウント命名で**IDは6〜30文字**。本ドキュメントでは御命名に合わせ、Deployer は `deploy`、OAuth2 Invoker は `oa2inv`（IDは oa2inv）を使用（文字数チェック: `eo-gsa-d1-deploy-asne1`=22文字、`eo-gsa-d1-oa2inv-asne1`=22文字、いずれも6〜30の制限内）。
