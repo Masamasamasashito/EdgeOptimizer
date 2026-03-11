@@ -1,6 +1,6 @@
 # n8nをGoogleドライブに接続する手順
 
-Edge Analyzerとして、Looker Studio で分析するためのデータストレージ作成手順
+Edge Analyzerとして、Looker Studio で分析するため、Googleドライブをデータストレージとして使うためのAPI連携手順
 
 ## 1. GCP プロジェクト作成
 
