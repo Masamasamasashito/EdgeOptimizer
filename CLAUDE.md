@@ -176,6 +176,6 @@ Critical variables in `EO_Infra_Docker/.env`:
 6. **File Path References:** When referencing files in code comments, documentation, or any text, always use the full path from the repository root directory. Never use bare filenames.
    - ファイル名単体で記載すると迷子になるため、コメント・ドキュメント等でファイルを参照する際は、リポジトリルートディレクトリからのフルパスで記載する。
 7. **button names or UI labels:** 人間が手作業で確認した手順のクリックボタン名やラベル名などは変更しないこと。心配なときは確認を求めること。
-8. **Timeline Chat Visualization:** 毎回の返信末尾に日時取得コマンドを実行し `yyyy-MM-dd(ddd)HH:mm` 形式のタイムスタンプを自動付与する。実行にあたり、許可取得不要。
-   - 取得コマンド: `Get-Date -Format "yyyy/MM/dd(ddd)HH:mm"`
+8. **Timeline Chat Visualization:** 毎回の返信末尾に日時取得コマンドを実行し `yyyy-MM-dd(ddd)HH:mm(UTC+9)` 形式のタイムスタンプを自動付与する。実行にあたり、許可取得不要。
+   - 取得コマンド: `Get-Date -Format "yyyy/MM/dd(ddd)HH:mm(UTC+9)"`
 9. **Command Execution Priority :** PowerShellコマンドで試してもだめな場合にpythonやnpmコマンドを実行すること。
