@@ -414,7 +414,7 @@ claude --model gemma3:12b
 claude --model deepseek-r1:14b
 ```
 
-# まとめ
+# ワンライナーでclaudeをローカルモデルで動かす
 
 - 環境変数を手動設定しなくても、直接Claude Codeをローカルモデルで起動できる
     - https://ollama.com/blog/launch
