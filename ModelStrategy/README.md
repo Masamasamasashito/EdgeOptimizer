@@ -355,92 +355,67 @@ Linux/macOS: nvidia-smi -l 1
 - 90% 超え: /clear でセッションリセット
 - 100%: プロセス再起動（VRAM エネルギー限界）
 
-# ollama起動
+# Ollama: 基本的な操作と管理
 
-ブラウザ `http://127.0.0.1:11434/` でOllamaの起動確認の画面を見られます。
-```
+## Ollama サーバーの起動
+
+ブラウザ `http://127.0.0.1:11434/` で起動画面を確認できます。
+
+```bash
 ollama serve
 ```
 
-# モデルダウンロード
+## モデルのダウンロードと確認
 
-```
-ollama pull qwen3.5:27b
-ollama list
+```bash
+ollama pull qwen3.5:27b  # モデルの取得
+ollama list              # インストール済みモデルの確認
 ```
 
-# shellでインタラクティブに(単純)モデル起動
+## モデルの単体起動（シェル・インタラクティブ）
 
-```
+```bash
 ollama run qwen3.5:27b
-/bye
+ollama run gemma3:27b
 ```
 
-## モデル削除
+## モデルの削除
 
-```
+```bash
 ollama rm {モデル名}
-# EX)
-ollama rm qwen3.5:27b
+# 例: ollama rm qwen3.5:27b
 ```
 
-# ローカルollama利用のための環境変数設定
+# Claude CodeでClaude以外のモデルを使う方法 - ローカルLLMからクラウドAPIまで網羅
 
-- Claudeは、デフォルトでAnthropicサーバーとの通信
-- デフォルトを変えて明示的にローカルOllamaインスタンスにリダイレクトするため環境変数を設定する必要あり。
-- APIキーはダミー
+https://note.com/taku_sid/n/n889deb7e535c
 
-```
-$env:ANTHROPIC_BASE_URL = "http://localhost:11434/"
-$env:ANTHROPIC_API_KEY = "ollama"
-```
-# 不要なトラフィックを抑制
 
-- データ使用量制限やプライバシー重視の環境での利用を想定した設定
-- テレメトリや非必須API呼び出しを停止
+# 環境変数の設定とリセット
 
-```
-$env:CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"
+## 環境変数の設定
+
+```bash
+cd your-project
+$env:ANTHROPIC_BASE_URL="http://localhost:11434/v1"
+$env:ANTHROPIC_API_KEY="ollama"
+$env:ANTHROPIC_MODEL="qwen3.5:27b"
 ```
 
-## claudeをローカルモデルで動かす
+## 環境変数のリセット
 
-例
-```
-claude --model qwen3.5:27b
+必要に応じて、設定されたベースURLやAPIキーを解除
 
-claude --model gemma3:12b
-
-claude --model deepseek-r1:14b
-```
-
-# ワンライナーでclaudeをローカルモデルで動かす
-
-- 環境変数を手動設定しなくても、直接Claude Codeをローカルモデルで起動できる
-    - https://ollama.com/blog/launch
-
-```
-ollama launch claude --model qwen3.5:27b
+```bash
+unset ANTHROPIC_BASE_URL
+unset ANTHROPIC_API_KEY
+unset ANTHROPIC_MODEL
 ```
 
-## claude出る
+# ollama runの終了
 
-```
-exit
-```
+Ollama のインタラクティブモードを抜けるコマンドです。
 
-## Ollama Runコマンド
-
-```
-ollama run 
-```
-
-## Ollama モデル削除コマンド
-```
-ollama rm {モデル名}
-```
-
-## 抜ける/出る
-```
+```bash
 /bye
 ```
