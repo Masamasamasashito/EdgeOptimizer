@@ -103,4 +103,5 @@ RequestEngine/cf/workers/ts/funcfiles/src/_02_extensions.ts
 test/
 
 # Claude Code (AI assistant local data - plans, session files)
-.claude/
+.claude/*
+!.claude/skills/
