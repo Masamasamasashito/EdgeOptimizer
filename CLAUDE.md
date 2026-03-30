@@ -179,3 +179,10 @@ Critical variables in `EO_Infra_Docker/.env`:
 8. **Timeline Chat Visualization:** 毎回の返信末尾に日時取得コマンドを実行し `yyyy-MM-dd(ddd)HH:mm(UTC+09:00)` 形式のタイムスタンプを自動付与する。実行にあたり、許可取得不要。
    - 取得コマンド: `Get-Date -Format "yyyy/MM/dd(ddd)HH:mm(UTC+09:00)"`
 9. **Command Execution Priority :** PowerShellコマンドで試してもだめな場合にpythonやnpmコマンドを実行すること。
+
+10. ファイルパス抽象化
+
+- Windows環境のファイルパス記載時、ユーザー名は必ず `%USERPROFILE%` を使用してください。
+- Mac/Linux環境のファイルパス記載時、ホームディレクトリは必ず `~/` を使用してください。
+- プロジェクト内のファイルパス記載時、常にプロジェクトルートからの相対パスで記述してください。
+- .mdファイル内の手順書を作成する際も、ユーザー固有の情報はプレースホルダー（例: <your-name>）に自動的に置き換えて出力してください。
