@@ -51,14 +51,14 @@ docker compose run --rm terraform apply
 ### Request Engine Deployment
 
 Deployments are triggered via GitHub Actions (manual `workflow_dispatch`):
-- `.github/workflows/deploy-py-to-aws-lambda.yml`
-- `.github/workflows/deploy-py-to-az-function.yml`
-- `.github/workflows/deploy-py-to-gcp-cloudrun.yml`
-- `.github/workflows/deploy-ts-to-cf-worker.yml`
+- `.github/workflows/deploy-py-to-aws-lambda-web.yml`
+- `.github/workflows/deploy-py-to-az-function-web.yml`
+- `.github/workflows/deploy-py-to-gcp-cloudrun-web.yml`
+- `.github/workflows/deploy-ts-to-cf-worker-web.yml`
 
 For Cloudflare Workers local development:
 ```bash
-cd RequestEngine/cf/workers/ts/funcfiles
+cd RequestEngine/Web/cf/workers/ts/funcfiles
 npm install
 npx wrangler dev                        # Local dev server
 npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
@@ -81,7 +81,7 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 - `EO_Documents\Manuals\SchemaDesign_DbNormalization.md` - 主にDBスキーマ設計と正規化。将来的に MultiCloudNamingEngine が命名ロジックを担う想定。
 - `MCNE_Documents\README.md` - MultiCloudNamingEngine（MCNE）の目的と開発方針。
 - `EO_Documents\Manuals\RE_README.md` - n8n Credentals and 280 HTTP Request Node setup
-    - `RequestEngine\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
+    - `RequestEngine\Web\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
 - `EO_Documents\Manuals\py\LAMBDA_README.md` - AWS Lambda specific setup
 - `EO_Documents\Manuals\py\AZFUNC_README.md` - Azure Functions specific setup
 - `EO_Documents\Manuals\py\CloudRun_README.md` - GCP Cloud Run specific setup
@@ -91,13 +91,13 @@ npx wrangler secret put CFWORKER_REQUEST_SECRET  # Set secret
 
 EX) AWS Lambda
 
-- RequestEngine\aws\lambda\py\funcfiles\lambda_function.py
+- RequestEngine\Web\aws\lambda\py\funcfiles\lambda_function.py
     - Before: Monolithic code with all logic in a single file
-    - After: `RequestEngine\aws\lambda\py\funcfiles\_03_aws_lambda_handler.py` for AWS Lambda specific handler , Verify n8n secret and cloudsecret
-    - After: `RequestEngine\aws\lambda\py\funcfiles\_01_imports.py` for imports
-    - After: `RequestEngine\funcfiles\common\py\request_engine_core.py` for shared core logic
-    - After: `RequestEngine\funcfiles\common\py\extensions` directory for shared utilities (`_ext_security.py`)
-    - After: `RequestEngine\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
+    - After: `RequestEngine\Web\aws\lambda\py\funcfiles\_03_aws_lambda_handler.py` for AWS Lambda specific handler , Verify n8n secret and cloudsecret
+    - After: `RequestEngine\Web\aws\lambda\py\funcfiles\_01_imports.py` for imports
+    - After: `RequestEngine\Web\funcfiles\common\py\request_engine_core.py` for shared core logic
+    - After: `RequestEngine\Web\funcfiles\common\py\extensions` directory for shared utilities (`_ext_security.py`)
+    - After: `RequestEngine\Web\aws\lambda\py\funcfiles\lambda_function.py.bak` - Documentation for the original monolithic structure is currently postponed
 
 ## Request Engine Data Flow
 

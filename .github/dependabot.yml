@@ -2,7 +2,7 @@ version: 2
 updates:
   # npm: Cloudflare Workers
   - package-ecosystem: "npm"
-    directory: "/RequestEngine/cf/workers/ts/funcfiles"
+    directory: "/RequestEngine/Web/cf/workers/ts/funcfiles"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -15,7 +15,7 @@ updates:
 
   # pip: Azure Functions
   - package-ecosystem: "pip"
-    directory: "/RequestEngine/azure/functions/py/funcfiles"
+    directory: "/RequestEngine/Web/azure/functions/py/funcfiles"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -28,7 +28,7 @@ updates:
 
   # pip: GCP Cloud Run
   - package-ecosystem: "pip"
-    directory: "/RequestEngine/gcp/cloudrun/py/funcfiles"
+    directory: "/RequestEngine/Web/gcp/cloudrun/py/funcfiles"
     schedule:
       interval: "weekly"
       day: "monday"

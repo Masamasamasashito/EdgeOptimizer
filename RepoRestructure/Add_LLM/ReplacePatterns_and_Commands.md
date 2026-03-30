@@ -16,22 +16,22 @@
 
 | 現ファイル名 | リネーム後 |
 |--------------|------------|
-| `deploy-py-to-aws-lambda.yml` | `deploy-py-to-aws-lambda-web.yml` |
-| `deploy-py-to-az-function.yml` | `deploy-py-to-az-function-web.yml` |
-| `deploy-py-to-gcp-cloudrun.yml` | `deploy-py-to-gcp-cloudrun-web.yml` |
-| `deploy-ts-to-cf-worker.yml` | `deploy-ts-to-cf-worker-web.yml` |
+| `deploy-py-to-aws-lambda-web.yml` | `deploy-py-to-aws-lambda-web.yml` |
+| `deploy-py-to-az-function-web.yml` | `deploy-py-to-az-function-web.yml` |
+| `deploy-py-to-gcp-cloudrun-web.yml` | `deploy-py-to-gcp-cloudrun-web.yml` |
+| `deploy-ts-to-cf-worker-web.yml` | `deploy-ts-to-cf-worker-web.yml` |
 
 **ワークフロー内のコメント**で旧ファイル名を自己参照している箇所は、**手順 3** の **A.4 スクリプト**で文字列を更新する。
 
 ### A.2 旧ファイル名を含む参照一覧（手順 3 の置換対象ファイルの目安）
 
-**`deploy-py-to-aws-lambda.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/py/LAMBDA_CFN_README.md`, `EO_Documents/Manuals/py/LAMBDA_README.md`, `EO_Documents/Manuals/py/old/LAMBDA_CFN_MCNE_Naming_Procedure.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `RequestEngine/aws/lambda/py/instances_conf/env.example`, `RequestEngine/aws/lambda/py/instances_conf/lambda001.env`
+**`deploy-py-to-aws-lambda-web.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/py/LAMBDA_CFN_README.md`, `EO_Documents/Manuals/py/LAMBDA_README.md`, `EO_Documents/Manuals/py/old/LAMBDA_CFN_MCNE_Naming_Procedure.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `RequestEngine/Web/aws/lambda/py/instances_conf/env.example`, `RequestEngine/Web/aws/lambda/py/instances_conf/lambda001.env`
 
-**`deploy-py-to-az-function.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `EO_Documents/Manuals/py/AZFUNC_README.md`, `RequestEngine/azure/functions/py/instances_conf/env.example`, `RequestEngine/azure/functions/py/instances_conf/funcapp001.env`
+**`deploy-py-to-az-function-web.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `EO_Documents/Manuals/py/AZFUNC_README.md`, `RequestEngine/Web/azure/functions/py/instances_conf/env.example`, `RequestEngine/Web/azure/functions/py/instances_conf/funcapp001.env`
 
-**`deploy-py-to-gcp-cloudrun.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/py/CloudRun_README.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `RequestEngine/gcp/cloudrun/py/terraform/cloud_run.tf`, `RequestEngine/gcp/cloudrun/py/instances_conf/env.example`, `RequestEngine/gcp/cloudrun/py/instances_conf/cloudrun001.env`
+**`deploy-py-to-gcp-cloudrun-web.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/py/CloudRun_README.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `RequestEngine/Web/gcp/cloudrun/py/terraform/cloud_run.tf`, `RequestEngine/Web/gcp/cloudrun/py/instances_conf/env.example`, `RequestEngine/Web/gcp/cloudrun/py/instances_conf/cloudrun001.env`
 
-**`deploy-ts-to-cf-worker.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/ts/CFWORKER_README.md`, `EO_Documents/Manuals/ts/CFWorker_Overview_README.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `RequestEngine/cf/workers/ts/instances_conf/env.example`, `RequestEngine/cf/workers/ts/instances_conf/cfworker001.env`, `RequestEngine/funcfiles/common/ts/request_engine_core.ts`, **リネーム後の** `.github/workflows/deploy-ts-to-cf-worker-web.yml` 本体
+**`deploy-ts-to-cf-worker-web.yml`**: `CLAUDE.md`, `EO_Documents/Manuals/ts/CFWORKER_README.md`, `EO_Documents/Manuals/ts/CFWorker_Overview_README.md`, `EO_Documents/Manuals/SchemaDesign_DbNormalization.md`, `RequestEngine/Web/cf/workers/ts/instances_conf/env.example`, `RequestEngine/Web/cf/workers/ts/instances_conf/cfworker001.env`, `RequestEngine/Web/funcfiles/common/ts/request_engine_core.ts`, **リネーム後の** `.github/workflows/deploy-ts-to-cf-worker-web.yml` 本体
 
 ### A.3 プレビュー用（検索のみ）
 
@@ -51,10 +51,10 @@ Set-Location "c:\Users\nishi\Documents\Docker\work\EdgeOptimizer"
 $DryRun = $true
 
 $pairs = @(
-  @{ Old = "deploy-py-to-aws-lambda.yml"; New = "deploy-py-to-aws-lambda-web.yml" }
-  @{ Old = "deploy-py-to-az-function.yml"; New = "deploy-py-to-az-function-web.yml" }
-  @{ Old = "deploy-py-to-gcp-cloudrun.yml"; New = "deploy-py-to-gcp-cloudrun-web.yml" }
-  @{ Old = "deploy-ts-to-cf-worker.yml"; New = "deploy-ts-to-cf-worker-web.yml" }
+  @{ Old = "deploy-py-to-aws-lambda-web.yml"; New = "deploy-py-to-aws-lambda-web.yml" }
+  @{ Old = "deploy-py-to-az-function-web.yml"; New = "deploy-py-to-az-function-web.yml" }
+  @{ Old = "deploy-py-to-gcp-cloudrun-web.yml"; New = "deploy-py-to-gcp-cloudrun-web.yml" }
+  @{ Old = "deploy-ts-to-cf-worker-web.yml"; New = "deploy-ts-to-cf-worker-web.yml" }
 )
 
 $files = Get-ChildItem -Path . -Recurse -File -ErrorAction SilentlyContinue |
@@ -98,16 +98,16 @@ foreach ($f in $files) {
 | 高 | Dependabot | `.github/dependabot.yml` の `directory:` |
 | 中 | ルートドキュメント | `README.md`, `CLAUDE.md`, `AppRequirements.md`, `QUICK_START.md` |
 | 中 | EO_Documents | `Manuals/**/*.md` 等 |
-| 低 | コメント | `RequestEngine/funcfiles/common/**/*.{py,ts}` |
+| 低 | コメント | `RequestEngine/Web/funcfiles/common/**/*.{py,ts}` |
 
 ### B.3 サブパス単位の対応（文字列）
 
 ```
-RequestEngine/funcfiles/   → RequestEngine/Web/funcfiles/
-RequestEngine/aws/         → RequestEngine/Web/aws/
-RequestEngine/azure/       → RequestEngine/Web/azure/
-RequestEngine/gcp/         → RequestEngine/Web/gcp/
-RequestEngine/cf/          → RequestEngine/Web/cf/
+RequestEngine/Web/funcfiles/   → RequestEngine/Web/funcfiles/
+RequestEngine/Web/aws/         → RequestEngine/Web/aws/
+RequestEngine/Web/azure/       → RequestEngine/Web/azure/
+RequestEngine/Web/gcp/         → RequestEngine/Web/gcp/
+RequestEngine/Web/cf/          → RequestEngine/Web/cf/
 ```
 
 `RequestEngine\` を使うパスも同様に **バックスラッシュ版**の置換を別ループで行う（`...\Web\...`）。
@@ -123,18 +123,18 @@ Set-Location "c:\Users\nishi\Documents\Docker\work\EdgeOptimizer"
 $DryRun = $true
 
 $pairsSlash = @(
-  @{ Old = "RequestEngine/funcfiles/"; New = "RequestEngine/Web/funcfiles/" }
-  @{ Old = "RequestEngine/aws/"; New = "RequestEngine/Web/aws/" }
-  @{ Old = "RequestEngine/azure/"; New = "RequestEngine/Web/azure/" }
-  @{ Old = "RequestEngine/gcp/"; New = "RequestEngine/Web/gcp/" }
-  @{ Old = "RequestEngine/cf/"; New = "RequestEngine/Web/cf/" }
+  @{ Old = "RequestEngine/Web/funcfiles/"; New = "RequestEngine/Web/funcfiles/" }
+  @{ Old = "RequestEngine/Web/aws/"; New = "RequestEngine/Web/aws/" }
+  @{ Old = "RequestEngine/Web/azure/"; New = "RequestEngine/Web/azure/" }
+  @{ Old = "RequestEngine/Web/gcp/"; New = "RequestEngine/Web/gcp/" }
+  @{ Old = "RequestEngine/Web/cf/"; New = "RequestEngine/Web/cf/" }
 )
 $pairsBackslash = @(
-  @{ Old = "RequestEngine\funcfiles\"; New = "RequestEngine\Web\funcfiles\" }
-  @{ Old = "RequestEngine\aws\"; New = "RequestEngine\Web\aws\" }
-  @{ Old = "RequestEngine\azure\"; New = "RequestEngine\Web\azure\" }
-  @{ Old = "RequestEngine\gcp\"; New = "RequestEngine\Web\gcp\" }
-  @{ Old = "RequestEngine\cf\"; New = "RequestEngine\Web\cf\" }
+  @{ Old = "RequestEngine\Web\funcfiles\"; New = "RequestEngine\Web\funcfiles\" }
+  @{ Old = "RequestEngine\Web\aws\"; New = "RequestEngine\Web\aws\" }
+  @{ Old = "RequestEngine\Web\azure\"; New = "RequestEngine\Web\azure\" }
+  @{ Old = "RequestEngine\Web\gcp\"; New = "RequestEngine\Web\gcp\" }
+  @{ Old = "RequestEngine\Web\cf\"; New = "RequestEngine\Web\cf\" }
 )
 
 $files = Get-ChildItem -Path . -Recurse -File -ErrorAction SilentlyContinue |

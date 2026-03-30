@@ -25,7 +25,7 @@ GitHub Actionsでのデプロイと、self-hosted n8nによるCSVデータ処理
 
 # 3. コミュニケーション
 - **Language Policy:** 思考（Thought）および出力（Output）はすべて「日本語」で行う。
-- **File Path References:** 参照時は必ずリポジトリルートからのフルパス（例: `RequestEngine/aws/lambda/py/funcfiles/_01_imports.py`）を記載すること。ファイル名単体は禁止。
+- **File Path References:** 参照時は必ずリポジトリルートからのフルパス（例: `RequestEngine/Web/aws/lambda/py/funcfiles/_01_imports.py`）を記載すること。ファイル名単体は禁止。
 - **Approval:** 構造・ロジックの変更前には必ず案を提示し、承認を得ること。
 - **README 参照時の記載:** チャットの会話で README 等を参照する場合は、AZFUNC_BICEP_README.md のようにどのドキュメントか分かる名称で記載すること。`README` のみの端折りは禁止。曖昧表現で人間の思考コストを増やさない。
 

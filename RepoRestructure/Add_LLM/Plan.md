@@ -17,7 +17,7 @@
 
 ```
 
-.github\workflows\deploy-py-to-aws-lambda.yml
+.github\workflows\deploy-py-to-aws-lambda-web.yml
 ⇢rename
   .github\workflows\deploy-py-to-aws-lambda-web.yml
   　azureも、gcpも、cfも同様
