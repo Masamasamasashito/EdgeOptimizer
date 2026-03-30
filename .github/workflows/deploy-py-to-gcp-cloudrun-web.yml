@@ -1,12 +1,12 @@
 name: Deploy GCP Cloud Run asne1
 
 on:
-#   push:
-#     paths:
-#       - 'RequestEngine/Web/gcp/cloudrun/py/funcfiles/**'
-#       - 'RequestEngine/Web/funcfiles/common/py/**'
-#     branches:
-#       - main
+  push:
+    paths:
+      - 'RequestEngine/Web/gcp/cloudrun/py/funcfiles/**'
+      - 'RequestEngine/Web/funcfiles/common/py/**'
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       ext_security:

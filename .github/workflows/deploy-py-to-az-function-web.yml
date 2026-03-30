@@ -1,12 +1,12 @@
 name: Deploy Azure Functions jpe
 
 on:
-#   push:
-#     paths:
-#       - 'RequestEngine/Web/azure/functions/py/funcfiles/**'
-#       - 'RequestEngine/Web/funcfiles/common/py/**'
-#     branches:
-#       - main
+  push:
+    paths:
+      - 'RequestEngine/Web/azure/functions/py/funcfiles/**'
+      - 'RequestEngine/Web/funcfiles/common/py/**'
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       ext_security:

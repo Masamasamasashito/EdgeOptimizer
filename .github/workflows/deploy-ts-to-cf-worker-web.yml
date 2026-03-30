@@ -1,18 +1,19 @@
 name: Deploy CloudFlare Worker Global
 
 on:
-#   push:
-#     paths:
-#       - 'RequestEngine/Web/cf/workers/ts/funcfiles/src/**'
-#       - 'RequestEngine/Web/cf/workers/ts/funcfiles/wrangler.toml'
-#       - 'RequestEngine/Web/cf/workers/ts/funcfiles/package.json'
-#       - 'RequestEngine/Web/cf/workers/ts/funcfiles/package-lock.json'
-#       - 'RequestEngine/Web/cf/workers/ts/funcfiles/tsconfig.json'
-#       - 'RequestEngine/Web/cf/workers/ts/funcfiles/build.mjs'
-#       - 'RequestEngine/Web/funcfiles/common/ts/**'
-#       # if you want to trigger workflow when you change deploy-ts-to-cf-worker-web.yml
-#       # - '.github/workflows/deploy-ts-to-cf-worker-web.yml'
-
+  push:
+    paths:
+      - 'RequestEngine/Web/cf/workers/ts/funcfiles/src/**'
+      - 'RequestEngine/Web/cf/workers/ts/funcfiles/wrangler.toml'
+      - 'RequestEngine/Web/cf/workers/ts/funcfiles/package.json'
+      - 'RequestEngine/Web/cf/workers/ts/funcfiles/package-lock.json'
+      - 'RequestEngine/Web/cf/workers/ts/funcfiles/tsconfig.json'
+      - 'RequestEngine/Web/cf/workers/ts/funcfiles/build.mjs'
+      - 'RequestEngine/Web/funcfiles/common/ts/**'
+      # if you want to trigger workflow when you change deploy-ts-to-cf-worker-web.yml
+      # - '.github/workflows/deploy-ts-to-cf-worker-web.yml'
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       ext_security:
