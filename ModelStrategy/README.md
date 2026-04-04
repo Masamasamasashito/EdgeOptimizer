@@ -376,7 +376,7 @@ ollama list              # インストール済みモデルの確認
 
 ```bash
 ollama run qwen3.5:27b
-ollama run gemma3:27b
+ollama run gemma4:26b
 ```
 
 ## モデルの削除

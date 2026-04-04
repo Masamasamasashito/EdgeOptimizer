@@ -6,8 +6,10 @@
 
 ```bash
 ollama launch claude --model qwen3.5:27b
+ollama launch claude --model gemma4:26b
 ```
 
 # 該当モデル
 
 - qwen3.5系
+- gemma4系

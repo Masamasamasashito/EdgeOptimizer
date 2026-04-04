@@ -1,0 +1,13 @@
+services:
+  llm-bench:
+    build: .
+    container_name: eo-llm-bench
+    network_mode: "host" # Required to easily access localhost ports where local LLM engines are running
+    volumes:
+      - ./bench_config.yaml:/app/bench_config.yaml:ro
+      - ./datasets:/app/datasets:ro
+      - ./reports:/app/reports
+    environment:
+      - PYTHONUNBUFFERED=1
+    # Run interactive or just let it finish
+    tty: true

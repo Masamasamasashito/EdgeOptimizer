@@ -1,0 +1,27 @@
+# EdgeOptimizer LLM Bench Configuration
+
+settings:
+  concurrency: 5           # Number of simultaneous requests
+  limit_requests: 20       # Total number of requests to process from the dataset (0 for all)
+  timeout_seconds: 120
+  output_dir: "./reports"
+  dataset_path: "./datasets/sample_prompts.jsonl"
+
+# List of endpoints to benchmark against
+endpoints:
+  - id: "vLLM (Local fp16)"
+    url: "http://localhost:8000/v1/chat/completions"
+    model: "mymodel"
+    enabled: true
+    # additional configs like API Key can go here
+    # api_key: "sk-..."
+    
+  - id: "SGLang (Local fp16)"
+    url: "http://localhost:30000/v1/chat/completions"
+    model: "mymodel"
+    enabled: false
+    
+  - id: "llama.cpp (Local Q4)"
+    url: "http://localhost:8080/v1/chat/completions"
+    model: "mymodel"
+    enabled: false

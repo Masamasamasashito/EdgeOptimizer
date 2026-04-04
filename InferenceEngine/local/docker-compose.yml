@@ -1,0 +1,77 @@
+version: '3.8'
+
+# This file contains sample configurations to run vLLM, SGLang, and llama.cpp locally.
+# It assumes you have an NVIDIA GPU (e.g., RTX 5090) and the nvidia-container-toolkit installed.
+
+services:
+  # ==========================================
+  # 1. vLLM (Standard high-throughput serving)
+  # ==========================================
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: eo-vllm-engine
+    ports:
+      - "8000:8000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: "all" # Use all available GPUs
+              capabilities: [gpu]
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface # Share model weights
+    # Example command for an 8B model. Adjust args like max-model-len to prevent OOM.
+    command: >
+      --model meta-llama/Meta-Llama-3-8B-Instruct
+      --dtype auto
+      --gpu-memory-utilization 0.9
+
+  # ==========================================
+  # 2. SGLang (Optimized for shared prefixes / Agentic UI)
+  # ==========================================
+  sglang:
+    image: lmsysorg/sglang:latest
+    container_name: eo-sglang-engine
+    ports:
+      - "30000:30000"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: "all"
+              capabilities: [gpu]
+    volumes:
+      - ~/.cache/huggingface:/root/.cache/huggingface
+    # Example command
+    command: >
+      python3 -m sglang.launch_server
+      --model-path meta-llama/Meta-Llama-3-8B-Instruct
+      --port 30000
+
+  # ==========================================
+  # 3. llama.cpp (For highly quantized, low-VRAM usage)
+  # ==========================================
+  llamacpp:
+    image: ghcr.io/ggerganov/llama.cpp:server-cuda
+    container_name: eo-llamacpp-engine
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: "all"
+              capabilities: [gpu]
+    volumes:
+      - ./models:/models # Mount directory where you dumped your .gguf models
+    # Requires an already downloaded .gguf file. For example Llama-3-8B-Instruct.Q4_K_M.gguf
+    # Note: Llama.cpp implements its own OpenAI compatible endpoint at /v1/chat/completions now
+    command: >
+      -m /models/Llama-3-8B-Instruct.Q4_K_M.gguf
+      --host 0.0.0.0
+      --port 8080
+      -n 512
+      -ngl 99 # Offload all layers to GPU
