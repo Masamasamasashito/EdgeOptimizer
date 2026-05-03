@@ -129,7 +129,7 @@ jobs:
 
       # 3. Lambda Deploy
       - name: Deploy to Lambda
-        uses: aws-actions/aws-lambda-deploy@v1.1.0
+        uses: aws-actions/aws-lambda-deploy@v1.1.1
         with:
           function-name: ${{ env.EoProject }}-${{ env.EoEnvironment }}-${{ env.EoServiceServerless }}-${{ env.EoAreaShort }}
           code-artifacts-dir: ./deploy_package
