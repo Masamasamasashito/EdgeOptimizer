@@ -8,7 +8,7 @@
     "build": "node build.mjs"
   },
   "devDependencies": {
-    "wrangler": "^4.81.1",
+    "wrangler": "^4.92.0",
     "typescript": "^6.0.2",
     "@cloudflare/workers-types": "^4.20260412.1",
     "esbuild": "^0.28.0"
