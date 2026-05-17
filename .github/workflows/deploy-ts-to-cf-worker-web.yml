@@ -107,7 +107,7 @@ jobs:
           EOF
 
       - name: Deploy to Cloudflare Worker Global
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           wranglerVersion: '4.64.0'
           apiToken: ${{ secrets.EO_CF_WORKER_USER_API_TOKEN_FOR_GITHUB }}
